@@ -411,7 +411,7 @@ body[dir="rtl"] .section-header .section-count { margin-left:0; margin-right:aut
     <h2 data-i18n="heroH2">Welcome back, <span class="accent">Adel</span> 👋</h2>
     <p data-i18n="heroP">Your personal toolkit for everyday work — flight calculations, GDS quick references, customer responses, and more, all organized in one place.</p>
     <div class="stats-row">
-      <div class="stat-pill"><span class="ico">🛠️</span> <strong>12</strong> <span data-i18n="statTools">tools</span></div>
+      <div class="stat-pill"><span class="ico">🛠️</span> <strong>13</strong> <span data-i18n="statTools">tools</span></div>
       <div class="stat-pill"><span class="ico">🌐</span> <span data-i18n="statBilingual">English &amp; Arabic</span></div>
       <div class="stat-pill"><span class="ico">⚡</span> <span data-i18n="statOffline">Works offline</span></div>
       <div class="stat-pill"><span class="ico">🔒</span> <span data-i18n="statPrivate">Private &amp; local</span></div>
@@ -426,7 +426,7 @@ body[dir="rtl"] .section-header .section-count { margin-left:0; margin-right:aut
         <h3 data-i18n="sec1Title">Daily Essentials</h3>
         <p data-i18n="sec1Sub">Tools you reach for every single shift</p>
       </div>
-      <span class="section-count">4 <span data-i18n="tools">tools</span></span>
+      <span class="section-count">5 <span data-i18n="tools">tools</span></span>
     </div>
     <div class="tools-grid">
 
@@ -483,6 +483,21 @@ body[dir="rtl"] .section-header .section-count { margin-left:0; margin-right:aut
         <div class="tool-body">
           <div class="tool-title" data-i18n="currencyTitle">Currency Converter</div>
           <div class="tool-desc" data-i18n="currencyDesc">Live exchange rates for 60+ currencies. Instant conversion with customer-ready output.</div>
+        </div>
+        <div class="tool-footer">
+          <div class="tool-cta"><span data-i18n="ctaOpen">Open</span> →</div>
+          <div class="tool-meta">v1.0</div>
+        </div>
+      </a>
+
+      <a class="tool-card" href="excess-baggage.html">
+        <div class="tool-head">
+          <div class="tool-icon">🧳</div>
+          <span class="tool-tag new" data-i18n="tagNew">NEW</span>
+        </div>
+        <div class="tool-body">
+          <div class="tool-title" data-i18n="baggageTitle">Excess Baggage Calculator</div>
+          <div class="tool-desc" data-i18n="baggageDesc">Smart hybrid calculator for 8 airlines. Handles weight, piece, and oversized rules with editable airline data.</div>
         </div>
         <div class="tool-footer">
           <div class="tool-cta"><span data-i18n="ctaOpen">Open</span> →</div>
@@ -673,6 +688,7 @@ const I18N = {
     cannedTitle:'Canned Responses', cannedDesc:'Ready-to-use professional reply templates for common customer scenarios. Copy & paste.',
     shiftTitle:'Shift & Prayer Times', shiftDesc:'Your shift schedule with daily prayer times, alarms, and the weekly view at a glance.',
     currencyTitle:'Currency Converter', currencyDesc:'Live exchange rates for 60+ currencies. Instant conversion with customer-ready output.',
+    baggageTitle:'Excess Baggage Calculator', baggageDesc:'Smart hybrid calculator for 8 airlines. Handles weight, piece, and oversized rules with editable airline data.',
     airlinesTitle:'Airline Directory', airlinesDesc:'Searchable directory of airlines with contact details, codes, and quick reference info.',
     tpTitle:'Travelport Galileo', tpDesc:'Quick reference for Galileo formats, commands, and common operations.',
     sabreTitle:'Sabre GDS', sabreDesc:'Quick reference for Sabre formats, commands, and PNR operations.',
@@ -700,6 +716,7 @@ const I18N = {
     cannedTitle:'الردود الجاهزة', cannedDesc:'قوالب ردود احترافية جاهزة للاستخدام للسيناريوهات الشائعة مع العملاء. نسخ ولصق.',
     shiftTitle:'الوردية وأوقات الصلاة', shiftDesc:'جدول ورديتك مع أوقات الصلاة اليومية والمنبهات وعرض الأسبوع في لمحة.',
     currencyTitle:'محوّل العملات', currencyDesc:'أسعار صرف حية لأكثر من 60 عملة. تحويل فوري مع نتيجة جاهزة للعميل.',
+    baggageTitle:'حاسبة الأمتعة الزائدة', baggageDesc:'حاسبة هجينة ذكية لـ 8 شركات طيران. تتعامل مع نظام الوزن والقطعة والأمتعة الكبيرة مع بيانات قابلة للتعديل.',
     airlinesTitle:'دليل شركات الطيران', airlinesDesc:'دليل قابل للبحث لشركات الطيران مع تفاصيل الاتصال والرموز ومعلومات سريعة.',
     tpTitle:'Travelport Galileo', tpDesc:'مرجع سريع لصيغ Galileo والأوامر والعمليات الشائعة.',
     sabreTitle:'Sabre GDS', sabreDesc:'مرجع سريع لصيغ Sabre والأوامر وعمليات PNR.',
@@ -753,8 +770,8 @@ function updateClock() {
 
 function aboutTool() {
   alert(currentLang === 'ar'
-    ? 'أدوات عادل — مجموعة أدوات إنتاجية شخصية.\n\nالإصدار: 1.1\n12 أداة\nالاستضافة: GitHub Pages\nالمؤلف: عادل'
-    : 'Adel\u2019s Toolkit — A personal productivity suite.\n\nVersion: 1.1\n12 tools included\nHosted on: GitHub Pages\nAuthor: Adel');
+    ? 'أدوات عادل — مجموعة أدوات إنتاجية شخصية.\n\nالإصدار: 1.2\n13 أداة\nالاستضافة: GitHub Pages\nالمؤلف: عادل'
+    : 'Adel\u2019s Toolkit — A personal productivity suite.\n\nVersion: 1.2\n13 tools included\nHosted on: GitHub Pages\nAuthor: Adel');
 }
 
 setLang(currentLang);

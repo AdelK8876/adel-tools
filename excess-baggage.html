@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Excess Baggage Calculator — Adel's Toolkit</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧳</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0f2044; --navy2:#162d5c; --blue:#1a56db; --teal:#0891b2;
+  --green:#059669; --red:#dc2626; --amber:#d97706; --purple:#7c3aed;
+  --bg:#0a1428; --bg2:#0f1d3a; --card:#162d5c; --card-hover:#1d3a73;
+  --border:rgba(255,255,255,.08); --border-bright:rgba(255,255,255,.16);
+  --border-hover:rgba(59,130,246,.4); --text:#f1f5f9; --muted:#94a3b8;
+  --dim:#64748b; --shadow:0 4px 20px rgba(0,0,0,.3);
+  --shadow-lg:0 12px 40px rgba(26,86,219,.25);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;position:relative;overflow-x:hidden}
+body[dir="rtl"]{font-family:'Cairo','Plus Jakarta Sans',sans-serif}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 20% 20%,rgba(124,58,237,.15) 0%,transparent 50%),radial-gradient(circle at 80% 60%,rgba(217,119,6,.12) 0%,transparent 50%),radial-gradient(circle at 50% 90%,rgba(99,102,241,.12) 0%,transparent 50%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;z-index:0}
+.page{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:32px 20px 48px}
+
+/* Header */
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-icon{width:50px;height:50px;background:linear-gradient(135deg,#7c3aed 0%,#d97706 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 8px 24px rgba(124,58,237,.4)}
+.brand-text h1{font-size:22px;font-weight:800;letter-spacing:-.02em;background:linear-gradient(135deg,#fff 0%,#cbd5e1 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.brand-text p{font-size:12px;color:var(--muted);margin-top:2px;font-weight:500}
+.header-right{display:flex;align-items:center;gap:10px}
+.back-link{font-size:12px;color:var(--muted);text-decoration:none;padding:8px 12px;border:1px solid var(--border);border-radius:8px;transition:all .15s;background:rgba(255,255,255,.02)}
+.back-link:hover{color:var(--text);border-color:var(--border-hover);background:rgba(255,255,255,.04)}
+.lang-toggle{display:flex;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;overflow:hidden;font-size:12px}
+.lang-toggle button{padding:7px 12px;background:transparent;border:none;cursor:pointer;font-family:inherit;font-weight:700;color:var(--muted);transition:all .15s}
+.lang-toggle button.active{background:var(--blue);color:#fff}
+.lang-toggle button:not(.active):hover{color:var(--text)}
+
+/* Disclaimer banner */
+.disclaimer{background:linear-gradient(135deg,rgba(217,119,6,.1) 0%,rgba(220,38,38,.05) 100%);border:1px solid rgba(217,119,6,.3);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:12.5px;color:#fcd34d;display:flex;align-items:flex-start;gap:10px;line-height:1.5}
+.disclaimer .ico{font-size:16px;flex-shrink:0;margin-top:1px}
+.disclaimer strong{color:#fde68a;font-weight:700}
+
+/* Main card */
+.card{background:linear-gradient(135deg,rgba(22,45,92,.8) 0%,rgba(15,29,58,.8) 100%);border:1px solid var(--border);border-radius:16px;padding:24px;backdrop-filter:blur(10px);box-shadow:var(--shadow-lg);position:relative;overflow:hidden;margin-bottom:20px}
+.card.accent::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#7c3aed,#d97706)}
+
+.section-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+
+.row-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-bottom:16px}
+@media (max-width:680px){.row-grid{grid-template-columns:1fr}}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+@media (max-width:520px){.row-2{grid-template-columns:1fr}}
+
+.field{position:relative}
+.field-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
+.field-input,.field-select{width:100%;height:46px;padding:0 14px;background:rgba(0,0,0,.25);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-weight:600;font-family:inherit;outline:none;transition:all .15s}
+.field-input{font-family:'JetBrains Mono',monospace;font-size:15px}
+.field-select{cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D'http%3A//www.w3.org/2000/svg'%20width%3D'12'%20height%3D'8'%20viewBox%3D'0%200%2012%208'%3E%3Cpath%20d%3D'M1%201l5%205%205-5'%20stroke%3D'%2394a3b8'%20stroke-width%3D'1.8'%20fill%3D'none'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+body[dir="rtl"] .field-select{padding-right:14px;padding-left:36px;background-position:left 14px center}
+.field-input:focus,.field-select:focus{border-color:#3b82f6;background-color:rgba(0,0,0,.35);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.field-input::placeholder{color:var(--dim)}
+.field-select option{background:#0f2044;color:var(--text)}
+.field-select optgroup{background:#0f2044;color:var(--muted);font-weight:700;font-size:11px}
+
+/* Edit rules button */
+.edit-rules-btn{padding:7px 11px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#c4b5fd;border-radius:7px;cursor:pointer;font-family:inherit;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:5px;transition:all .15s;text-transform:none;letter-spacing:0}
+.edit-rules-btn:hover{background:rgba(124,58,237,.25);border-color:rgba(124,58,237,.5);color:#fff}
+
+/* Allowance card */
+.allowance-box{background:linear-gradient(135deg,rgba(16,185,129,.1) 0%,rgba(6,182,212,.05) 100%);border:1px solid rgba(16,185,129,.25);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.allowance-box .icon{font-size:20px}
+.allowance-box .text{font-size:13px;color:var(--text);flex:1;min-width:200px;line-height:1.5}
+.allowance-box .text strong{color:#34d399;font-weight:700}
+.allowance-box .system-badge{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:5px;background:rgba(16,185,129,.2);color:#34d399;border:1px solid rgba(16,185,129,.4);text-transform:uppercase;letter-spacing:.06em;font-family:'JetBrains Mono',monospace}
+
+/* Bags list */
+.bags-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.bag-row{display:grid;grid-template-columns:auto 1fr 110px 100px auto;gap:10px;align-items:center;padding:12px 14px;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:10px;transition:all .15s}
+.bag-row:hover{border-color:var(--border-bright)}
+.bag-row.over{border-color:rgba(220,38,38,.4);background:rgba(220,38,38,.05)}
+.bag-row.extra{border-color:rgba(217,119,6,.4);background:rgba(217,119,6,.05)}
+.bag-row.sports{border-color:rgba(124,58,237,.4);background:rgba(124,58,237,.05)}
+.bag-num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);font-weight:700;width:30px;text-align:center}
+.bag-type{font-size:13px;color:var(--text);font-weight:600;display:flex;align-items:center;gap:6px}
+.bag-status{font-size:10.5px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-weight:600;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.bag-status.over{color:#fca5a5}
+.bag-status.ok{color:#34d399}
+.bag-weight{display:flex;align-items:center;gap:4px}
+.bag-weight input{width:60px;height:34px;padding:0 8px;background:rgba(0,0,0,.3);border:1.5px solid var(--border);border-radius:7px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;text-align:center;outline:none}
+.bag-weight input:focus{border-color:#3b82f6}
+.bag-weight .unit{font-size:11px;color:var(--muted);font-weight:600}
+.bag-cost{text-align:right;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--text)}
+.bag-cost.zero{color:var(--dim)}
+.bag-remove{width:28px;height:28px;border-radius:50%;background:transparent;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-family:inherit;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.bag-remove:hover{background:rgba(220,38,38,.2);border-color:#dc2626;color:#fca5a5}
+@media (max-width:600px){
+  .bag-row{grid-template-columns:auto 1fr auto;gap:8px;padding:10px}
+  .bag-status{grid-column:1/-1}
+  .bag-cost{grid-column:2/3;text-align:left;font-size:12px}
+  .bag-remove{grid-column:3/4}
+}
+
+/* Add buttons */
+.add-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.add-btn{padding:9px 14px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+.add-btn:hover{background:rgba(255,255,255,.08);color:var(--text);border-color:var(--border-hover)}
+
+/* Result card */
+.result-card{background:linear-gradient(135deg,rgba(124,58,237,.15) 0%,rgba(217,119,6,.08) 100%);border:1px solid rgba(124,58,237,.3);border-radius:14px;padding:24px;margin-top:18px;text-align:center;position:relative;overflow:hidden}
+.result-card::before{content:'';position:absolute;top:-50%;right:-20%;width:200px;height:200px;background:radial-gradient(circle,rgba(124,58,237,.15) 0%,transparent 70%);pointer-events:none}
+.result-label{font-size:10.5px;font-weight:700;color:#c4b5fd;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px}
+.result-amount{font-size:36px;font-weight:800;letter-spacing:-.02em;color:var(--text);font-family:'JetBrains Mono',monospace;line-height:1.1;margin-bottom:8px}
+.result-amount .ccy{color:#c4b5fd;margin-left:8px;font-size:24px}
+body[dir="rtl"] .result-amount .ccy{margin-left:0;margin-right:8px}
+.result-amount.zero{color:#34d399;font-size:24px}
+.result-conv{font-size:13px;color:var(--muted);margin-top:6px;font-family:'JetBrains Mono',monospace}
+.result-breakdown{margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);font-size:11.5px;color:var(--muted);font-family:'JetBrains Mono',monospace;text-align:left;line-height:1.7}
+body[dir="rtl"] .result-breakdown{text-align:right}
+.result-breakdown .line{display:flex;justify-content:space-between;gap:8px}
+.result-breakdown .line .lhs{color:var(--text);opacity:.85}
+.result-breakdown .line .rhs{color:#c4b5fd;font-weight:700}
+.result-breakdown .total{margin-top:8px;padding-top:6px;border-top:1px dashed rgba(255,255,255,.1);font-size:13px}
+
+.actions{display:flex;gap:8px;margin-top:18px;justify-content:center;flex-wrap:wrap}
+.action-btn{padding:9px 14px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.action-btn:hover{background:rgba(255,255,255,.08);border-color:var(--border-hover)}
+.action-btn.primary{background:linear-gradient(135deg,#7c3aed,#d97706);border-color:transparent;color:#fff}
+.action-btn.primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
+
+/* Modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-backdrop.show{display:flex}
+.modal{background:linear-gradient(135deg,rgba(22,45,92,.98) 0%,rgba(15,29,58,.98) 100%);border:1px solid var(--border-bright);border-radius:16px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.6);position:relative}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#7c3aed,#d97706);border-radius:16px 16px 0 0}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)}
+.modal-head h2{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
+.modal-close{width:32px;height:32px;border-radius:8px;background:transparent;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.modal-close:hover{background:rgba(220,38,38,.15);border-color:#dc2626;color:#fca5a5}
+.modal-body{padding:20px 24px;font-size:13px;line-height:1.6}
+.modal-section{margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.modal-section:last-child{border:none;margin:0;padding:0}
+.modal-section h3{font-size:11px;font-weight:700;color:#c4b5fd;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.modal-row{display:grid;grid-template-columns:1fr 110px 110px;gap:10px;align-items:center;margin-bottom:8px}
+.modal-row .lbl{font-size:12.5px;color:var(--muted)}
+.modal-row input{height:36px;padding:0 10px;background:rgba(0,0,0,.3);border:1.5px solid var(--border);border-radius:7px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;text-align:center;outline:none;width:100%}
+.modal-row input:focus{border-color:#3b82f6}
+.modal-foot{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.modal-foot .btns{display:flex;gap:8px}
+.btn{padding:9px 16px;border-radius:8px;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);transition:all .15s}
+.btn:hover{background:rgba(255,255,255,.08)}
+.btn.primary{background:linear-gradient(135deg,#7c3aed,#d97706);border-color:transparent;color:#fff}
+.btn.primary:hover{filter:brightness(1.1)}
+.btn.danger{background:rgba(220,38,38,.15);border-color:rgba(220,38,38,.3);color:#fca5a5}
+.btn.danger:hover{background:rgba(220,38,38,.25)}
+
+/* Email modal */
+.email-preview{background:#fff;color:#1a1a1a;border-radius:8px;padding:18px;font-family:'Segoe UI',sans-serif;font-size:13px;line-height:1.55;max-height:50vh;overflow-y:auto}
+.email-preview h3{color:#7c3aed;font-size:15px;margin-bottom:8px}
+.email-preview .ep-section{background:#f8f5ff;border:1px solid #e9d5ff;border-radius:6px;padding:10px 12px;margin:10px 0}
+.email-preview .ep-table{width:100%;font-size:12.5px;margin-top:6px}
+.email-preview .ep-table td{padding:3px 0}
+.email-preview .ep-table td:last-child{text-align:right;font-weight:700}
+.email-preview .ep-total{margin-top:8px;padding-top:8px;border-top:1px dashed #ccc;font-weight:700;color:#7c3aed}
+.email-preview .ep-disclaimer{font-size:10.5px;color:#888;font-style:italic;margin-top:14px;padding-top:10px;border-top:1px solid #eee}
+
+/* Toast */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:#0f2044;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 12px 32px rgba(0,0,0,.5);border:1px solid var(--border-bright);opacity:0;transition:all .3s;pointer-events:none;z-index:300;max-width:90vw}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+.footer{margin-top:36px;padding-top:24px;border-top:1px solid var(--border);text-align:center;font-size:11.5px;color:var(--muted)}
+
+@media (max-width:520px){
+  .page{padding:20px 14px 40px}
+  .card{padding:18px}
+  .result-amount{font-size:28px}
+  .modal-row{grid-template-columns:1fr;gap:6px}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="brand">
+      <div class="brand-icon">🧳</div>
+      <div class="brand-text">
+        <h1 data-i18n="title">Excess Baggage Calculator</h1>
+        <p data-i18n="subtitle">Smart hybrid system · weight + piece</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <a href="index.html" class="back-link" data-i18n="back">← Toolkit</a>
+      <div class="lang-toggle">
+        <button class="active" data-lang="en" onclick="setLang('en')">🇬🇧 EN</button>
+        <button data-lang="ar" onclick="setLang('ar')">🇸🇦 AR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    <span class="ico">⚠️</span>
+    <div>
+      <strong data-i18n="disclaimerTitle">Important disclaimer:</strong>
+      <span data-i18n="disclaimerText">Rates are based on published airline fees as of May 2026. Always verify with the airline's official baggage page or check-in counter before quoting customers — rules can change without notice.</span>
+    </div>
+  </div>
+
+  <!-- Main calculator card -->
+  <div class="card accent">
+    <div class="row-grid">
+      <div class="field">
+        <div class="field-label">
+          <span data-i18n="airlineLabel">✈️ Airline</span>
+          <button class="edit-rules-btn" id="edit-rules-btn">⚙️ <span data-i18n="editRules">Edit rules</span></button>
+        </div>
+        <select class="field-select" id="airline"></select>
+      </div>
+      <div class="field">
+        <div class="field-label" data-i18n="cabinLabel">💺 Cabin</div>
+        <select class="field-select" id="cabin">
+          <option value="economy" data-i18n="economy">Economy</option>
+          <option value="premium" data-i18n="premium">Premium Economy</option>
+          <option value="business" data-i18n="business">Business</option>
+          <option value="first" data-i18n="first">First</option>
+        </select>
+      </div>
+      <div class="field">
+        <div class="field-label" data-i18n="locationLabel">📍 Where paying</div>
+        <select class="field-select" id="location">
+          <option value="online" data-i18n="online">Online (cheaper)</option>
+          <option value="airport" data-i18n="airport">At airport</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Allowance display -->
+    <div class="allowance-box" id="allowance-box">
+      <span class="icon">📊</span>
+      <div class="text" id="allowance-text">—</div>
+      <span class="system-badge" id="system-badge">—</span>
+    </div>
+
+    <!-- Bags list -->
+    <div class="section-label" data-i18n="bagsLabel">🧳 Customer's baggage</div>
+    <div class="bags-list" id="bags-list"></div>
+
+    <div class="add-buttons">
+      <button class="add-btn" id="add-extra-btn">➕ <span data-i18n="addExtra">Add extra bag</span></button>
+      <button class="add-btn" id="add-sports-btn">⛷️ <span data-i18n="addSports">Add sports/oversized</span></button>
+      <button class="add-btn" id="reset-btn">🔄 <span data-i18n="reset">Reset</span></button>
+    </div>
+
+    <!-- Result -->
+    <div class="result-card">
+      <div class="result-label">💰 <span data-i18n="totalLabel">Total excess fee</span></div>
+      <div class="result-amount" id="result-amount">
+        <span class="zero" data-i18n="enterDetails">Enter bag details to calculate</span>
+      </div>
+      <div class="result-conv" id="result-conv"></div>
+      <div class="result-breakdown" id="result-breakdown"></div>
+      <div class="actions">
+        <button class="action-btn" id="copy-summary-btn">📋 <span data-i18n="copySummary">Copy summary</span></button>
+        <button class="action-btn primary" id="email-btn">📧 <span data-i18n="customerEmail">Customer email</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span data-i18n="footerText">Built by Adel · Cairo, Egypt 🇪🇬</span>
+  </div>
+</div>
+
+<!-- Edit Rules Modal -->
+<div class="modal-backdrop" id="rules-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>⚙️ <span data-i18n="editRulesTitle">Edit Baggage Rules</span> — <span id="rules-airline-name"></span></h2>
+      <button class="modal-close" onclick="closeModal('rules-modal')">×</button>
+    </div>
+    <div class="modal-body" id="rules-modal-body"></div>
+    <div class="modal-foot">
+      <button class="btn danger" id="rules-reset-btn" data-i18n="resetDefaults">Reset to defaults</button>
+      <div class="btns">
+        <button class="btn" onclick="closeModal('rules-modal')" data-i18n="cancel">Cancel</button>
+        <button class="btn primary" id="rules-save-btn" data-i18n="saveChanges">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Email Modal -->
+<div class="modal-backdrop" id="email-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>📧 <span data-i18n="emailPreview">Customer Email Preview</span></h2>
+      <button class="modal-close" onclick="closeModal('email-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="email-preview" id="email-preview"></div>
+    </div>
+    <div class="modal-foot">
+      <div></div>
+      <div class="btns">
+        <button class="btn" onclick="closeModal('email-modal')" data-i18n="close">Close</button>
+        <button class="btn primary" id="email-copy-btn">📋 <span data-i18n="copyEmail">Copy email</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// I18N
+// ─────────────────────────────────────────────────────────────
+const I18N = {
+  en: {
+    title:'Excess Baggage Calculator', subtitle:'Smart hybrid system · weight + piece',
+    back:'← Toolkit',
+    disclaimerTitle:'Important disclaimer:',
+    disclaimerText:'Rates are based on published airline fees as of May 2026. Always verify with the airline\'s official baggage page or check-in counter before quoting customers — rules can change without notice.',
+    airlineLabel:'✈️ Airline', editRules:'Edit rules',
+    cabinLabel:'💺 Cabin', locationLabel:'📍 Where paying',
+    economy:'Economy', premium:'Premium Economy', business:'Business', first:'First',
+    online:'Online (cheaper)', airport:'At airport',
+    bagsLabel:'🧳 Customer\'s baggage',
+    addExtra:'Add extra bag', addSports:'Add sports/oversized', reset:'Reset',
+    totalLabel:'Total excess fee', enterDetails:'Enter bag details to calculate',
+    copySummary:'Copy summary', customerEmail:'Customer email',
+    bagN:'Bag', extraBag:'Extra bag', sports:'Sports/oversized',
+    weight:'Weight', kg:'kg', kgOver:'kg over', allowed:'Allowed', within:'within allowance',
+    allowance:'allowance', perKg:'per kg', flat:'flat fee',
+    systemWeight:'WEIGHT', systemPiece:'PIECE', systemHybrid:'HYBRID',
+    allowanceText:'<strong>{piece} × {weight} kg</strong> checked + {cabin} kg cabin',
+    editRulesTitle:'Edit Baggage Rules', cancel:'Cancel', saveChanges:'Save changes',
+    resetDefaults:'Reset to defaults', close:'Close',
+    emailPreview:'Customer Email Preview', copyEmail:'Copy email',
+    section_economy:'Economy', section_premium:'Premium Economy',
+    section_business:'Business', section_first:'First',
+    field_pieces:'Pieces allowed', field_weight:'Weight per piece (kg)',
+    field_cabin:'Cabin baggage (kg)', field_excess_kg:'Excess fee (USD/kg)',
+    field_extra_piece:'Extra piece fee (USD)', field_sports:'Sports/oversized (USD)',
+    saved:'✓ Rules saved',
+    summaryLine:'{count} bag{s}, {over} kg total excess',
+    customerGreeting:'Dear Customer,',
+    emailIntro:'Please find below the calculation for your baggage on {airline}:',
+    emailNoExcess:'Good news — your baggage is within the free allowance, no extra fee will apply.',
+    emailFooter:'Please note: rates are estimates based on the airline\'s published fees and may change. We recommend confirming at the time of booking or check-in.',
+    emailRegards:'Best regards',
+    footerText:'Built by Adel · Cairo, Egypt 🇪🇬',
+    locale:'en-GB',
+  },
+  ar: {
+    title:'حاسبة الأمتعة الزائدة', subtitle:'نظام هجين ذكي · وزن + قطعة',
+    back:'← الأدوات',
+    disclaimerTitle:'تنبيه مهم:',
+    disclaimerText:'الأسعار مبنية على الرسوم المنشورة من شركات الطيران حتى مايو 2026. تأكد دائماً من صفحة الأمتعة الرسمية للشركة أو من مكتب الإركاب قبل إعطاء العميل سعراً — القواعد قد تتغير دون إشعار.',
+    airlineLabel:'✈️ شركة الطيران', editRules:'تعديل القواعد',
+    cabinLabel:'💺 درجة المقصورة', locationLabel:'📍 مكان الدفع',
+    economy:'اقتصادي', premium:'اقتصادي بريميوم', business:'رجال الأعمال', first:'الدرجة الأولى',
+    online:'عبر الإنترنت (أرخص)', airport:'في المطار',
+    bagsLabel:'🧳 أمتعة العميل',
+    addExtra:'إضافة حقيبة إضافية', addSports:'إضافة معدات رياضية/كبيرة', reset:'إعادة تعيين',
+    totalLabel:'إجمالي رسوم الزيادة', enterDetails:'أدخل تفاصيل الحقائب للحساب',
+    copySummary:'نسخ الملخص', customerEmail:'بريد العميل',
+    bagN:'الحقيبة', extraBag:'حقيبة إضافية', sports:'معدات رياضية/كبيرة',
+    weight:'الوزن', kg:'كغ', kgOver:'كغ زيادة', allowed:'المسموح', within:'ضمن المسموح',
+    allowance:'المسموح به', perKg:'لكل كغ', flat:'رسم ثابت',
+    systemWeight:'وزن', systemPiece:'قطعة', systemHybrid:'هجين',
+    allowanceText:'<strong>{piece} × {weight} كغ</strong> أمتعة مسجلة + {cabin} كغ يد',
+    editRulesTitle:'تعديل قواعد الأمتعة', cancel:'إلغاء', saveChanges:'حفظ التغييرات',
+    resetDefaults:'استعادة الافتراضي', close:'إغلاق',
+    emailPreview:'معاينة بريد العميل', copyEmail:'نسخ البريد',
+    section_economy:'اقتصادي', section_premium:'اقتصادي بريميوم',
+    section_business:'رجال الأعمال', section_first:'الدرجة الأولى',
+    field_pieces:'عدد القطع المسموح', field_weight:'وزن القطعة (كغ)',
+    field_cabin:'وزن أمتعة اليد (كغ)', field_excess_kg:'رسوم الزيادة (USD/كغ)',
+    field_extra_piece:'رسوم القطعة الإضافية (USD)', field_sports:'الأمتعة الكبيرة (USD)',
+    saved:'✓ تم حفظ القواعد',
+    summaryLine:'{count} حقيبة، {over} كغ زيادة إجمالاً',
+    customerGreeting:'عميلنا العزيز،',
+    emailIntro:'يسرنا تزويدكم بحساب الأمتعة الخاصة برحلتكم على {airline}:',
+    emailNoExcess:'خبر سار — أمتعتك ضمن المسموح المجاني، لا توجد رسوم إضافية.',
+    emailFooter:'ملاحظة: الأسعار تقديرية مبنية على الرسوم المنشورة من شركة الطيران وقد تتغير. نوصي بالتأكيد وقت الحجز أو الإركاب.',
+    emailRegards:'مع خالص التقدير',
+    footerText:'صنع بواسطة عادل · القاهرة، مصر 🇪🇬',
+    locale:'ar-EG',
+  }
+};
+let currentLang = localStorage.getItem('adel-tools-lang') || 'en';
+function tA(key) { return (I18N[currentLang] && I18N[currentLang][key]) || key; }
+
+// ─────────────────────────────────────────────────────────────
+// AIRLINE BAGGAGE RULES
+// All fees in USD (online rate); airport rate = +40% (industry typical)
+// "system" = how excess is charged: 'weight' (per kg), 'piece' (flat per bag), 'hybrid' (both apply)
+// ─────────────────────────────────────────────────────────────
+const DEFAULT_AIRLINES = [
+  {
+    iata:'MS', name:'EgyptAir', system:'weight',
+    economy: { pieces:1, weight:23, cabin:8, excess_kg:25, extra_piece:120, sports:150 },
+    premium: { pieces:2, weight:23, cabin:8, excess_kg:25, extra_piece:120, sports:150 },
+    business:{ pieces:2, weight:32, cabin:14, excess_kg:35, extra_piece:200, sports:200 },
+    first:   { pieces:3, weight:32, cabin:14, excess_kg:35, extra_piece:200, sports:200 },
+  },
+  {
+    iata:'EK', name:'Emirates', system:'weight',
+    economy: { pieces:1, weight:30, cabin:7, excess_kg:20, extra_piece:100, sports:150 },
+    premium: { pieces:1, weight:35, cabin:7, excess_kg:25, extra_piece:120, sports:150 },
+    business:{ pieces:2, weight:40, cabin:14, excess_kg:30, extra_piece:150, sports:200 },
+    first:   { pieces:2, weight:50, cabin:14, excess_kg:35, extra_piece:200, sports:200 },
+  },
+  {
+    iata:'QR', name:'Qatar Airways', system:'weight',
+    economy: { pieces:1, weight:30, cabin:7, excess_kg:25, extra_piece:120, sports:175 },
+    premium: { pieces:2, weight:35, cabin:7, excess_kg:25, extra_piece:140, sports:175 },
+    business:{ pieces:2, weight:40, cabin:15, excess_kg:35, extra_piece:175, sports:225 },
+    first:   { pieces:3, weight:50, cabin:15, excess_kg:35, extra_piece:200, sports:225 },
+  },
+  {
+    iata:'EY', name:'Etihad Airways', system:'weight',
+    economy: { pieces:1, weight:23, cabin:7, excess_kg:25, extra_piece:120, sports:150 },
+    premium: { pieces:1, weight:30, cabin:7, excess_kg:25, extra_piece:140, sports:150 },
+    business:{ pieces:2, weight:40, cabin:12, excess_kg:35, extra_piece:175, sports:200 },
+    first:   { pieces:2, weight:50, cabin:15, excess_kg:35, extra_piece:200, sports:200 },
+  },
+  {
+    iata:'SV', name:'Saudia', system:'piece',
+    economy: { pieces:2, weight:23, cabin:7, excess_kg:30, extra_piece:150, sports:200 },
+    premium: { pieces:2, weight:23, cabin:7, excess_kg:30, extra_piece:150, sports:200 },
+    business:{ pieces:2, weight:32, cabin:14, excess_kg:40, extra_piece:200, sports:250 },
+    first:   { pieces:3, weight:32, cabin:14, excess_kg:40, extra_piece:250, sports:250 },
+  },
+  {
+    iata:'TK', name:'Turkish Airlines', system:'hybrid',
+    economy: { pieces:1, weight:30, cabin:8, excess_kg:18, extra_piece:80, sports:150 },
+    premium: { pieces:2, weight:30, cabin:8, excess_kg:22, extra_piece:100, sports:175 },
+    business:{ pieces:2, weight:40, cabin:12, excess_kg:30, extra_piece:150, sports:200 },
+    first:   { pieces:2, weight:40, cabin:12, excess_kg:30, extra_piece:150, sports:200 },
+  },
+  {
+    iata:'LH', name:'Lufthansa', system:'piece',
+    economy: { pieces:1, weight:23, cabin:8, excess_kg:0, extra_piece:100, sports:150 },
+    premium: { pieces:2, weight:23, cabin:8, excess_kg:0, extra_piece:100, sports:150 },
+    business:{ pieces:2, weight:32, cabin:18, excess_kg:0, extra_piece:200, sports:200 },
+    first:   { pieces:3, weight:32, cabin:18, excess_kg:0, extra_piece:300, sports:200 },
+  },
+  {
+    iata:'AF', name:'Air France', system:'piece',
+    economy: { pieces:1, weight:23, cabin:12, excess_kg:0, extra_piece:100, sports:150 },
+    premium: { pieces:2, weight:23, cabin:12, excess_kg:0, extra_piece:120, sports:150 },
+    business:{ pieces:2, weight:32, cabin:18, excess_kg:0, extra_piece:200, sports:200 },
+    first:   { pieces:3, weight:32, cabin:18, excess_kg:0, extra_piece:300, sports:200 },
+  },
+];
+
+const STORAGE_KEY = 'adel-baggage-rules-v1';
+let airlines = [];
+
+function loadAirlines() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed) && parsed.length) {
+        airlines = parsed;
+        return;
+      }
+    }
+  } catch (e) {}
+  airlines = JSON.parse(JSON.stringify(DEFAULT_AIRLINES));
+  saveAirlines();
+}
+function saveAirlines() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(airlines)); } catch (e) {}
+}
+
+// ─────────────────────────────────────────────────────────────
+// EXCHANGE RATES (read from currency converter cache)
+// ─────────────────────────────────────────────────────────────
+let cachedRates = null;
+function loadRates() {
+  try {
+    const c = localStorage.getItem('adel-currency-cache-v1');
+    if (c) {
+      const data = JSON.parse(c);
+      if (data && data.rates) cachedRates = data.rates;
+    }
+  } catch (e) {}
+  // Fallback rates
+  if (!cachedRates) {
+    cachedRates = { USD:1, EUR:0.92, EGP:50.2, AED:3.6725, SAR:3.75, LBP:89500 };
+  }
+}
+function convertUSD(amountUSD, toCcy) {
+  if (!cachedRates || !cachedRates[toCcy]) return null;
+  return amountUSD * cachedRates[toCcy];
+}
+
+// ─────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────
+let bags = []; // [{ id, type:'checked'|'extra'|'sports', weight }]
+let bagIdCounter = 1;
+
+function initialBags() {
+  // Start with 1 bag at the default allowed weight
+  const r = currentRules();
+  if (!r) return;
+  const allowedPieces = Math.max(1, r.pieces);
+  bags = [];
+  for (let i = 0; i < allowedPieces; i++) {
+    bags.push({ id: bagIdCounter++, type:'checked', weight: r.weight });
+  }
+}
+
+function currentAirline() {
+  const iata = document.getElementById('airline').value;
+  return airlines.find(a => a.iata === iata);
+}
+function currentCabin() { return document.getElementById('cabin').value; }
+function currentLocation() { return document.getElementById('location').value; }
+function currentRules() {
+  const a = currentAirline();
+  if (!a) return null;
+  return a[currentCabin()] || a.economy;
+}
+function locationMultiplier() { return currentLocation() === 'airport' ? 1.4 : 1.0; }
+
+// ─────────────────────────────────────────────────────────────
+// POPULATE DROPDOWNS
+// ─────────────────────────────────────────────────────────────
+function populateAirlines() {
+  const sel = document.getElementById('airline');
+  const prev = sel.value || 'MS';
+  sel.innerHTML = airlines.map(a => `<option value="${a.iata}">${a.iata} — ${a.name}</option>`).join('');
+  if (airlines.find(a => a.iata === prev)) sel.value = prev;
+}
+
+// ─────────────────────────────────────────────────────────────
+// RENDER ALLOWANCE
+// ─────────────────────────────────────────────────────────────
+function renderAllowance() {
+  const a = currentAirline();
+  const r = currentRules();
+  if (!a || !r) return;
+  const txt = tA('allowanceText')
+    .replace('{piece}', r.pieces)
+    .replace('{weight}', r.weight)
+    .replace('{cabin}', r.cabin);
+  document.getElementById('allowance-text').innerHTML = txt;
+  const sysKey = a.system === 'weight' ? 'systemWeight' : (a.system === 'piece' ? 'systemPiece' : 'systemHybrid');
+  document.getElementById('system-badge').textContent = tA(sysKey);
+}
+
+// ─────────────────────────────────────────────────────────────
+// RENDER BAGS
+// ─────────────────────────────────────────────────────────────
+function renderBags() {
+  const r = currentRules();
+  const list = document.getElementById('bags-list');
+  if (!r) { list.innerHTML = ''; return; }
+  list.innerHTML = bags.map((bag, idx) => {
+    let label = '', cls = '', overText = '', badge = '';
+    if (bag.type === 'checked') {
+      label = `${tA('bagN')} ${idx + 1}`;
+      const over = Math.max(0, bag.weight - r.weight);
+      if (over > 0) { cls = 'over'; overText = `<span class="bag-status over">⚠️ ${over.toFixed(1)} ${tA('kgOver')}</span>`; }
+      else { overText = `<span class="bag-status ok">✓ ${tA('within')}</span>`; }
+    } else if (bag.type === 'extra') {
+      label = `🧳 ${tA('extraBag')}`;
+      cls = 'extra';
+      const over = Math.max(0, bag.weight - r.weight);
+      if (over > 0) overText = `<span class="bag-status over">⚠️ +${tA('flat')} + ${over.toFixed(1)} ${tA('kgOver')}</span>`;
+      else overText = `<span class="bag-status">${tA('flat')}</span>`;
+    } else if (bag.type === 'sports') {
+      label = `⛷️ ${tA('sports')}`;
+      cls = 'sports';
+      overText = `<span class="bag-status">${tA('flat')}</span>`;
+    }
+    return `<div class="bag-row ${cls}" data-id="${bag.id}">
+      <div class="bag-num">#${idx + 1}</div>
+      <div class="bag-type">${label}</div>
+      <div class="bag-weight">
+        <input type="number" min="0" max="100" step="0.5" value="${bag.weight}" data-bag-id="${bag.id}" class="weight-input">
+        <span class="unit">${tA('kg')}</span>
+      </div>
+      <div class="bag-status-cell">${overText}</div>
+      <button class="bag-remove" data-remove-id="${bag.id}" title="Remove">×</button>
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────────────────
+// CALCULATE
+// ─────────────────────────────────────────────────────────────
+function calculate() {
+  const r = currentRules();
+  const a = currentAirline();
+  if (!r || !a) return { total:0, breakdown:[], totalOverKg:0 };
+  const mult = locationMultiplier();
+  const breakdown = [];
+  let total = 0, totalOverKg = 0;
+
+  bags.forEach((bag, idx) => {
+    if (bag.type === 'checked') {
+      const over = Math.max(0, bag.weight - r.weight);
+      if (over > 0) {
+        if (a.system === 'piece') {
+          // piece concept: heavy overweight piece = flat extra-piece fee
+          // (in real life, airlines have a tiered overweight fee but we use extra_piece as approx)
+          const fee = (r.extra_piece) * mult;
+          total += fee;
+          totalOverKg += over;
+          breakdown.push({
+            label: `${tA('bagN')} ${idx + 1}: ${bag.weight}${tA('kg')} (${over.toFixed(1)} ${tA('kgOver')})`,
+            calc: `${tA('flat')} × $${r.extra_piece}${mult > 1 ? ` × ${mult.toFixed(1)}` : ''}`,
+            cost: fee,
+          });
+        } else {
+          // weight concept: per kg
+          const fee = over * r.excess_kg * mult;
+          total += fee;
+          totalOverKg += over;
+          breakdown.push({
+            label: `${tA('bagN')} ${idx + 1}: ${bag.weight}${tA('kg')} (${over.toFixed(1)} ${tA('kgOver')})`,
+            calc: `${over.toFixed(1)} × $${r.excess_kg}${mult > 1 ? ` × ${mult.toFixed(1)}` : ''}`,
+            cost: fee,
+          });
+        }
+      }
+    } else if (bag.type === 'extra') {
+      const baseFee = r.extra_piece * mult;
+      let fee = baseFee;
+      let calcText = `$${r.extra_piece}${mult > 1 ? ` × ${mult.toFixed(1)}` : ''}`;
+      const over = Math.max(0, bag.weight - r.weight);
+      if (over > 0 && a.system !== 'piece') {
+        const overFee = over * r.excess_kg * mult;
+        fee += overFee;
+        totalOverKg += over;
+        calcText += ` + ${over.toFixed(1)} × $${r.excess_kg}`;
+      }
+      total += fee;
+      breakdown.push({
+        label: `${tA('extraBag')} (${bag.weight}${tA('kg')})`,
+        calc: calcText,
+        cost: fee,
+      });
+    } else if (bag.type === 'sports') {
+      const fee = r.sports * mult;
+      total += fee;
+      breakdown.push({
+        label: `${tA('sports')} (${bag.weight}${tA('kg')})`,
+        calc: `${tA('flat')} × $${r.sports}${mult > 1 ? ` × ${mult.toFixed(1)}` : ''}`,
+        cost: fee,
+      });
+    }
+  });
+
+  return { total, breakdown, totalOverKg };
+}
+
+// ─────────────────────────────────────────────────────────────
+// RENDER RESULT
+// ─────────────────────────────────────────────────────────────
+function renderResult() {
+  const { total, breakdown, totalOverKg } = calculate();
+  const amtEl = document.getElementById('result-amount');
+  const convEl = document.getElementById('result-conv');
+  const bdEl = document.getElementById('result-breakdown');
+
+  if (total === 0) {
+    if (bags.length === 0) {
+      amtEl.innerHTML = `<span class="zero">${tA('enterDetails')}</span>`;
+    } else {
+      amtEl.innerHTML = `<span class="zero">✓ ${tA('within')}</span>`;
+    }
+    convEl.innerHTML = '';
+    bdEl.innerHTML = '';
+    return;
+  }
+
+  amtEl.innerHTML = `${fmt(total)}<span class="ccy">USD</span>`;
+  // Conversions
+  const egp = convertUSD(total, 'EGP');
+  const aed = convertUSD(total, 'AED');
+  const conv = [];
+  if (egp) conv.push(`≈ ${fmt(egp)} EGP`);
+  if (aed) conv.push(`≈ ${fmt(aed)} AED`);
+  convEl.textContent = conv.join('  ·  ');
+
+  // Breakdown
+  bdEl.innerHTML = breakdown.map(b => `
+    <div class="line">
+      <span class="lhs">${b.label}<br><span style="opacity:.7;font-size:10.5px">${b.calc}</span></span>
+      <span class="rhs">$${fmt(b.cost)}</span>
+    </div>
+  `).join('') + `<div class="line total">
+    <span class="lhs"><strong>TOTAL</strong></span>
+    <span class="rhs"><strong>$${fmt(total)} USD</strong></span>
+  </div>`;
+}
+
+function fmt(n) {
+  return n.toLocaleString(tA('locale'), { minimumFractionDigits:2, maximumFractionDigits:2 });
+}
+
+// ─────────────────────────────────────────────────────────────
+// COPY SUMMARY
+// ─────────────────────────────────────────────────────────────
+function copySummary() {
+  const a = currentAirline();
+  const r = currentRules();
+  const { total, totalOverKg, breakdown } = calculate();
+  if (!a || !r) return;
+
+  const cabinName = tA('section_' + currentCabin());
+  let lines = [];
+  lines.push(`Excess Baggage Quote — ${a.name} (${a.iata})`);
+  lines.push(`Cabin: ${cabinName} · Allowance: ${r.pieces} × ${r.weight}kg + ${r.cabin}kg cabin`);
+  lines.push('');
+  if (total === 0) {
+    lines.push('✓ Customer baggage is within free allowance — no excess fee.');
+  } else {
+    breakdown.forEach(b => lines.push(`• ${b.label}: $${fmt(b.cost)}`));
+    lines.push('');
+    lines.push(`TOTAL: $${fmt(total)} USD`);
+    const egp = convertUSD(total, 'EGP');
+    const aed = convertUSD(total, 'AED');
+    if (egp) lines.push(`     ≈ ${fmt(egp)} EGP`);
+    if (aed) lines.push(`     ≈ ${fmt(aed)} AED`);
+  }
+  lines.push('');
+  lines.push('Note: rates are estimates. Always confirm with the airline.');
+
+  navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('✓ ' + tA('copySummary')));
+}
+
+// ─────────────────────────────────────────────────────────────
+// EMAIL
+// ─────────────────────────────────────────────────────────────
+function buildEmailHTML() {
+  const a = currentAirline();
+  const r = currentRules();
+  const { total, breakdown } = calculate();
+  if (!a || !r) return '';
+  const cabinName = tA('section_' + currentCabin());
+  const intro = tA('emailIntro').replace('{airline}', `<strong>${a.name} (${a.iata})</strong>`);
+
+  let body = `<h3>🧳 ${tA('title')}</h3>`;
+  body += `<p>${tA('customerGreeting')}</p>`;
+  body += `<p>${intro}</p>`;
+  body += `<div class="ep-section"><strong>${cabinName}</strong> · ${r.pieces} × ${r.weight}kg ${tA('allowance')} + ${r.cabin}kg cabin</div>`;
+  if (total === 0) {
+    body += `<p style="color:#059669"><strong>✓ ${tA('emailNoExcess')}</strong></p>`;
+  } else {
+    body += `<table class="ep-table"><tbody>`;
+    breakdown.forEach(b => {
+      body += `<tr><td>${b.label}<br><small style="color:#888;font-size:11px">${b.calc}</small></td><td>$${fmt(b.cost)}</td></tr>`;
+    });
+    body += `</tbody></table>`;
+    body += `<div class="ep-total">TOTAL: $${fmt(total)} USD`;
+    const egp = convertUSD(total, 'EGP');
+    const aed = convertUSD(total, 'AED');
+    if (egp) body += `<br><small style="font-weight:400;color:#666">≈ ${fmt(egp)} EGP</small>`;
+    if (aed) body += `<br><small style="font-weight:400;color:#666">≈ ${fmt(aed)} AED</small>`;
+    body += `</div>`;
+  }
+  body += `<p class="ep-disclaimer">${tA('emailFooter')}</p>`;
+  body += `<p>${tA('emailRegards')},<br>Adel</p>`;
+  return body;
+}
+
+function buildEmailText() {
+  const a = currentAirline();
+  const r = currentRules();
+  const { total, breakdown } = calculate();
+  if (!a || !r) return '';
+  const cabinName = tA('section_' + currentCabin());
+  const intro = tA('emailIntro').replace('{airline}', `${a.name} (${a.iata})`);
+
+  let txt = `${tA('customerGreeting')}\n\n${intro}\n\n`;
+  txt += `${cabinName}: ${r.pieces} × ${r.weight}kg ${tA('allowance')} + ${r.cabin}kg cabin\n\n`;
+  if (total === 0) {
+    txt += `✓ ${tA('emailNoExcess')}\n\n`;
+  } else {
+    breakdown.forEach(b => { txt += `• ${b.label}: $${fmt(b.cost)}\n  (${b.calc})\n`; });
+    txt += `\nTOTAL: $${fmt(total)} USD\n`;
+    const egp = convertUSD(total, 'EGP');
+    const aed = convertUSD(total, 'AED');
+    if (egp) txt += `       ≈ ${fmt(egp)} EGP\n`;
+    if (aed) txt += `       ≈ ${fmt(aed)} AED\n`;
+    txt += `\n`;
+  }
+  txt += `${tA('emailFooter')}\n\n${tA('emailRegards')},\nAdel\n`;
+  return txt;
+}
+
+function openEmailModal() {
+  document.getElementById('email-preview').innerHTML = buildEmailHTML();
+  openModal('email-modal');
+}
+
+function copyEmail() {
+  navigator.clipboard.writeText(buildEmailText()).then(() => showToast(tA('saved')));
+}
+
+// ─────────────────────────────────────────────────────────────
+// EDIT RULES MODAL
+// ─────────────────────────────────────────────────────────────
+function openRulesModal() {
+  const a = currentAirline();
+  if (!a) return;
+  document.getElementById('rules-airline-name').textContent = `${a.name} (${a.iata})`;
+  const body = document.getElementById('rules-modal-body');
+  const cabinKeys = ['economy','premium','business','first'];
+  body.innerHTML = cabinKeys.map(ck => {
+    const r = a[ck] || a.economy;
+    return `<div class="modal-section" data-cabin="${ck}">
+      <h3>${tA('section_'+ck)}</h3>
+      <div class="modal-row">
+        <span class="lbl">${tA('field_pieces')}</span>
+        <input type="number" min="0" max="9" step="1" data-field="pieces" value="${r.pieces}">
+        <span></span>
+      </div>
+      <div class="modal-row">
+        <span class="lbl">${tA('field_weight')}</span>
+        <input type="number" min="0" max="50" step="1" data-field="weight" value="${r.weight}">
+        <span></span>
+      </div>
+      <div class="modal-row">
+        <span class="lbl">${tA('field_cabin')}</span>
+        <input type="number" min="0" max="20" step="1" data-field="cabin" value="${r.cabin}">
+        <span></span>
+      </div>
+      <div class="modal-row">
+        <span class="lbl">${tA('field_excess_kg')}</span>
+        <input type="number" min="0" max="200" step="1" data-field="excess_kg" value="${r.excess_kg}">
+        <span></span>
+      </div>
+      <div class="modal-row">
+        <span class="lbl">${tA('field_extra_piece')}</span>
+        <input type="number" min="0" max="500" step="10" data-field="extra_piece" value="${r.extra_piece}">
+        <span></span>
+      </div>
+      <div class="modal-row">
+        <span class="lbl">${tA('field_sports')}</span>
+        <input type="number" min="0" max="500" step="10" data-field="sports" value="${r.sports}">
+        <span></span>
+      </div>
+    </div>`;
+  }).join('');
+  openModal('rules-modal');
+}
+
+function saveRules() {
+  const a = currentAirline();
+  if (!a) return;
+  document.querySelectorAll('#rules-modal-body .modal-section').forEach(sec => {
+    const ck = sec.dataset.cabin;
+    if (!a[ck]) a[ck] = { ...a.economy };
+    sec.querySelectorAll('input[data-field]').forEach(inp => {
+      const v = parseFloat(inp.value);
+      if (!isNaN(v)) a[ck][inp.dataset.field] = v;
+    });
+  });
+  saveAirlines();
+  closeModal('rules-modal');
+  renderAllowance(); renderBags(); renderResult();
+  showToast(tA('saved'));
+}
+
+function resetRulesForAirline() {
+  const a = currentAirline();
+  if (!a) return;
+  const def = DEFAULT_AIRLINES.find(d => d.iata === a.iata);
+  if (!def) return;
+  ['economy','premium','business','first'].forEach(ck => {
+    if (def[ck]) a[ck] = { ...def[ck] };
+  });
+  saveAirlines();
+  closeModal('rules-modal');
+  renderAllowance(); renderBags(); renderResult();
+  showToast(tA('saved'));
+}
+
+// ─────────────────────────────────────────────────────────────
+// MODAL HELPERS
+// ─────────────────────────────────────────────────────────────
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// ─────────────────────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ─────────────────────────────────────────────────────────────
+// LANGUAGE
+// ─────────────────────────────────────────────────────────────
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('adel-tools-lang', lang);
+  document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.documentElement.lang = lang;
+  document.querySelectorAll('.lang-toggle button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const v = I18N[lang][el.dataset.i18n];
+    if (v !== undefined) el.textContent = v;
+  });
+  renderAllowance();
+  renderBags();
+  renderResult();
+}
+
+// ─────────────────────────────────────────────────────────────
+// EVENTS
+// ─────────────────────────────────────────────────────────────
+document.getElementById('airline').addEventListener('change', () => {
+  initialBags();
+  renderAllowance(); renderBags(); renderResult();
+});
+document.getElementById('cabin').addEventListener('change', () => {
+  initialBags();
+  renderAllowance(); renderBags(); renderResult();
+});
+document.getElementById('location').addEventListener('change', renderResult);
+
+document.getElementById('add-extra-btn').addEventListener('click', () => {
+  const r = currentRules();
+  bags.push({ id: bagIdCounter++, type:'extra', weight: r ? r.weight : 23 });
+  renderBags(); renderResult();
+});
+document.getElementById('add-sports-btn').addEventListener('click', () => {
+  bags.push({ id: bagIdCounter++, type:'sports', weight: 30 });
+  renderBags(); renderResult();
+});
+document.getElementById('reset-btn').addEventListener('click', () => {
+  initialBags(); renderBags(); renderResult();
+});
+
+// Bag list interactions (event delegation)
+document.getElementById('bags-list').addEventListener('input', e => {
+  if (e.target.classList.contains('weight-input')) {
+    const id = parseInt(e.target.dataset.bagId, 10);
+    const bag = bags.find(b => b.id === id);
+    if (bag) {
+      bag.weight = parseFloat(e.target.value) || 0;
+      renderBags(); renderResult();
+      // Re-focus the just-edited input
+      const newInp = document.querySelector(`.weight-input[data-bag-id="${id}"]`);
+      if (newInp) { newInp.focus(); newInp.setSelectionRange(newInp.value.length, newInp.value.length); }
+    }
+  }
+});
+document.getElementById('bags-list').addEventListener('click', e => {
+  if (e.target.classList.contains('bag-remove')) {
+    const id = parseInt(e.target.dataset.removeId, 10);
+    bags = bags.filter(b => b.id !== id);
+    renderBags(); renderResult();
+  }
+});
+
+document.getElementById('edit-rules-btn').addEventListener('click', openRulesModal);
+document.getElementById('rules-save-btn').addEventListener('click', saveRules);
+document.getElementById('rules-reset-btn').addEventListener('click', resetRulesForAirline);
+
+document.getElementById('copy-summary-btn').addEventListener('click', copySummary);
+document.getElementById('email-btn').addEventListener('click', openEmailModal);
+document.getElementById('email-copy-btn').addEventListener('click', copyEmail);
+
+// Close modal on backdrop click
+document.querySelectorAll('.modal-backdrop').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
+});
+
+// ─────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────
+loadAirlines();
+loadRates();
+populateAirlines();
+initialBags();
+setLang(currentLang);
+</script>
+
+</body>
+</html>
