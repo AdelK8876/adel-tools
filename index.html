@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Adel's Toolkit — Your Daily Workbench</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0f2044;
+  --navy2:#162d5c;
+  --blue:#1a56db;
+  --blue2:#1e40af;
+  --teal:#0891b2;
+  --green:#059669;
+  --amber:#d97706;
+  --bg:#0a1428;
+  --bg2:#0f1d3a;
+  --card:#162d5c;
+  --card-hover:#1d3a73;
+  --border:rgba(255,255,255,.08);
+  --border-hover:rgba(59,130,246,.4);
+  --text:#f1f5f9;
+  --muted:#94a3b8;
+  --shadow-card:0 4px 20px rgba(0,0,0,.3);
+  --shadow-card-hover:0 12px 40px rgba(26,86,219,.25);
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body {
+  font-family:'Plus Jakarta Sans', sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  position:relative;
+  overflow-x:hidden;
+}
+body[dir="rtl"] { font-family:'Cairo', 'Plus Jakarta Sans', sans-serif; }
+
+/* Animated gradient background */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(26,86,219,.18) 0%, transparent 50%),
+    radial-gradient(circle at 80% 60%, rgba(8,145,178,.15) 0%, transparent 50%),
+    radial-gradient(circle at 50% 90%, rgba(99,102,241,.12) 0%, transparent 50%);
+  pointer-events:none;
+  z-index:0;
+}
+body::after {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+  background-size:50px 50px;
+  pointer-events:none;
+  z-index:0;
+}
+
+.page {
+  position:relative;
+  z-index:1;
+  max-width:1280px;
+  margin:0 auto;
+  padding:40px 32px 56px;
+}
+
+/* ── HEADER ── */
+.header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:36px; gap:20px; flex-wrap:wrap; }
+.brand { display:flex; align-items:center; gap:16px; }
+.brand-icon {
+  width:56px; height:56px;
+  background:linear-gradient(135deg, #1a56db 0%, #0891b2 100%);
+  border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px;
+  box-shadow:0 8px 24px rgba(26,86,219,.4);
+}
+.brand-text h1 {
+  font-size:28px;
+  font-weight:800;
+  letter-spacing:-.02em;
+  background:linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.brand-text p { font-size:13px; color:var(--muted); margin-top:2px; font-weight:500; }
+
+.header-right { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.lang-toggle {
+  display:flex;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border);
+  border-radius:9px;
+  overflow:hidden;
+  font-size:12.5px;
+  backdrop-filter:blur(10px);
+}
+.lang-toggle button {
+  padding:8px 14px;
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  font-family:inherit;
+  font-weight:700;
+  color:var(--muted);
+  transition:all .15s;
+}
+.lang-toggle button.active {
+  background:var(--blue);
+  color:#fff;
+}
+.lang-toggle button:not(.active):hover { color:var(--text); }
+
+.live-clock {
+  font-family:'JetBrains Mono', monospace;
+  font-size:13px;
+  color:var(--muted);
+  background:rgba(255,255,255,.04);
+  padding:9px 14px;
+  border-radius:9px;
+  border:1px solid var(--border);
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.live-clock .dot {
+  width:7px; height:7px;
+  background:var(--green);
+  border-radius:50%;
+  box-shadow:0 0 8px rgba(5,150,105,.6);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity:1; }
+  50% { opacity:.5; }
+}
+
+/* ── HERO TEXT ── */
+.hero { margin-bottom:32px; }
+.hero h2 {
+  font-size:32px;
+  font-weight:800;
+  letter-spacing:-.02em;
+  line-height:1.15;
+  margin-bottom:12px;
+}
+.hero h2 .accent {
+  background:linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero p {
+  font-size:14.5px;
+  color:var(--muted);
+  max-width:640px;
+  line-height:1.6;
+}
+
+.stats-row {
+  display:flex;
+  gap:18px;
+  margin:20px 0 0;
+  flex-wrap:wrap;
+}
+.stat-pill {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 14px;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border);
+  border-radius:100px;
+  font-size:12.5px;
+  color:var(--muted);
+  font-weight:500;
+}
+.stat-pill strong { color:var(--text); font-weight:700; }
+.stat-pill .ico { font-size:14px; }
+
+/* ── SECTIONS ── */
+.section { margin-top:36px; }
+.section-header {
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:18px;
+  padding-bottom:12px;
+  border-bottom:1px solid var(--border);
+}
+.section-header .section-icon {
+  font-size:20px;
+  width:38px;
+  height:38px;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(255,255,255,.04);
+  border-radius:10px;
+  border:1px solid var(--border);
+}
+.section-header .section-text h3 {
+  font-size:14.5px;
+  font-weight:800;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color:var(--text);
+}
+.section-header .section-text p {
+  font-size:12px;
+  color:var(--muted);
+  margin-top:2px;
+  font-weight:500;
+}
+.section-header .section-count {
+  margin-left:auto;
+  font-family:'JetBrains Mono', monospace;
+  font-size:11px;
+  color:var(--muted);
+  background:rgba(255,255,255,.04);
+  padding:4px 10px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  font-weight:600;
+}
+body[dir="rtl"] .section-header .section-count { margin-left:0; margin-right:auto; }
+
+/* Section accent colors */
+.section.daily .section-icon { background:linear-gradient(135deg, rgba(59,130,246,.2), rgba(6,182,212,.2)); border-color:rgba(59,130,246,.3); }
+.section.airline .section-icon { background:linear-gradient(135deg, rgba(139,92,246,.2), rgba(236,72,153,.2)); border-color:rgba(139,92,246,.3); }
+.section.personal .section-icon { background:linear-gradient(135deg, rgba(16,185,129,.2), rgba(6,182,212,.2)); border-color:rgba(16,185,129,.3); }
+
+/* ── TOOLS GRID ── */
+.tools-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+  gap:16px;
+}
+
+.tool-card {
+  background:linear-gradient(135deg, rgba(22,45,92,.8) 0%, rgba(15,29,58,.8) 100%);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:20px;
+  cursor:pointer;
+  transition:all .25s cubic-bezier(.4,0,.2,1);
+  text-decoration:none;
+  color:inherit;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  position:relative;
+  overflow:hidden;
+  backdrop-filter:blur(10px);
+  box-shadow:var(--shadow-card);
+  min-height:200px;
+}
+.tool-card::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:3px;
+  background:var(--card-accent, linear-gradient(90deg, #3b82f6, #06b6d4));
+  opacity:.7;
+  transition:opacity .25s;
+}
+.tool-card:hover {
+  transform:translateY(-4px);
+  border-color:var(--border-hover);
+  box-shadow:var(--shadow-card-hover);
+  background:linear-gradient(135deg, rgba(29,58,115,.8) 0%, rgba(22,45,92,.8) 100%);
+}
+.tool-card:hover::before { opacity:1; height:4px; }
+
+/* Card colors per category */
+.section.daily .tool-card { --card-accent:linear-gradient(90deg, #3b82f6, #06b6d4); }
+.section.airline .tool-card { --card-accent:linear-gradient(90deg, #8b5cf6, #ec4899); }
+.section.personal .tool-card { --card-accent:linear-gradient(90deg, #10b981, #06b6d4); }
+
+.tool-head {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+.tool-icon {
+  width:42px; height:42px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:21px;
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--border);
+  flex-shrink:0;
+}
+.section.daily .tool-icon { background:linear-gradient(135deg, rgba(59,130,246,.2), rgba(6,182,212,.2)); border-color:rgba(59,130,246,.3); }
+.section.airline .tool-icon { background:linear-gradient(135deg, rgba(139,92,246,.2), rgba(236,72,153,.2)); border-color:rgba(139,92,246,.3); }
+.section.personal .tool-icon { background:linear-gradient(135deg, rgba(16,185,129,.2), rgba(6,182,212,.2)); border-color:rgba(16,185,129,.3); }
+
+.tool-tag {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px;
+  font-weight:700;
+  padding:3px 7px;
+  border-radius:4px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.tool-tag.new { background:rgba(16,185,129,.15); color:#10b981; border:1px solid rgba(16,185,129,.3); }
+.tool-tag.stable { background:rgba(59,130,246,.15); color:#3b82f6; border:1px solid rgba(59,130,246,.3); }
+
+.tool-body { flex:1; display:flex; flex-direction:column; gap:6px; }
+.tool-title {
+  font-size:16px;
+  font-weight:700;
+  letter-spacing:-.01em;
+}
+.tool-desc {
+  font-size:12.5px;
+  color:var(--muted);
+  line-height:1.55;
+}
+
+.tool-footer {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:auto;
+  padding-top:10px;
+  border-top:1px solid var(--border);
+}
+.tool-cta {
+  font-size:12px;
+  font-weight:700;
+  color:#3b82f6;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  transition:gap .2s;
+}
+.section.airline .tool-cta { color:#a78bfa; }
+.section.personal .tool-cta { color:#34d399; }
+.tool-card:hover .tool-cta { gap:9px; }
+.tool-meta { font-size:10px; color:var(--muted); font-family:'JetBrains Mono', monospace; }
+
+/* ── FOOTER ── */
+.footer {
+  margin-top:56px;
+  padding-top:28px;
+  border-top:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:12px;
+  color:var(--muted);
+  flex-wrap:wrap;
+  gap:14px;
+}
+.footer .links { display:flex; gap:18px; }
+.footer .links a { color:var(--muted); text-decoration:none; transition:color .15s; }
+.footer .links a:hover { color:var(--text); }
+
+@media (max-width:680px) {
+  .page { padding:24px 16px 40px; }
+  .hero h2 { font-size:24px; }
+  .hero p { font-size:13.5px; }
+  .header { flex-direction:column; align-items:stretch; }
+  .brand-text h1 { font-size:22px; }
+  .stats-row { gap:8px; }
+  .footer { flex-direction:column; align-items:flex-start; }
+  .tools-grid { grid-template-columns:1fr; }
+  .section-header { flex-wrap:wrap; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand">
+      <div class="brand-icon">🛠️</div>
+      <div class="brand-text">
+        <h1 data-i18n="brandTitle">Adel&rsquo;s Toolkit</h1>
+        <p data-i18n="brandSub">Your daily workbench</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="live-clock">
+        <span class="dot"></span>
+        <span id="clock">—</span>
+        <span style="opacity:.6" id="clock-tz">Local</span>
+      </div>
+      <div class="lang-toggle">
+        <button class="active" data-lang="en" onclick="setLang('en')">🇬🇧 EN</button>
+        <button data-lang="ar" onclick="setLang('ar')">🇸🇦 AR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <h2 data-i18n="heroH2">Welcome back, <span class="accent">Adel</span> 👋</h2>
+    <p data-i18n="heroP">Your personal toolkit for everyday work — flight calculations, GDS quick references, customer responses, and more, all organized in one place.</p>
+    <div class="stats-row">
+      <div class="stat-pill"><span class="ico">🛠️</span> <strong>11</strong> <span data-i18n="statTools">tools</span></div>
+      <div class="stat-pill"><span class="ico">🌐</span> <span data-i18n="statBilingual">English &amp; Arabic</span></div>
+      <div class="stat-pill"><span class="ico">⚡</span> <span data-i18n="statOffline">Works offline</span></div>
+      <div class="stat-pill"><span class="ico">🔒</span> <span data-i18n="statPrivate">Private &amp; local</span></div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: DAILY -->
+  <div class="section daily">
+    <div class="section-header">
+      <div class="section-icon">⭐</div>
+      <div class="section-text">
+        <h3 data-i18n="sec1Title">Daily Essentials</h3>
+        <p data-i18n="sec1Sub">Tools you reach for every single shift</p>
+      </div>
+      <span class="section-count">3 <span data-i18n="tools">tools</span></span>
+    </div>
+    <div class="tools-grid">
+
+      <a class="tool-card" href="flight-calculator.html">
+        <div class="tool-head">
+          <div class="tool-icon">✈️</div>
+          <span class="tool-tag new" data-i18n="tagUpdated">UPDATED</span>
+        </div>
+        <div class="tool-body">
+          <div class="tool-title" data-i18n="flightTitle">Flight Calculator</div>
+          <div class="tool-desc" data-i18n="flightDesc">Distance, duration, arrival time, and customer-ready emails with passenger and booking details.</div>
+        </div>
+        <div class="tool-footer">
+          <div class="tool-cta"><span data-i18n="ctaOpen">Open</span> →</div>
+          <div class="tool-meta">v3.0</div>
+        </div>
+      </a>
+
+      <a class="tool-card" href="canned-responses.html">
+        <div class="tool-head">
+          <div class="tool-icon">💬</div>
+          <span class="tool-tag stable" data-i18n="tagStable">STABLE</span>
+        </div>
+        <div class="tool-body">
+          <div class="tool-title" data-i18n="cannedTitle">Canned Responses</div>
+          <div class="tool-desc" data-i18n="cannedDesc">Ready-to-use professional reply templates for common customer scenarios. Copy &amp; paste.</div>
+        </div>
+        <div class="tool-footer">
+          <div class="tool-cta"><span data-i18n="ctaOpen">Open</span> →</div>
+          <div class="tool-meta">v1.0</div>
+        </div>
+      </a>
+
+      <a class="tool-card" href="shift-schedule.html">
+        <div class="tool-head">
+          <div class="tool-icon">🕌</div>
+          <span class="tool-tag stable" data-i18n="tagStable">STABLE</span>
+        </div>
+        <div class="tool-body">
+          <div class="tool-title" data-i18n="shiftTitle">Shift &amp; Prayer Times</div>
+          <div class="tool-desc" data-i18n="shiftDesc">Your shift schedule with daily prayer times, alarms, and the weekly view at a glance.</div>
+        </div>
+        <div class="tool-footer">
+          <div class="tool-cta"><span data-i18n="ctaOpen">Open</span> →</div>
+          <div class="tool-meta">v1.0</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- SECTION 2: AIRLINE TOOLS -->
+  <div class="section airline">
+    <div class="section-header">
+      <div class="section-icon">🖥️</div>
+      <div class="section-text">
+        <h3 data-i18n="sec2Title">Airline &amp; GDS Tools</h3>
+        <p data-i18n="sec2Sub">Reference guides and quick-look tables</p>
+      </div>
+      <span class="section-count">4 <span data-i18n="tools">tools</span></span>
+    </div>
+    <div class="tools-grid">
+
+      <a class="tool-card" href="airline-directory.html">
+        <div class="tool-head">
+          <div class="tool-icon">✈️</div>
+          <span class="tool-tag stable" data-i18n="tagStable">STABLE</span>
+        </div>
+        <div class="tool-body">
+          <div class="tool-title" data-i18n="airlinesTitle">Airline Directory</div>
+          <div class="tool-desc" data-i18n="airlinesDesc">Searchable directory of airlines with contact details, codes, and quick reference info.</div>
+        </div>
+        <div class="tool-footer">
+          <div class="tool-cta"><span data-i18n="ctaOpen">Open</span> →</div>
+          <div class="tool-meta">v1.0</div>
+        </div>
+      </a>
+
+      <a class="tool-card" href="travelport-quick-reference.html">
+        <div class="tool-head">
+          <div class="tool-icon">🖥️</div>
+          <span class="tool-tag stable" data-i18n="tagStable">STABLE</span>
+        </div>
+        <div class="tool-body">
+          <div class="tool-title" data-i18n="tpTitle">Travelport Galileo</div>
+          <div class="tool-desc" data-i18n="tpDesc">Quick reference for Galileo formats, commands, and common operations.</div>
+        </div>
+        <div class="tool-footer">
+          <div class="tool-cta"><span data-i18n="ctaOpen">Open</span> →</div>
+          <div class="tool-meta">v1.0</div>
+        </div>
+      </a>
+
+      <a class="tool-card" href="sabre-quick-reference.html">
+        <div class="tool-head">
+          <div class="tool-icon">🖥️</div>
+          <span class="tool-tag stable" data-i18n="tagStable">STABLE</span>
+        </div>
+        <div class="tool-body">
+          <div class="tool-title" data-i18n="sabreTitle">Sabre GDS</div>
+          <div class="tool-desc" data-i18n="sabreDesc">Quick reference for Sabre formats, commands, and PNR operations.</div>
+        </div>
+        <div class="tool-footer">
+          <div class="tool-cta"><span data-i18n="ctaOpen">Open</span> →</div>
+          <div class="tool-meta">v1.0</div>
+        </div>
+      </a>
+
+      <a class="tool-card" href="gds-comparison.html">
+        <div class="tool-head">
+          <div class="tool-icon">📊</div>
+          <span class="tool-tag stable" data-i18n="tagStable">STABLE</span>
+        </div>
+        <div class="tool-body">
+          <div class="tool-title" data-i18n="gdsTitle">GDS Format Comparison</div>
+          <div class="tool-desc" data-i18n="gdsDesc">Side-by-side comparison of Galileo, Sabre, and Amadeus commands for the same operations.</div>
+        </div>
+        <div class="tool-footer">
+          <div class="tool-cta"><span data-i18n="ctaOpen">Open</span> →</div>
+          <div class="tool-meta">v1.0</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- SECTION 3: PERSONAL -->
+  <div class="section personal">
+    <div class="section-header">
+      <div class="section-icon">🌐</div>
+      <div class="section-text">
+        <h3 data-i18n="sec3Title">Personal &amp; Reference</h3>
+        <p data-i18n="sec3Sub">Your saved links, profile, and reference material</p>
+      </div>
+      <span class="section-count">4 <span data-i18n="tools">tools</span></span>
+    </div>
+    <div class="tools-grid">
+
+      <a class="tool-card" href="link-library.html">
+        <div class="tool-head">
+          <div class="tool-icon">🔗</div>
+          <span class="tool-tag stable" data-i18n="tagStable">STABLE</span>
+        </div>
+        <div class="tool-body">
+          <div class="tool-title" data-i18n="linksTitle">Link Library</div>
+          <div class="tool-desc" data-i18n="linksDesc">Personal saved social media and reference links with tags, search, and live preview.</div>
+        </div>
+        <div class="tool-footer">
+          <div class="tool-cta"><span data-i18n="ctaOpen">Open</span> →</div>
+          <div class="tool-meta">v1.0</div>
+        </div>
+      </a>
+
+      <a class="tool-card" href="personal-hub.html">
+        <div class="tool-head">
+          <div class="tool-icon">🪪</div>
+          <span class="tool-tag stable" data-i18n="tagStable">STABLE</span>
+        </div>
+        <div class="tool-body">
+          <div class="tool-title" data-i18n="hubTitle">Personal Hub</div>
+          <div class="tool-desc" data-i18n="hubDesc">Your personal information card — contact details, profile, and personal info in one place.</div>
+        </div>
+        <div class="tool-footer">
+          <div class="tool-cta"><span data-i18n="ctaOpen">Open</span> →</div>
+          <div class="tool-meta">v1.0</div>
+        </div>
+      </a>
+
+      <a class="tool-card" href="case-tracker.html">
+        <div class="tool-head">
+          <div class="tool-icon">📋</div>
+          <span class="tool-tag stable" data-i18n="tagStable">STABLE</span>
+        </div>
+        <div class="tool-body">
+          <div class="tool-title" data-i18n="caseTitle">Case Tracker</div>
+          <div class="tool-desc" data-i18n="caseDesc">Personal case tracking system to organize ongoing customer issues and follow-ups.</div>
+        </div>
+        <div class="tool-footer">
+          <div class="tool-cta"><span data-i18n="ctaOpen">Open</span> →</div>
+          <div class="tool-meta">v1.0</div>
+        </div>
+      </a>
+
+      <a class="tool-card" href="cheat-sheet.html">
+        <div class="tool-head">
+          <div class="tool-icon">📖</div>
+          <span class="tool-tag stable" data-i18n="tagStable">STABLE</span>
+        </div>
+        <div class="tool-body">
+          <div class="tool-title" data-i18n="cheatTitle">Refund &amp; Fare Cheat Sheet</div>
+          <div class="tool-desc" data-i18n="cheatDesc">Quick reference for refund policies, fare rules, and common scenarios.</div>
+        </div>
+        <div class="tool-footer">
+          <div class="tool-cta"><span data-i18n="ctaOpen">Open</span> →</div>
+          <div class="tool-meta">v1.0</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div>
+      <span data-i18n="footerMade">Built by Adel</span> · <span data-i18n="footerLoc">Cairo, Egypt 🇪🇬</span>
+    </div>
+    <div class="links">
+      <a href="#" onclick="aboutTool();return false;" data-i18n="footerAbout">About</a>
+      <a href="https://github.com/AdelK8876/adel-tools" target="_blank" rel="noopener">GitHub</a>
+      <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" data-i18n="footerTop">Back to top</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const I18N = {
+  en: {
+    brandTitle:'Adel\u2019s Toolkit',
+    brandSub:'Your daily workbench',
+    heroH2:'Welcome back, <span class="accent">Adel</span> 👋',
+    heroP:'Your personal toolkit for everyday work — flight calculations, GDS quick references, customer responses, and more, all organized in one place.',
+    statTools:'tools', statBilingual:'English & Arabic', statOffline:'Works offline', statPrivate:'Private & local',
+    tools:'tools',
+    sec1Title:'Daily Essentials', sec1Sub:'Tools you reach for every single shift',
+    sec2Title:'Airline & GDS Tools', sec2Sub:'Reference guides and quick-look tables',
+    sec3Title:'Personal & Reference', sec3Sub:'Your saved links, profile, and reference material',
+    flightTitle:'Flight Calculator', flightDesc:'Distance, duration, arrival time, and customer-ready emails with passenger and booking details.',
+    cannedTitle:'Canned Responses', cannedDesc:'Ready-to-use professional reply templates for common customer scenarios. Copy & paste.',
+    shiftTitle:'Shift & Prayer Times', shiftDesc:'Your shift schedule with daily prayer times, alarms, and the weekly view at a glance.',
+    airlinesTitle:'Airline Directory', airlinesDesc:'Searchable directory of airlines with contact details, codes, and quick reference info.',
+    tpTitle:'Travelport Galileo', tpDesc:'Quick reference for Galileo formats, commands, and common operations.',
+    sabreTitle:'Sabre GDS', sabreDesc:'Quick reference for Sabre formats, commands, and PNR operations.',
+    gdsTitle:'GDS Format Comparison', gdsDesc:'Side-by-side comparison of Galileo, Sabre, and Amadeus commands for the same operations.',
+    linksTitle:'Link Library', linksDesc:'Personal saved social media and reference links with tags, search, and live preview.',
+    hubTitle:'Personal Hub', hubDesc:'Your personal information card — contact details, profile, and personal info in one place.',
+    caseTitle:'Case Tracker', caseDesc:'Personal case tracking system to organize ongoing customer issues and follow-ups.',
+    cheatTitle:'Refund & Fare Cheat Sheet', cheatDesc:'Quick reference for refund policies, fare rules, and common scenarios.',
+    tagUpdated:'UPDATED', tagStable:'STABLE',
+    ctaOpen:'Open',
+    footerMade:'Built by Adel', footerLoc:'Cairo, Egypt 🇪🇬',
+    footerAbout:'About', footerTop:'Back to top',
+  },
+  ar: {
+    brandTitle:'أدوات عادل',
+    brandSub:'منضدة عملك اليومية',
+    heroH2:'مرحباً بعودتك، <span class="accent">عادل</span> 👋',
+    heroP:'مجموعة أدواتك الشخصية لعملك اليومي — حسابات الرحلات، مراجع GDS السريعة، ردود العملاء، وأكثر، كل شيء منظم في مكان واحد.',
+    statTools:'أدوات', statBilingual:'العربية والإنجليزية', statOffline:'يعمل بدون إنترنت', statPrivate:'خاص ومحلي',
+    tools:'أدوات',
+    sec1Title:'الأساسيات اليومية', sec1Sub:'الأدوات التي تستخدمها في كل وردية',
+    sec2Title:'أدوات شركات الطيران و GDS', sec2Sub:'مراجع سريعة وجداول مقارنة',
+    sec3Title:'الشخصي والمرجعي', sec3Sub:'روابطك المحفوظة وملفك ومواد المراجع',
+    flightTitle:'حاسبة الرحلات', flightDesc:'المسافة والمدة ووقت الوصول ورسائل البريد الجاهزة مع تفاصيل الركاب والحجز.',
+    cannedTitle:'الردود الجاهزة', cannedDesc:'قوالب ردود احترافية جاهزة للاستخدام للسيناريوهات الشائعة مع العملاء. نسخ ولصق.',
+    shiftTitle:'الوردية وأوقات الصلاة', shiftDesc:'جدول ورديتك مع أوقات الصلاة اليومية والمنبهات وعرض الأسبوع في لمحة.',
+    airlinesTitle:'دليل شركات الطيران', airlinesDesc:'دليل قابل للبحث لشركات الطيران مع تفاصيل الاتصال والرموز ومعلومات سريعة.',
+    tpTitle:'Travelport Galileo', tpDesc:'مرجع سريع لصيغ Galileo والأوامر والعمليات الشائعة.',
+    sabreTitle:'Sabre GDS', sabreDesc:'مرجع سريع لصيغ Sabre والأوامر وعمليات PNR.',
+    gdsTitle:'مقارنة صيغ GDS', gdsDesc:'مقارنة جنباً إلى جنب بين أوامر Galileo و Sabre و Amadeus لنفس العمليات.',
+    linksTitle:'مكتبة الروابط', linksDesc:'الروابط الاجتماعية والمرجعية المحفوظة مع الوسوم والبحث والمعاينة المباشرة.',
+    hubTitle:'البطاقة الشخصية', hubDesc:'بطاقة معلوماتك الشخصية — تفاصيل الاتصال والملف الشخصي في مكان واحد.',
+    caseTitle:'متتبع الحالات', caseDesc:'نظام تتبع شخصي لتنظيم قضايا العملاء الجارية والمتابعات.',
+    cheatTitle:'مرجع الاسترداد والأسعار', cheatDesc:'مرجع سريع لسياسات الاسترداد وقواعد الأسعار والسيناريوهات الشائعة.',
+    tagUpdated:'محدّث', tagStable:'مستقر',
+    ctaOpen:'فتح',
+    footerMade:'صنع بواسطة عادل', footerLoc:'القاهرة، مصر 🇪🇬',
+    footerAbout:'حول', footerTop:'إلى الأعلى',
+  }
+};
+
+let currentLang = localStorage.getItem('adel-tools-lang') || 'en';
+
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('adel-tools-lang', lang);
+  document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.documentElement.lang = lang;
+  document.querySelectorAll('.lang-toggle button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const v = I18N[lang][el.dataset.i18n];
+    if (v !== undefined) el.innerHTML = v;
+  });
+}
+
+function updateClock() {
+  const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  const t = new Intl.DateTimeFormat('en-GB', {
+    timeZone: userTZ,
+    hour:'2-digit', minute:'2-digit', second:'2-digit',
+    hour12:false
+  }).format(new Date());
+  document.getElementById('clock').textContent = t;
+  const tzLabel = document.getElementById('clock-tz');
+  if (tzLabel && userTZ.includes('/')) {
+    const cityRaw = userTZ.split('/').pop().replace(/_/g, ' ');
+    const arCityMap = {
+      'Cairo':'القاهرة','Beirut':'بيروت','Dubai':'دبي','Riyadh':'الرياض','Jeddah':'جدة',
+      'Istanbul':'إسطنبول','Karachi':'كراتشي','Mumbai':'مومباي','Singapore':'سنغافورة',
+      'Bangkok':'بانكوك','London':'لندن','Paris':'باريس','New York':'نيويورك','Doha':'الدوحة',
+      'Kuwait':'الكويت','Bahrain':'البحرين','Muscat':'مسقط','Amman':'عمّان','Damascus':'دمشق',
+      'Baghdad':'بغداد','Tehran':'طهران','Casablanca':'الدار البيضاء','Tunis':'تونس','Algiers':'الجزائر',
+    };
+    tzLabel.textContent = (currentLang === 'ar' && arCityMap[cityRaw]) ? arCityMap[cityRaw] : cityRaw;
+  }
+}
+
+function aboutTool() {
+  alert(currentLang === 'ar'
+    ? 'أدوات عادل — مجموعة أدوات إنتاجية شخصية.\n\nالإصدار: 1.0\n11 أداة\nالاستضافة: GitHub Pages\nالمؤلف: عادل'
+    : 'Adel\u2019s Toolkit — A personal productivity suite.\n\nVersion: 1.0\n11 tools included\nHosted on: GitHub Pages\nAuthor: Adel');
+}
+
+setLang(currentLang);
+updateClock();
+setInterval(updateClock, 1000);
+</script>
+
+</body>
+</html>

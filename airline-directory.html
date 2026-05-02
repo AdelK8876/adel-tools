@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Airline Directory — Wego Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0f2044; --navy2:#162d5c; --blue:#1a56db; --blue2:#1e40af;
+  --teal:#0891b2; --green:#059669; --amber:#d97706; --red:#dc2626;
+  --purple:#7c3aed;
+  --bg:#f0f4f8; --card:#ffffff; --border:#dde3ec; --text:#1e293b;
+  --muted:#64748b; --light:#f8fafc; --sidebar:#0f2044;
+  --sidebar-w:260px;
+  --shadow-sm:0 1px 3px rgba(15,32,68,.06);
+  --shadow-md:0 4px 12px rgba(15,32,68,.08);
+  --shadow-lg:0 12px 32px rgba(15,32,68,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px}
+
+/* ── SIDEBAR ── */
+#sidebar{width:var(--sidebar-w);background:var(--sidebar);position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;overflow:hidden;z-index:100;box-shadow:4px 0 20px rgba(0,0,0,.2);transition:transform .25s}
+#sb-head{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+#sb-head .logo{color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+#sb-head .logo span{background:linear-gradient(135deg,#3b82f6,#06b6d4);padding:5px 9px;border-radius:6px;font-size:12px}
+#sb-head .sub{color:rgba(255,255,255,.4);font-size:10.5px;margin-top:4px;letter-spacing:.05em;text-transform:uppercase}
+#sb-nav{flex:1;overflow-y:auto;padding:10px 0}
+#sb-nav::-webkit-scrollbar{width:3px}
+#sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px}
+.nav-section{padding:14px 16px 6px;font-size:9px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em}
+.nav-btn{display:flex;align-items:center;gap:11px;padding:10px 16px;cursor:pointer;border-left:3px solid transparent;transition:all .15s;color:rgba(255,255,255,.78);font-size:13px;font-weight:500}
+.nav-btn:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav-btn.active{background:rgba(59,130,246,.18);border-left-color:#3b82f6;color:#fff;font-weight:600}
+.nav-btn .nb-icon{font-size:15px;width:20px;text-align:center}
+.nav-btn .nb-count{margin-left:auto;font-size:10.5px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);padding:2px 7px;border-radius:10px;font-weight:600;font-family:'JetBrains Mono',monospace}
+.nav-btn.active .nb-count{background:rgba(59,130,246,.3);color:#fff}
+
+/* mobile sidebar toggle */
+#mobile-toggle{display:none;position:fixed;top:12px;left:12px;z-index:200;background:var(--navy);color:#fff;border:none;width:40px;height:40px;border-radius:8px;font-size:18px;cursor:pointer;box-shadow:var(--shadow-md)}
+#sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:90}
+
+/* ── MAIN ── */
+#main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+#topbar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:50;box-shadow:var(--shadow-sm);flex-wrap:wrap}
+.tb-title{font-size:15px;font-weight:700;color:var(--navy);flex-shrink:0}
+.tb-sub{font-size:11px;color:var(--muted)}
+.search-box{flex:1;min-width:220px;max-width:420px;position:relative}
+.search-box input{width:100%;padding:9px 14px 9px 38px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;outline:none;background:var(--light);transition:all .15s}
+.search-box input:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,86,219,.1)}
+.search-box::before{content:'🔍';position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:13px;opacity:.6}
+.tb-actions{display:flex;gap:8px;margin-left:auto}
+.btn{padding:9px 16px;border-radius:9px;border:none;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:var(--blue2);transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.btn-ghost{background:#fff;color:var(--text);border:1.5px solid var(--border)}
+.btn-ghost:hover{border-color:var(--blue);color:var(--blue)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{background:#b91c1c}
+.btn-sm{padding:6px 11px;font-size:11.5px}
+
+/* ── CONTENT ── */
+#content{padding:22px 24px;flex:1}
+.results-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.results-count{font-size:12px;color:var(--muted)}
+.results-count strong{color:var(--text);font-weight:700}
+
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.empty-state{padding:60px 20px;text-align:center;color:var(--muted);background:var(--card);border:2px dashed var(--border);border-radius:14px}
+.empty-state .icon{font-size:48px;opacity:.4;margin-bottom:10px}
+.empty-state h3{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+
+/* ── AIRLINE CARD ── */
+.airline-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .18s;position:relative;display:flex;flex-direction:column}
+.airline-card:hover{border-color:var(--blue);box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.airline-card .accent{position:absolute;top:0;left:0;width:4px;height:100%;background:var(--accent,var(--navy))}
+.ac-head{padding:14px 16px 10px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px}
+.ac-iata{flex-shrink:0;background:var(--accent,var(--navy));color:#fff;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;padding:6px 10px;border-radius:7px;letter-spacing:.04em;min-width:42px;text-align:center}
+.ac-titles{flex:1;min-width:0}
+.ac-name{font-size:14.5px;font-weight:700;color:var(--navy);line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ac-name-ar{font-size:12px;color:var(--muted);margin-top:1px;font-family:'Segoe UI','Arial',sans-serif;direction:rtl;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ac-meta{padding:10px 16px 12px 18px;display:flex;flex-wrap:wrap;gap:6px}
+.pill{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px}
+.pill-fsc{background:#e0f2fe;color:#075985}
+.pill-lcc{background:#fef3c7;color:#92400e}
+.pill-hub{background:#f1f5f9;color:#475569;font-family:'JetBrains Mono',monospace;text-transform:none;letter-spacing:0}
+.pill-alliance{background:#ede9fe;color:#5b21b6}
+.ac-info{padding:10px 16px 14px 18px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:5px;border-top:1px solid var(--border);background:#fafbfc}
+.ac-info-row{display:flex;align-items:center;gap:8px}
+.ac-info-row .icon{flex-shrink:0;width:14px;text-align:center;font-size:12.5px}
+.ac-info-row .val{flex:1;color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ac-info-row .val.empty{color:#cbd5e1;font-style:italic;font-weight:400}
+
+/* ── MODAL ── */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(15,32,68,.55);z-index:300;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-backdrop.show{display:flex;animation:fadeIn .18s}
+.modal{background:#fff;border-radius:14px;max-width:640px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);animation:slideUp .22s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.m-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.m-iata{flex-shrink:0;background:var(--accent,var(--navy));color:#fff;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;padding:7px 12px;border-radius:8px}
+.m-titles{flex:1;min-width:0}
+.m-name{font-size:16px;font-weight:800;color:var(--navy)}
+.m-name-ar{font-size:13px;color:var(--muted);font-family:'Segoe UI',sans-serif;direction:rtl;margin-top:2px}
+.m-close{background:transparent;border:none;font-size:22px;cursor:pointer;color:var(--muted);width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.m-close:hover{background:#f1f5f9;color:var(--text)}
+.m-body{padding:18px 22px;overflow-y:auto;flex:1}
+.m-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0;background:var(--light);border-radius:0 0 14px 14px}
+
+/* ── DETAIL VIEW ── */
+.detail-section{margin-bottom:18px}
+.detail-section:last-child{margin-bottom:0}
+.detail-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.detail-meta-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.phone-list{display:flex;flex-direction:column;gap:7px}
+.phone-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--light);border-radius:8px;border:1px solid var(--border)}
+.phone-row .region{font-size:11px;color:var(--muted);font-weight:600;min-width:80px;text-transform:uppercase;letter-spacing:.04em}
+.phone-row .number{flex:1;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);font-weight:600;word-break:break-all}
+.phone-row .copy-btn{background:transparent;border:1px solid var(--border);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:12px;color:var(--muted);transition:all .15s;flex-shrink:0}
+.phone-row .copy-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.phone-row .copy-btn.copied{background:var(--green);color:#fff;border-color:var(--green)}
+.detail-text{font-size:13px;color:var(--text);line-height:1.65;background:var(--light);padding:11px 13px;border-radius:8px;border:1px solid var(--border);white-space:pre-wrap}
+.detail-text.empty{color:#94a3b8;font-style:italic;border-style:dashed}
+.detail-link{display:inline-flex;align-items:center;gap:6px;color:var(--blue);font-weight:600;font-size:13px;text-decoration:none;padding:8px 12px;background:#eff6ff;border-radius:7px;border:1px solid #bfdbfe;transition:all .15s}
+.detail-link:hover{background:#dbeafe;text-decoration:none}
+
+/* ── FORM (Add/Edit) ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+.form-group label{font-size:11.5px;font-weight:600;color:var(--text)}
+.form-group label .req{color:var(--red)}
+.form-group input,.form-group select,.form-group textarea{padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;outline:none;transition:border-color .15s;background:#fff;color:var(--text);width:100%}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.1)}
+.form-group textarea{resize:vertical;min-height:64px;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.5}
+.form-group .hint{font-size:10.5px;color:var(--muted)}
+.color-input{display:flex;gap:8px;align-items:center}
+.color-input input[type="color"]{width:40px;height:40px;padding:2px;border-radius:7px;cursor:pointer;border:1.5px solid var(--border)}
+.color-input input[type="text"]{flex:1;font-family:'JetBrains Mono',monospace;font-size:12px}
+.phones-editor{display:flex;flex-direction:column;gap:8px}
+.phone-edit-row{display:grid;grid-template-columns:120px 1fr 36px;gap:6px;align-items:center}
+.phone-edit-row input{padding:8px 10px;font-size:12.5px}
+.phone-edit-row .del-phone{background:#fef2f2;border:1px solid #fecaca;border-radius:7px;color:var(--red);width:36px;height:36px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.phone-edit-row .del-phone:hover{background:var(--red);color:#fff}
+.add-phone-btn{align-self:flex-start;font-size:11.5px;padding:6px 12px;background:#f0fdf4;color:var(--green);border:1px solid #bbf7d0;border-radius:7px;cursor:pointer;font-weight:600}
+.add-phone-btn:hover{background:#dcfce7}
+.section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin:16px 0 8px;padding-top:14px;border-top:1px solid var(--border)}
+.section-title:first-child{padding-top:0;border-top:none;margin-top:0}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);z-index:500;display:none;animation:slideUp .22s}
+.toast.show{display:block}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+
+/* ── RESPONSIVE ── */
+@media (max-width:900px){
+  #sidebar{transform:translateX(-100%)}
+  #sidebar.open{transform:none}
+  #sidebar.open ~ #sidebar-backdrop{display:block}
+  #main{margin-left:0}
+  #mobile-toggle{display:flex;align-items:center;justify-content:center}
+  #topbar{padding-left:60px}
+  .form-grid{grid-template-columns:1fr}
+  .phone-edit-row{grid-template-columns:1fr 1fr 36px}
+}
+@media (max-width:560px){
+  #content{padding:14px}
+  .cards-grid{grid-template-columns:1fr}
+  .tb-title{display:none}
+  .modal{max-height:95vh}
+}
+</style>
+</head>
+<body>
+
+<button id="mobile-toggle" onclick="toggleSidebar()">☰</button>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div id="sb-head">
+    <div class="logo"><span>✈</span> Airline Directory</div>
+    <div class="sub">Wego · Quick Reference</div>
+  </div>
+  <nav id="sb-nav" id="nav-container"></nav>
+</aside>
+<div id="sidebar-backdrop" onclick="toggleSidebar()"></div>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <div>
+      <div class="tb-title">Airline Directory</div>
+      <div class="tb-sub" id="tb-sub">— airlines</div>
+    </div>
+    <div class="search-box">
+      <input id="search" type="text" placeholder="Search by name or IATA code (e.g. MS, Emirates)…" autocomplete="off" oninput="onSearch()">
+    </div>
+    <div class="tb-actions">
+      <button class="btn btn-ghost btn-sm" onclick="exportData()">📤 Export</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('import-file').click()">📥 Import</button>
+      <input id="import-file" type="file" accept=".json" style="display:none" onchange="importData(event)">
+      <button class="btn btn-primary" onclick="openAddModal()">+ Add Airline</button>
+    </div>
+  </div>
+
+  <div id="content">
+    <div class="results-bar">
+      <div class="results-count" id="count">Loading…</div>
+    </div>
+    <div class="cards-grid" id="cards"></div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-backdrop" id="detail-modal" onclick="if(event.target===this)closeModal('detail-modal')">
+  <div class="modal" id="detail-content"></div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-backdrop" id="form-modal" onclick="if(event.target===this)closeModal('form-modal')">
+  <div class="modal">
+    <div class="m-head">
+      <div class="m-titles" style="flex:1">
+        <div class="m-name" id="form-title">Add Airline</div>
+        <div class="m-name-ar" style="font-family:'Plus Jakarta Sans',sans-serif;direction:ltr;font-size:11.5px;color:var(--muted);margin-top:3px">Fill in the details below. * = required</div>
+      </div>
+      <button class="m-close" onclick="closeModal('form-modal')">✕</button>
+    </div>
+    <div class="m-body">
+      <div class="section-title">Basic Information</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Airline Name (EN) <span class="req">*</span></label>
+          <input id="f-name" type="text" placeholder="e.g. EgyptAir">
+        </div>
+        <div class="form-group">
+          <label>Airline Name (AR)</label>
+          <input id="f-nameAr" type="text" placeholder="مثال: مصر للطيران" dir="rtl">
+        </div>
+        <div class="form-group">
+          <label>IATA Code <span class="req">*</span></label>
+          <input id="f-iata" type="text" placeholder="MS" maxlength="3" style="font-family:'JetBrains Mono',monospace;text-transform:uppercase">
+        </div>
+        <div class="form-group">
+          <label>ICAO Code</label>
+          <input id="f-icao" type="text" placeholder="MSR" maxlength="4" style="font-family:'JetBrains Mono',monospace;text-transform:uppercase">
+        </div>
+        <div class="form-group">
+          <label>Type <span class="req">*</span></label>
+          <select id="f-type">
+            <option value="FSC">Full-Service (FSC)</option>
+            <option value="LCC">Low-Cost (LCC)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Hub Airport</label>
+          <input id="f-hub" type="text" placeholder="e.g. Cairo (CAI)">
+        </div>
+        <div class="form-group">
+          <label>Alliance</label>
+          <select id="f-alliance">
+            <option value="">— None —</option>
+            <option value="Star Alliance">Star Alliance</option>
+            <option value="oneworld">oneworld</option>
+            <option value="SkyTeam">SkyTeam</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Brand Color (accent)</label>
+          <div class="color-input">
+            <input id="f-accent-color" type="color" value="#0f2044" oninput="document.getElementById('f-accent').value=this.value.toUpperCase()">
+            <input id="f-accent" type="text" placeholder="#0f2044" value="#0F2044" oninput="document.getElementById('f-accent-color').value=this.value">
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">Contact Phones</div>
+      <div class="phones-editor" id="phones-editor"></div>
+      <button class="add-phone-btn" onclick="addPhoneRow()">+ Add Phone</button>
+
+      <div class="section-title">Web</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Email</label>
+          <input id="f-email" type="email" placeholder="contact@airline.com">
+        </div>
+        <div class="form-group">
+          <label>Website</label>
+          <input id="f-website" type="url" placeholder="https://airline.com">
+        </div>
+      </div>
+
+      <div class="section-title">Policies & Rules</div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Refund Policy</label>
+          <textarea id="f-refund" placeholder="Summary of refund rules — what's refundable, fees, timeframes…"></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Change Policy</label>
+          <textarea id="f-change" placeholder="Summary of date/route change rules — fees, restrictions…"></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Baggage Allowance</label>
+          <textarea id="f-baggage" placeholder="Cabin: 7kg | Checked Economy: 23kg | Business: 2x32kg"></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Notes</label>
+          <textarea id="f-notes" placeholder="Anything else — operational quirks, escalation tips, codeshare partners…"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('form-modal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="saveAirline()">💾 Save Airline</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'wego_airline_directory_v1';
+const TODAY = new Date().toISOString().slice(0,10).replace(/-/g,'');
+
+// ── STARTER DATA ───────────────────────────────────────────
+const STARTER_AIRLINES = [
+  // Middle East — FSC
+  {id:'eg-ms', name:'EgyptAir', nameAr:'مصر للطيران', iata:'MS', icao:'MSR', type:'FSC', hub:'Cairo (CAI)', alliance:'Star Alliance', accent:'#C8102E', phones:[], email:'', website:'https://www.egyptair.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'ae-ek', name:'Emirates', nameAr:'طيران الإمارات', iata:'EK', icao:'UAE', type:'FSC', hub:'Dubai (DXB)', alliance:'', accent:'#D71921', phones:[], email:'', website:'https://www.emirates.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'qa-qr', name:'Qatar Airways', nameAr:'الخطوط الجوية القطرية', iata:'QR', icao:'QTR', type:'FSC', hub:'Doha (DOH)', alliance:'oneworld', accent:'#5C0931', phones:[], email:'', website:'https://www.qatarairways.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'ae-ey', name:'Etihad Airways', nameAr:'الاتحاد للطيران', iata:'EY', icao:'ETD', type:'FSC', hub:'Abu Dhabi (AUH)', alliance:'', accent:'#BD9B60', phones:[], email:'', website:'https://www.etihad.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'sa-sv', name:'Saudia', nameAr:'الخطوط الجوية العربية السعودية', iata:'SV', icao:'SVA', type:'FSC', hub:'Jeddah (JED)', alliance:'SkyTeam', accent:'#006C35', phones:[], email:'', website:'https://www.saudia.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'om-wy', name:'Oman Air', nameAr:'الطيران العماني', iata:'WY', icao:'OMA', type:'FSC', hub:'Muscat (MCT)', alliance:'', accent:'#BE0C30', phones:[], email:'', website:'https://www.omanair.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'jo-rj', name:'Royal Jordanian', nameAr:'الملكية الأردنية', iata:'RJ', icao:'RJA', type:'FSC', hub:'Amman (AMM)', alliance:'oneworld', accent:'#4F1F1A', phones:[], email:'', website:'https://www.rj.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'kw-ku', name:'Kuwait Airways', nameAr:'الخطوط الجوية الكويتية', iata:'KU', icao:'KAC', type:'FSC', hub:'Kuwait City (KWI)', alliance:'', accent:'#003781', phones:[], email:'', website:'https://www.kuwaitairways.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'bh-gf', name:'Gulf Air', nameAr:'طيران الخليج', iata:'GF', icao:'GFA', type:'FSC', hub:'Bahrain (BAH)', alliance:'', accent:'#C19A45', phones:[], email:'', website:'https://www.gulfair.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'lb-me', name:'Middle East Airlines', nameAr:'طيران الشرق الأوسط', iata:'ME', icao:'MEA', type:'FSC', hub:'Beirut (BEY)', alliance:'SkyTeam', accent:'#B81E3A', phones:[], email:'', website:'https://www.mea.com.lb', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'tr-tk', name:'Turkish Airlines', nameAr:'الخطوط الجوية التركية', iata:'TK', icao:'THY', type:'FSC', hub:'Istanbul (IST)', alliance:'Star Alliance', accent:'#C70A0C', phones:[], email:'', website:'https://www.turkishairlines.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  // Middle East — LCC
+  {id:'ae-fz', name:'flydubai', nameAr:'فلاي دبي', iata:'FZ', icao:'FDB', type:'LCC', hub:'Dubai (DXB)', alliance:'', accent:'#F57F29', phones:[], email:'', website:'https://www.flydubai.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'ae-g9', name:'Air Arabia', nameAr:'العربية للطيران', iata:'G9', icao:'ABY', type:'LCC', hub:'Sharjah (SHJ)', alliance:'', accent:'#870E3A', phones:[], email:'', website:'https://www.airarabia.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'sa-xy', name:'Flynas', nameAr:'طيران ناس', iata:'XY', icao:'KNE', type:'LCC', hub:'Riyadh (RUH)', alliance:'', accent:'#00857D', phones:[], email:'', website:'https://www.flynas.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'eg-ft', name:'FlyEgypt', nameAr:'فلاي إيجيبت', iata:'FT', icao:'FEG', type:'LCC', hub:'Cairo (CAI)', alliance:'', accent:'#ED1C24', phones:[], email:'', website:'https://www.flyegypt.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'eg-sm', name:'Air Cairo', nameAr:'طيران القاهرة', iata:'SM', icao:'MSC', type:'LCC', hub:'Cairo (CAI)', alliance:'', accent:'#003366', phones:[], email:'', website:'https://www.aircairo.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'kw-j9', name:'Jazeera Airways', nameAr:'طيران الجزيرة', iata:'J9', icao:'JZR', type:'LCC', hub:'Kuwait City (KWI)', alliance:'', accent:'#76232F', phones:[], email:'', website:'https://www.jazeeraairways.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'om-ov', name:'SalamAir', nameAr:'طيران السلام', iata:'OV', icao:'OMS', type:'LCC', hub:'Muscat (MCT)', alliance:'', accent:'#F47B2A', phones:[], email:'', website:'https://www.salamair.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  // Europe
+  {id:'de-lh', name:'Lufthansa', nameAr:'لوفتهانزا', iata:'LH', icao:'DLH', type:'FSC', hub:'Frankfurt (FRA)', alliance:'Star Alliance', accent:'#05164D', phones:[], email:'', website:'https://www.lufthansa.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'nl-kl', name:'KLM', nameAr:'كي إل إم', iata:'KL', icao:'KLM', type:'FSC', hub:'Amsterdam (AMS)', alliance:'SkyTeam', accent:'#00A1DE', phones:[], email:'', website:'https://www.klm.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'fr-af', name:'Air France', nameAr:'الخطوط الجوية الفرنسية', iata:'AF', icao:'AFR', type:'FSC', hub:'Paris (CDG)', alliance:'SkyTeam', accent:'#002157', phones:[], email:'', website:'https://www.airfrance.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'gb-ba', name:'British Airways', nameAr:'الخطوط الجوية البريطانية', iata:'BA', icao:'BAW', type:'FSC', hub:'London (LHR)', alliance:'oneworld', accent:'#075AAA', phones:[], email:'', website:'https://www.britishairways.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  // Asia
+  {id:'sg-sq', name:'Singapore Airlines', nameAr:'الخطوط الجوية السنغافورية', iata:'SQ', icao:'SIA', type:'FSC', hub:'Singapore (SIN)', alliance:'Star Alliance', accent:'#F99F1C', phones:[], email:'', website:'https://www.singaporeair.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'in-ai', name:'Air India', nameAr:'الخطوط الجوية الهندية', iata:'AI', icao:'AIC', type:'FSC', hub:'Delhi (DEL)', alliance:'Star Alliance', accent:'#D6232C', phones:[], email:'', website:'https://www.airindia.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  {id:'in-6e', name:'IndiGo', nameAr:'إنديجو', iata:'6E', icao:'IGO', type:'LCC', hub:'Delhi (DEL)', alliance:'', accent:'#00318C', phones:[], email:'', website:'https://www.goindigo.in', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+  // Africa
+  {id:'ma-at', name:'Royal Air Maroc', nameAr:'الخطوط الجوية الملكية المغربية', iata:'AT', icao:'RAM', type:'FSC', hub:'Casablanca (CMN)', alliance:'oneworld', accent:'#C1272D', phones:[], email:'', website:'https://www.royalairmaroc.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
+];
+
+// ── STATE ──────────────────────────────────────────────────
+let airlines = [];
+let activeFilter = 'all';
+let searchQuery = '';
+let editingId = null;
+
+// ── INIT ───────────────────────────────────────────────────
+function init(){
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if(stored){
+    try{ airlines = JSON.parse(stored); }
+    catch(e){ airlines = [...STARTER_AIRLINES]; }
+  } else {
+    airlines = JSON.parse(JSON.stringify(STARTER_AIRLINES));
+    save();
+  }
+  renderSidebar();
+  render();
+}
+
+function save(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(airlines));
+}
+
+// ── SIDEBAR ────────────────────────────────────────────────
+function renderSidebar(){
+  const counts = {
+    all: airlines.length,
+    fsc: airlines.filter(a => a.type === 'FSC').length,
+    lcc: airlines.filter(a => a.type === 'LCC').length,
+    star: airlines.filter(a => a.alliance === 'Star Alliance').length,
+    oneworld: airlines.filter(a => a.alliance === 'oneworld').length,
+    skyteam: airlines.filter(a => a.alliance === 'SkyTeam').length,
+    none: airlines.filter(a => !a.alliance).length,
+  };
+  const items = [
+    {section:'View'},
+    {id:'all', icon:'⭐', label:'All Airlines', count:counts.all},
+    {section:'By Type'},
+    {id:'fsc', icon:'✈️', label:'Full-Service (FSC)', count:counts.fsc},
+    {id:'lcc', icon:'💸', label:'Low-Cost (LCC)', count:counts.lcc},
+    {section:'By Alliance'},
+    {id:'star', icon:'🌐', label:'Star Alliance', count:counts.star},
+    {id:'oneworld', icon:'🌐', label:'oneworld', count:counts.oneworld},
+    {id:'skyteam', icon:'🌐', label:'SkyTeam', count:counts.skyteam},
+    {id:'none', icon:'⚪', label:'No Alliance', count:counts.none},
+  ];
+  let html = '';
+  items.forEach(it => {
+    if(it.section){ html += `<div class="nav-section">${it.section}</div>`; }
+    else {
+      html += `<div class="nav-btn ${activeFilter===it.id?'active':''}" onclick="setFilter('${it.id}')">
+        <span class="nb-icon">${it.icon}</span>
+        <span>${it.label}</span>
+        <span class="nb-count">${it.count}</span>
+      </div>`;
+    }
+  });
+  document.getElementById('sb-nav').innerHTML = html;
+}
+
+function setFilter(id){
+  activeFilter = id;
+  if(window.innerWidth <= 900) toggleSidebar();
+  renderSidebar();
+  render();
+}
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ── SEARCH ─────────────────────────────────────────────────
+function onSearch(){
+  searchQuery = document.getElementById('search').value.trim().toLowerCase();
+  render();
+}
+
+// ── RENDER CARDS ───────────────────────────────────────────
+function getFiltered(){
+  return airlines.filter(a => {
+    // filter
+    if(activeFilter === 'fsc' && a.type !== 'FSC') return false;
+    if(activeFilter === 'lcc' && a.type !== 'LCC') return false;
+    if(activeFilter === 'star' && a.alliance !== 'Star Alliance') return false;
+    if(activeFilter === 'oneworld' && a.alliance !== 'oneworld') return false;
+    if(activeFilter === 'skyteam' && a.alliance !== 'SkyTeam') return false;
+    if(activeFilter === 'none' && a.alliance) return false;
+    // search
+    if(searchQuery){
+      const q = searchQuery;
+      const hit = (a.name||'').toLowerCase().includes(q)
+        || (a.nameAr||'').includes(q)
+        || (a.iata||'').toLowerCase().includes(q)
+        || (a.icao||'').toLowerCase().includes(q)
+        || (a.hub||'').toLowerCase().includes(q);
+      if(!hit) return false;
+    }
+    return true;
+  }).sort((a,b) => a.name.localeCompare(b.name));
+}
+
+function render(){
+  const list = getFiltered();
+  document.getElementById('count').innerHTML = `<strong>${list.length}</strong> ${list.length===1?'airline':'airlines'}${searchQuery?` matching "<strong>${escapeHtml(searchQuery)}</strong>"`:''}`;
+  document.getElementById('tb-sub').textContent = `${airlines.length} airlines · ${airlines.filter(a=>a.type==='FSC').length} FSC · ${airlines.filter(a=>a.type==='LCC').length} LCC`;
+
+  const cards = document.getElementById('cards');
+  if(list.length === 0){
+    cards.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <div class="icon">🔍</div>
+      <h3>No airlines found</h3>
+      <p>${searchQuery ? `No matches for "${escapeHtml(searchQuery)}"` : 'No airlines in this view yet.'}</p>
+      ${!searchQuery ? '<button class="btn btn-primary" onclick="openAddModal()" style="margin-top:14px">+ Add an Airline</button>' : ''}
+    </div>`;
+    return;
+  }
+
+  cards.innerHTML = list.map(a => {
+    const hasPhones = a.phones && a.phones.length > 0;
+    const hasRefund = (a.refundPolicy||'').trim().length > 0;
+    const hasBaggage = (a.baggage||'').trim().length > 0;
+    const hasWeb = (a.website||'').trim().length > 0;
+    const primaryPhone = hasPhones ? a.phones[0] : null;
+    return `<div class="airline-card" onclick="openDetail('${a.id}')" style="--accent:${a.accent||'#0f2044'}">
+      <div class="accent"></div>
+      <div class="ac-head">
+        <div class="ac-iata">${escapeHtml(a.iata)}</div>
+        <div class="ac-titles">
+          <div class="ac-name">${escapeHtml(a.name)}</div>
+          <div class="ac-name-ar">${escapeHtml(a.nameAr||'—')}</div>
+        </div>
+      </div>
+      <div class="ac-meta">
+        <span class="pill ${a.type==='LCC'?'pill-lcc':'pill-fsc'}">${a.type}</span>
+        ${a.hub ? `<span class="pill pill-hub">📍 ${escapeHtml(a.hub)}</span>` : ''}
+        ${a.alliance ? `<span class="pill pill-alliance">${escapeHtml(a.alliance)}</span>` : ''}
+      </div>
+      <div class="ac-info">
+        <div class="ac-info-row"><span class="icon">📞</span><span class="val ${hasPhones?'':'empty'}">${hasPhones ? `${escapeHtml(primaryPhone.region)}: ${escapeHtml(primaryPhone.number)}${a.phones.length>1?` <span style="color:var(--muted);font-weight:400">+${a.phones.length-1} more</span>`:''}` : 'No phone added yet'}</span></div>
+        <div class="ac-info-row"><span class="icon">📋</span><span class="val ${hasRefund?'':'empty'}">${hasRefund ? 'Refund/change policy' : 'No policy notes yet'}</span></div>
+        <div class="ac-info-row"><span class="icon">🧳</span><span class="val ${hasBaggage?'':'empty'}">${hasBaggage ? 'Baggage rules' : 'No baggage notes yet'}</span></div>
+        <div class="ac-info-row"><span class="icon">🔗</span><span class="val ${hasWeb?'':'empty'}">${hasWeb ? escapeHtml(a.website.replace(/^https?:\/\//,'').replace(/\/$/,'')) : 'No website'}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── DETAIL MODAL ───────────────────────────────────────────
+function openDetail(id){
+  const a = airlines.find(x => x.id === id);
+  if(!a) return;
+  const accent = a.accent || '#0f2044';
+
+  const phonesHtml = (a.phones && a.phones.length) ? `<div class="phone-list">${a.phones.map((p,i) => `
+    <div class="phone-row">
+      <span class="region">${escapeHtml(p.region)}</span>
+      <span class="number">${escapeHtml(p.number)}</span>
+      <button class="copy-btn" onclick="copyPhone('${p.number.replace(/'/g,"\\'")}', this)" title="Copy">📋</button>
+    </div>
+  `).join('')}</div>` : `<div class="detail-text empty">No phone numbers added yet. Click "Edit" to add.</div>`;
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="m-head" style="--accent:${accent}">
+      <div class="m-iata" style="background:${accent}">${escapeHtml(a.iata)}</div>
+      <div class="m-titles">
+        <div class="m-name">${escapeHtml(a.name)}</div>
+        <div class="m-name-ar">${escapeHtml(a.nameAr||'—')}</div>
+      </div>
+      <button class="m-close" onclick="closeModal('detail-modal')">✕</button>
+    </div>
+    <div class="m-body">
+      <div class="detail-meta-row">
+        <span class="pill ${a.type==='LCC'?'pill-lcc':'pill-fsc'}">${a.type}</span>
+        ${a.icao ? `<span class="pill pill-hub">ICAO: ${escapeHtml(a.icao)}</span>` : ''}
+        ${a.hub ? `<span class="pill pill-hub">📍 Hub: ${escapeHtml(a.hub)}</span>` : ''}
+        ${a.alliance ? `<span class="pill pill-alliance">${escapeHtml(a.alliance)}</span>` : ''}
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">📞 Phone Numbers</div>
+        ${phonesHtml}
+      </div>
+
+      ${(a.email || a.website) ? `<div class="detail-section">
+        <div class="detail-label">🌐 Web</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          ${a.website ? `<a href="${escapeHtml(a.website)}" target="_blank" rel="noopener" class="detail-link">🔗 ${escapeHtml(a.website.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a>` : ''}
+          ${a.email ? `<a href="mailto:${escapeHtml(a.email)}" class="detail-link">📧 ${escapeHtml(a.email)}</a>` : ''}
+        </div>
+      </div>` : ''}
+
+      <div class="detail-section">
+        <div class="detail-label">💰 Refund Policy</div>
+        <div class="detail-text ${(a.refundPolicy||'').trim() ? '' : 'empty'}">${escapeHtml(a.refundPolicy || 'No refund policy notes yet. Click "Edit" to add what you know.')}</div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">🔄 Change Policy</div>
+        <div class="detail-text ${(a.changePolicy||'').trim() ? '' : 'empty'}">${escapeHtml(a.changePolicy || 'No change policy notes yet.')}</div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">🧳 Baggage Allowance</div>
+        <div class="detail-text ${(a.baggage||'').trim() ? '' : 'empty'}">${escapeHtml(a.baggage || 'No baggage rules yet.')}</div>
+      </div>
+
+      ${(a.notes||'').trim() ? `<div class="detail-section">
+        <div class="detail-label">📝 Notes</div>
+        <div class="detail-text">${escapeHtml(a.notes)}</div>
+      </div>` : ''}
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-danger btn-sm" onclick="deleteAirline('${a.id}')">🗑 Delete</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('detail-modal')">Close</button>
+      <button class="btn btn-primary btn-sm" onclick="closeModal('detail-modal');openEditModal('${a.id}')">✏️ Edit</button>
+    </div>
+  `;
+  document.getElementById('detail-modal').classList.add('show');
+}
+
+function copyPhone(num, btn){
+  navigator.clipboard.writeText(num).then(() => {
+    btn.textContent = '✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋'; btn.classList.remove('copied'); }, 1400);
+  });
+}
+
+// ── ADD/EDIT FORM ──────────────────────────────────────────
+function openAddModal(){
+  editingId = null;
+  document.getElementById('form-title').textContent = 'Add New Airline';
+  // reset
+  ['name','nameAr','iata','icao','hub','email','website','refund','change','baggage','notes'].forEach(f => document.getElementById('f-'+f).value = '');
+  document.getElementById('f-type').value = 'FSC';
+  document.getElementById('f-alliance').value = '';
+  document.getElementById('f-accent').value = '#0F2044';
+  document.getElementById('f-accent-color').value = '#0F2044';
+  renderPhonesEditor([]);
+  document.getElementById('form-modal').classList.add('show');
+  setTimeout(() => document.getElementById('f-name').focus(), 100);
+}
+
+function openEditModal(id){
+  const a = airlines.find(x => x.id === id);
+  if(!a) return;
+  editingId = id;
+  document.getElementById('form-title').textContent = `Edit: ${a.name}`;
+  document.getElementById('f-name').value = a.name||'';
+  document.getElementById('f-nameAr').value = a.nameAr||'';
+  document.getElementById('f-iata').value = a.iata||'';
+  document.getElementById('f-icao').value = a.icao||'';
+  document.getElementById('f-type').value = a.type||'FSC';
+  document.getElementById('f-hub').value = a.hub||'';
+  document.getElementById('f-alliance').value = a.alliance||'';
+  document.getElementById('f-accent').value = (a.accent||'#0f2044').toUpperCase();
+  document.getElementById('f-accent-color').value = a.accent||'#0f2044';
+  document.getElementById('f-email').value = a.email||'';
+  document.getElementById('f-website').value = a.website||'';
+  document.getElementById('f-refund').value = a.refundPolicy||'';
+  document.getElementById('f-change').value = a.changePolicy||'';
+  document.getElementById('f-baggage').value = a.baggage||'';
+  document.getElementById('f-notes').value = a.notes||'';
+  renderPhonesEditor(a.phones||[]);
+  document.getElementById('form-modal').classList.add('show');
+}
+
+function renderPhonesEditor(phones){
+  const wrap = document.getElementById('phones-editor');
+  if(phones.length === 0){
+    wrap.innerHTML = '<div style="font-size:12px;color:var(--muted);font-style:italic;padding:6px 0">No phones yet — click "+ Add Phone" below.</div>';
+    return;
+  }
+  wrap.innerHTML = phones.map((p, i) => `
+    <div class="phone-edit-row">
+      <input type="text" placeholder="Region (e.g. Egypt)" value="${escapeHtml(p.region||'')}" data-phone-region="${i}">
+      <input type="text" placeholder="Number" value="${escapeHtml(p.number||'')}" data-phone-number="${i}" style="font-family:'JetBrains Mono',monospace">
+      <button class="del-phone" onclick="removePhoneRow(${i})">✕</button>
+    </div>
+  `).join('');
+}
+
+function getPhonesFromEditor(){
+  const regions = document.querySelectorAll('[data-phone-region]');
+  const numbers = document.querySelectorAll('[data-phone-number]');
+  const phones = [];
+  regions.forEach((r, i) => {
+    const region = r.value.trim();
+    const number = numbers[i] ? numbers[i].value.trim() : '';
+    if(region || number) phones.push({region: region || 'Phone', number});
+  });
+  return phones;
+}
+
+function addPhoneRow(){
+  const current = getPhonesFromEditor();
+  current.push({region:'', number:''});
+  renderPhonesEditor(current);
+  // focus the new row's first input
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('[data-phone-region]');
+    inputs[inputs.length-1]?.focus();
+  }, 50);
+}
+
+function removePhoneRow(idx){
+  const current = getPhonesFromEditor();
+  current.splice(idx, 1);
+  renderPhonesEditor(current);
+}
+
+function saveAirline(){
+  const name = document.getElementById('f-name').value.trim();
+  const iata = document.getElementById('f-iata').value.trim().toUpperCase();
+  if(!name){ toast('Airline name is required','error'); return; }
+  if(!iata){ toast('IATA code is required','error'); return; }
+
+  const data = {
+    id: editingId || ('user-' + Date.now().toString(36)),
+    name,
+    nameAr: document.getElementById('f-nameAr').value.trim(),
+    iata,
+    icao: document.getElementById('f-icao').value.trim().toUpperCase(),
+    type: document.getElementById('f-type').value,
+    hub: document.getElementById('f-hub').value.trim(),
+    alliance: document.getElementById('f-alliance').value,
+    accent: document.getElementById('f-accent').value.trim() || '#0f2044',
+    phones: getPhonesFromEditor(),
+    email: document.getElementById('f-email').value.trim(),
+    website: document.getElementById('f-website').value.trim(),
+    refundPolicy: document.getElementById('f-refund').value.trim(),
+    changePolicy: document.getElementById('f-change').value.trim(),
+    baggage: document.getElementById('f-baggage').value.trim(),
+    notes: document.getElementById('f-notes').value.trim(),
+  };
+
+  if(editingId){
+    const idx = airlines.findIndex(a => a.id === editingId);
+    if(idx >= 0) airlines[idx] = data;
+    toast(`Updated ${name}`, 'success');
+  } else {
+    airlines.push(data);
+    toast(`Added ${name}`, 'success');
+  }
+  save();
+  closeModal('form-modal');
+  renderSidebar();
+  render();
+}
+
+function deleteAirline(id){
+  const a = airlines.find(x => x.id === id);
+  if(!a) return;
+  if(!confirm(`Delete ${a.name}?\n\nThis cannot be undone (but you can re-import from a backup).`)) return;
+  airlines = airlines.filter(x => x.id !== id);
+  save();
+  closeModal('detail-modal');
+  renderSidebar();
+  render();
+  toast(`Deleted ${a.name}`, 'success');
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.remove('show');
+}
+
+// ── EXPORT / IMPORT ────────────────────────────────────────
+function exportData(){
+  const blob = new Blob([JSON.stringify(airlines, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Adel_airlines_backup_${TODAY}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast(`Exported ${airlines.length} airlines`, 'success');
+}
+
+function importData(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if(!Array.isArray(imported)) throw new Error('Invalid format');
+      const choice = confirm(`Import ${imported.length} airlines.\n\nOK = Replace all current data\nCancel = Merge (add new, skip duplicates by IATA)`);
+      if(choice){
+        airlines = imported;
+      } else {
+        const existingIatas = new Set(airlines.map(a => a.iata));
+        const toAdd = imported.filter(a => !existingIatas.has(a.iata));
+        airlines = [...airlines, ...toAdd];
+        toast(`Merged ${toAdd.length} new airlines`, 'success');
+      }
+      save();
+      renderSidebar();
+      render();
+      if(choice) toast(`Imported ${imported.length} airlines (replaced)`, 'success');
+    } catch(err){
+      toast('Import failed: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = ''; // reset
+}
+
+// ── TOAST ──────────────────────────────────────────────────
+function toast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (type||'');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ── HELPERS ────────────────────────────────────────────────
+function escapeHtml(s){
+  if(s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ── KEYBOARD ───────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){
+    closeModal('detail-modal');
+    closeModal('form-modal');
+  }
+});
+
+// ── BOOT ───────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flight Calculator — Wego Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0f2044; --navy2:#162d5c; --blue:#1a56db; --blue2:#1e40af;
+  --teal:#0891b2; --green:#059669; --amber:#d97706; --red:#dc2626;
+  --bg:#f0f4f8; --card:#ffffff; --border:#dde3ec; --text:#1e293b;
+  --muted:#64748b; --light:#f8fafc; --sidebar:#0f2044;
+  --sidebar-w:280px;
+  --shadow-sm:0 1px 3px rgba(15,32,68,.06);
+  --shadow-md:0 4px 12px rgba(15,32,68,.08);
+  --shadow-lg:0 12px 32px rgba(15,32,68,.18);
+  --gradient-hero:linear-gradient(135deg,#1a56db 0%,#0891b2 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px}
+body[dir="rtl"]{font-family:'Cairo','Plus Jakarta Sans',sans-serif}
+body[dir="rtl"] #sidebar{left:auto;right:0;box-shadow:-4px 0 20px rgba(0,0,0,.2)}
+body[dir="rtl"] #main{margin-left:0;margin-right:var(--sidebar-w)}
+body[dir="rtl"] #mobile-toggle{left:auto;right:12px}
+body[dir="rtl"] .preset-btn{border-left:none;border-right:3px solid transparent}
+body[dir="rtl"] .preset-btn:hover{border-right-color:#3b82f6}
+body[dir="rtl"] .leg-endpoint.right{text-align:left;align-items:flex-start}
+body[dir="rtl"] .leg-endpoint.right .city-line{justify-content:flex-start}
+body[dir="rtl"] .leg-endpoint:not(.right){text-align:right;align-items:flex-end}
+body[dir="rtl"] .leg-endpoint:not(.right) .city-line{justify-content:flex-end}
+body[dir="rtl"] .email-preview{font-family:'Cairo','Segoe UI',sans-serif;direction:rtl;text-align:right}
+body[dir="rtl"] .email-preview .ev-end.right{text-align:left;align-items:flex-start}
+body[dir="rtl"] .email-preview .ev-end.right .ev-cl{justify-content:flex-start}
+body[dir="rtl"] .email-preview .ev-end:not(.right){text-align:right;align-items:flex-end}
+body[dir="rtl"] .email-preview .ev-end:not(.right) .ev-cl{justify-content:flex-end}
+body[dir="rtl"] .email-preview .channel{direction:ltr;justify-content:flex-end;text-align:right}
+@media (max-width:900px){
+  body[dir="rtl"] #sidebar{transform:translateX(100%)}
+  body[dir="rtl"] #sidebar.open{transform:none}
+  body[dir="rtl"] #main{margin-right:0}
+  body[dir="rtl"] #topbar{padding-left:24px;padding-right:60px}
+}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* ── SIDEBAR (kept) ── */
+#sidebar{width:var(--sidebar-w);background:var(--sidebar);position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;overflow:hidden;z-index:100;box-shadow:4px 0 20px rgba(0,0,0,.2);transition:transform .25s}
+#sb-head{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+#sb-head .logo{color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+#sb-head .logo span{background:linear-gradient(135deg,#3b82f6,#06b6d4);padding:5px 9px;border-radius:6px;font-size:12px}
+#sb-head .sub{color:rgba(255,255,255,.4);font-size:10.5px;margin-top:4px;letter-spacing:.05em;text-transform:uppercase}
+#sb-content{flex:1;overflow-y:auto;padding:6px 0 16px}
+#sb-content::-webkit-scrollbar{width:3px}
+#sb-content::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px}
+.sb-section{padding:14px 16px 6px;font-size:9px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em}
+
+.world-clock-item{display:flex;align-items:center;gap:10px;padding:10px 16px;color:rgba(255,255,255,.85);transition:background .15s;cursor:default}
+.world-clock-item .iata{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;color:#3b82f6;background:rgba(59,130,246,.15);padding:3px 7px;border-radius:5px;letter-spacing:.04em;min-width:38px;text-align:center;flex-shrink:0}
+.world-clock-item .city{flex:1;font-size:12.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.world-clock-item .time{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#fff;flex-shrink:0}
+
+.preset-btn{display:flex;align-items:center;gap:8px;padding:9px 16px;color:rgba(255,255,255,.78);cursor:pointer;border-left:3px solid transparent;transition:all .15s;font-size:12.5px;font-weight:500}
+.preset-btn:hover{background:rgba(255,255,255,.07);color:#fff;border-left-color:#3b82f6}
+.preset-btn .from-iata,.preset-btn .to-iata{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;color:#06b6d4}
+.preset-btn .arrow{color:rgba(255,255,255,.4);font-size:11px}
+
+#mobile-toggle{display:none;position:fixed;top:12px;left:12px;z-index:200;background:var(--navy);color:#fff;border:none;width:40px;height:40px;border-radius:8px;font-size:18px;cursor:pointer;box-shadow:var(--shadow-md)}
+#sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:90}
+
+/* ── MAIN ── */
+#main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+#topbar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:14px;position:sticky;top:0;z-index:50;box-shadow:var(--shadow-sm)}
+.tb-title{font-size:15px;font-weight:700;color:var(--navy)}
+.tb-sub{font-size:11.5px;color:var(--muted);margin-top:1px}
+.lang-toggle{display:flex;background:var(--light);border:1.5px solid var(--border);border-radius:8px;overflow:hidden;font-size:12.5px;flex-shrink:0}
+.lang-toggle button{padding:7px 14px;background:transparent;border:none;cursor:pointer;font-family:inherit;font-weight:700;color:var(--muted);transition:all .15s}
+.lang-toggle button.active{background:var(--blue);color:#fff}
+.lang-toggle button:not(.active):hover{background:#fff;color:var(--text)}
+
+#content{padding:24px;flex:1;display:flex;flex-direction:column;gap:18px;max-width:980px;margin:0 auto;width:100%}
+
+/* ── CALCULATOR CARD ── */
+.calc-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.calc-head{padding:18px 22px 14px;background:var(--gradient-hero);color:#fff}
+.calc-head h2{font-size:16px;font-weight:700;letter-spacing:-.01em}
+.calc-head p{font-size:12px;color:rgba(255,255,255,.85);margin-top:3px}
+.calc-body{padding:22px}
+
+/* Trip-type tabs (Wego-style) */
+.trip-tabs{display:flex;gap:24px;border-bottom:1px solid var(--border);margin-bottom:20px}
+.trip-tab{padding:10px 0;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;display:flex;align-items:center;gap:6px}
+.trip-tab:hover{color:var(--text)}
+.trip-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.trip-tab .tag{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;background:#e6efff;color:var(--blue);padding:2px 6px;border-radius:4px}
+.trip-tab.active .tag{background:var(--blue);color:#fff}
+
+/* Booking reference fields (Wego internal) */
+.booking-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;padding:14px;background:#fef3f2;border:1px solid #fecaca;border-radius:10px}
+.booking-cell{display:flex;flex-direction:column;gap:5px}
+.booking-cell label{font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:4px}
+.booking-cell input{height:38px;padding:0 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13.5px;font-family:'JetBrains Mono',monospace;font-weight:600;letter-spacing:.04em;background:#fff;color:var(--text);outline:none;text-transform:uppercase}
+.booking-cell input::placeholder{color:#cbd5e1;text-transform:none;font-weight:400;letter-spacing:0}
+.booking-cell input:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.1)}
+.booking-cell .hint{font-size:10px;color:var(--muted);font-style:italic;line-height:1.3}
+.booking-cell .hint.req::after{content:'';display:inline}
+
+/* Booking summary in result + email */
+.booking-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px 16px;background:#fef3f2;border:1px solid #fecaca;border-radius:10px;margin-bottom:14px}
+.booking-summary .b-item{display:flex;flex-direction:column;gap:2px}
+.booking-summary .b-label{font-size:9.5px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.08em}
+.booking-summary .b-value{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--navy);letter-spacing:.04em}
+.booking-summary .b-value.empty{color:#cbd5e1;font-weight:500;font-style:italic;font-size:12px}
+
+@media (max-width:680px){
+  .booking-row{grid-template-columns:1fr}
+  .booking-summary{grid-template-columns:1fr;gap:8px}
+}
+
+/* Section label */
+.section-label{font-size:10.5px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.section-label .dot{width:6px;height:6px;background:var(--blue);border-radius:50%}
+
+/* Passengers row */
+.pax-row{display:grid;grid-template-columns:repeat(4,1fr) 1.4fr;gap:10px;margin-bottom:18px;padding:14px;background:var(--light);border-radius:10px;border:1px solid var(--border)}
+.pax-cell{display:flex;flex-direction:column;gap:5px}
+.pax-cell label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.pax-stepper{display:flex;align-items:center;background:#fff;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;height:36px}
+.pax-stepper button{width:32px;height:34px;border:none;background:transparent;cursor:pointer;font-size:16px;font-weight:700;color:var(--blue);font-family:inherit}
+.pax-stepper button:hover{background:#eff6ff}
+.pax-stepper input{flex:1;border:none;text-align:center;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;outline:none;background:transparent;-moz-appearance:textfield;width:100%;padding:0;color:var(--text)}
+.pax-stepper input::-webkit-outer-spin-button,.pax-stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.pax-hint{font-size:9.5px;color:var(--muted);font-weight:500}
+.pax-cell select{height:36px;padding:0 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13.5px;font-family:inherit;background:#fff;color:var(--text);font-weight:600;cursor:pointer;outline:none}
+.pax-cell select:hover,.pax-cell select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.1)}
+
+/* Passenger summary in result */
+.pax-summary{display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:12px 16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;margin-bottom:14px}
+.pax-summary .pax-item{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#1e40af}
+.pax-summary .pax-item .ico{font-size:14px}
+.pax-summary .pax-item .lbl{color:#64748b;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+
+/* Big Email CTA banner */
+.email-cta-banner{background:linear-gradient(135deg,#0891b2 0%,#1a56db 100%);color:#fff;padding:16px 22px;border-radius:11px;margin:14px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 4px 14px rgba(26,86,219,.25)}
+.email-cta-banner .left{display:flex;align-items:center;gap:12px}
+.email-cta-banner .ico{font-size:24px}
+.email-cta-banner .title{font-size:14px;font-weight:700}
+.email-cta-banner .sub{font-size:11.5px;color:rgba(255,255,255,.8);margin-top:2px}
+.email-cta-banner button{background:#fff;color:var(--blue);border:none;padding:10px 18px;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.email-cta-banner button:hover{background:#f0f7ff;transform:translateY(-1px)}
+
+/* Inline email preview card */
+.email-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-md);display:none;animation:slideUp .3s}
+.email-card.show{display:block}
+.email-head-bar{padding:14px 22px;background:linear-gradient(135deg,#0891b2 0%,#1a56db 100%);color:#fff;display:flex;align-items:center;justify-content:space-between}
+.email-head-bar .title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px}
+.email-head-bar .badge{font-size:10px;font-weight:700;background:rgba(255,255,255,.18);padding:3px 9px;border-radius:5px;letter-spacing:.05em;text-transform:uppercase}
+.email-body-wrap{padding:22px;background:#f8fafc;max-height:600px;overflow-y:auto}
+.email-actions-bar{padding:14px 22px;background:#fff;border-top:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap}
+
+.flight-row{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:end;margin-bottom:18px}
+.flight-leg{display:flex;flex-direction:column;gap:6px}
+.flight-leg label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.flight-leg select{padding:11px 13px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;outline:none;background:var(--light);transition:all .15s;font-weight:500;color:var(--text);cursor:pointer;width:100%}
+.flight-leg select:focus,.flight-leg select:hover{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,86,219,.1)}
+.swap-btn{background:#fff;border:1.5px solid var(--border);width:42px;height:42px;border-radius:50%;cursor:pointer;font-size:18px;color:var(--blue);transition:all .2s;display:flex;align-items:center;justify-content:center;flex-shrink:0;align-self:end;margin-bottom:1px}
+.swap-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue);transform:rotate(180deg)}
+
+.detail-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.detail-row.three{grid-template-columns:1fr 1fr 1fr}
+.detail-group{display:flex;flex-direction:column;gap:6px}
+.detail-group label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.detail-group input{padding:11px 13px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:'JetBrains Mono',monospace;outline:none;background:var(--light);transition:all .15s;font-weight:600;color:var(--text);width:100%}
+.detail-group input:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,86,219,.1)}
+.detail-group .now-btn{align-self:flex-start;font-size:10.5px;color:var(--blue);background:transparent;border:none;cursor:pointer;font-weight:600;padding:3px 0;font-family:inherit}
+.detail-group .now-btn:hover{text-decoration:underline}
+
+.duration-inline{display:flex;gap:8px;align-items:center}
+.duration-inline input{flex:1;text-align:center}
+.duration-inline span{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase}
+.duration-info{font-size:11px;color:var(--green);margin-top:4px;display:flex;align-items:center;gap:5px}
+.duration-info.manual{color:var(--amber)}
+.duration-info button{background:transparent;border:none;color:var(--blue);cursor:pointer;font-family:inherit;font-size:11px;font-weight:600;padding:0;text-decoration:underline}
+
+/* Return section */
+.return-section{display:none;margin-top:8px;padding-top:18px;border-top:1px dashed var(--border)}
+.return-section.show{display:block}
+
+.calc-btn{width:100%;padding:14px 22px;background:var(--gradient-hero);color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;box-shadow:0 4px 14px rgba(26,86,219,.3);margin-top:10px}
+.calc-btn:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(26,86,219,.4)}
+.calc-btn:active{transform:translateY(0)}
+
+/* ── RESULT CARD (NEW DESIGN — EgyptAir/Wego style) ── */
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-md);display:none;animation:slideUp .3s}
+.result-card.show{display:block}
+@keyframes slideUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:none}}
+
+.result-head{padding:14px 22px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.result-head .left{display:flex;align-items:center;gap:10px}
+.result-head .icon{font-size:20px}
+.result-head .title{font-size:15px;font-weight:700}
+.result-head .subtitle{font-size:11.5px;color:rgba(255,255,255,.65);margin-top:1px}
+.result-head .ref{font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,.55);background:rgba(255,255,255,.08);padding:4px 9px;border-radius:5px;letter-spacing:.05em}
+
+.result-body{padding:20px 22px}
+
+/* Flight itinerary card (Image 4 style) */
+.itinerary{background:#f4f8fc;border:1px solid #d4e1f0;border-radius:12px;padding:18px 20px;margin-bottom:14px;position:relative}
+.itinerary .leg-header{font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.itinerary .leg-header .badge{background:var(--blue);color:#fff;font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;letter-spacing:.04em}
+
+.leg-body{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:start}
+.leg-endpoint{display:flex;flex-direction:column;gap:6px}
+.leg-endpoint.right{text-align:right;align-items:flex-end}
+.leg-endpoint .city-line{display:flex;align-items:baseline;gap:8px}
+.leg-endpoint.right .city-line{justify-content:flex-end}
+.leg-endpoint .city-name{font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.01em;line-height:1.1}
+.leg-endpoint .iata-badge{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--blue);background:#dbeafe;padding:3px 7px;border-radius:5px;letter-spacing:.04em}
+.leg-endpoint .airport-full{font-size:11.5px;color:var(--muted);font-weight:500;margin-top:1px}
+.leg-endpoint .country{font-size:11.5px;color:var(--muted);font-weight:500}
+.leg-endpoint .time-block{margin-top:8px}
+.leg-endpoint .time-big{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--navy);letter-spacing:-.02em;line-height:1}
+.leg-endpoint .time-period{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--blue);margin-left:3px}
+.leg-endpoint .day-label{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:4px}
+.leg-endpoint .day-label strong{color:var(--text);font-weight:700}
+.leg-endpoint .day-badge{display:inline-block;font-size:9.5px;font-weight:700;background:var(--amber);color:#fff;padding:1px 6px;border-radius:3px;margin-left:6px;vertical-align:1px;letter-spacing:.04em}
+.leg-endpoint .day-badge.same{background:var(--green)}
+
+.leg-arrow{display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 6px;min-width:80px}
+.leg-arrow .duration-text{font-size:11px;color:var(--muted);font-weight:600;font-family:'JetBrains Mono',monospace}
+.leg-arrow .arrow-line{width:100%;height:1.5px;background:linear-gradient(90deg,transparent 0%,var(--blue) 20%,var(--blue) 80%,transparent 100%);position:relative;margin:8px 0}
+.leg-arrow .arrow-line::after{content:'✈';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#f4f8fc;padding:0 6px;color:var(--blue);font-size:13px}
+.leg-arrow .distance-text{font-size:10.5px;color:var(--muted);font-weight:500}
+
+.itinerary-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid #d4e1f0}
+.meta-item{display:flex;flex-direction:column;gap:3px}
+.meta-item .label{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.meta-item .value{font-size:13px;font-weight:600;color:var(--text);font-family:'JetBrains Mono',monospace}
+.meta-item .value.text{font-family:'Plus Jakarta Sans',sans-serif}
+
+/* Action row */
+.action-row{display:flex;gap:10px;margin-top:18px}
+.action-btn{flex:1;padding:11px 14px;background:#fff;border:1.5px solid var(--border);border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--text);display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s}
+.action-btn:hover{border-color:var(--blue);background:#f0f7ff;color:var(--blue)}
+.action-btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.action-btn.primary:hover{background:var(--blue2);color:#fff}
+
+.error-banner{padding:11px 16px;background:#fef2f2;border:1px solid #fecaca;border-radius:9px;color:var(--red);font-size:12.5px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+/* ── INFO CARD ── */
+.info-card{background:#eff6ff;border:1px solid #bfdbfe;border-radius:11px;padding:14px 16px;display:flex;gap:11px;align-items:flex-start;font-size:12.5px;color:#1e40af;line-height:1.55}
+.info-card .icon{font-size:17px;flex-shrink:0}
+
+/* ── EMAIL MODAL ── */
+.modal-backdrop{position:fixed;inset:0;background:rgba(15,32,68,.6);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)}
+.modal-backdrop.show{display:flex}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:760px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow-lg)}
+.modal-head{padding:16px 22px;background:var(--gradient-hero);color:#fff;display:flex;justify-content:space-between;align-items:center}
+.modal-head h3{font-size:16px;font-weight:700}
+.modal-head .sub{font-size:11.5px;color:rgba(255,255,255,.75);margin-top:1px}
+.modal-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.modal-close:hover{background:rgba(255,255,255,.3)}
+.modal-body{flex:1;overflow-y:auto;background:#f8fafc}
+
+/* Email preview — looks like an email */
+.email-preview{background:#fff;margin:18px;padding:30px 34px;border-radius:8px;box-shadow:var(--shadow-sm);font-family:'Segoe UI',Tahoma,Arial,sans-serif;font-size:14px;color:#333;line-height:1.65}
+.email-preview .email-greeting{font-size:15px;font-weight:600;color:#1e293b;margin-bottom:14px}
+.email-preview .email-intro{margin-bottom:18px;color:#475569}
+.email-preview .email-flight-box{background:linear-gradient(135deg,#f0f7ff 0%,#e6f0fc 100%);border:1px solid #cfe1f7;border-radius:10px;padding:18px 20px;margin:16px 0}
+.email-preview .email-flight-box .route-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #cfe1f7;display:flex;align-items:center;gap:8px}
+.email-preview .email-flight-box .leg{margin-bottom:12px}
+.email-preview .email-flight-box .leg:last-of-type{margin-bottom:0}
+.email-preview .email-flight-box .leg-title{font-weight:700;color:var(--navy);font-size:13.5px;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.email-preview .email-flight-box .leg-detail{margin-left:24px;color:#475569;font-size:13.5px;line-height:1.55}
+.email-preview .email-flight-box .leg-detail strong{color:#1e293b}
+.email-preview .email-flight-box .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid #cfe1f7}
+.email-preview .email-flight-box .stat{font-size:13px;color:#475569}
+.email-preview .email-flight-box .stat strong{color:#1e293b;font-weight:700}
+.email-preview .email-footer{margin-top:22px;padding-top:18px;border-top:2px solid #e5eaf2}
+.email-preview .email-footer .footer-intro{margin-bottom:12px;color:#475569}
+.email-preview .email-footer .channel{margin:5px 0;font-family:'Segoe UI',sans-serif;font-size:13.5px;color:#1e293b;display:flex;gap:8px;align-items:center}
+.email-preview .email-footer .channel-icon{display:inline-block;width:22px}
+
+.email-preview .email-pax-block{background:#fff7ed;border:1px solid #fde4c6;border-radius:10px;padding:14px 18px;margin:14px 0;font-size:13.5px}
+
+.email-preview .email-booking-block{background:#fef3f2;border:1px solid #fecaca;border-radius:10px;padding:14px 18px;margin:14px 0;font-size:13.5px}
+.email-preview .email-booking-block .bb-title{font-weight:700;color:#1e293b;margin-bottom:8px}
+.email-preview .email-booking-block .bb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.email-preview .email-booking-block .bb-item .bb-l{font-size:9.5px;color:#dc2626;text-transform:uppercase;font-weight:700;letter-spacing:.08em}
+.email-preview .email-booking-block .bb-item .bb-v{font-family:'Courier New',monospace;font-size:14px;font-weight:700;color:#0f2044;letter-spacing:.04em}
+.email-preview .email-booking-block .bb-item .bb-v.empty{color:#cbd5e1;font-style:italic;font-size:12px;font-weight:500}
+@media (max-width:680px){
+  .email-preview .email-booking-block .bb-grid{grid-template-columns:1fr;gap:6px}
+}
+.email-preview .email-pax-block strong{color:#1e293b}
+.email-preview .email-pax-block .pl{margin:3px 0;color:#475569}
+
+.email-preview .ev-box{background:linear-gradient(135deg,#f0f7ff 0%,#e6f0fc 100%);border:1px solid #cfe1f7;border-radius:12px;padding:20px 22px;margin:16px 0}
+.email-preview .ev-title{font-size:13px;font-weight:700;color:#0f2044;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #cfe1f7;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.04em}
+.email-preview .ev-title .ev-bdg{background:#1a56db;color:#fff;font-size:10px;padding:2px 7px;border-radius:4px;letter-spacing:.04em}
+.email-preview .ev-row{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:start;margin-bottom:14px}
+.email-preview .ev-end{display:flex;flex-direction:column}
+.email-preview .ev-end.right{text-align:right;align-items:flex-end}
+.email-preview .ev-cl{display:flex;align-items:baseline;gap:7px;margin-bottom:2px}
+.email-preview .ev-end.right .ev-cl{justify-content:flex-end}
+.email-preview .ev-cn{font-size:20px;font-weight:700;color:#0f2044;line-height:1.1}
+.email-preview .ev-iata{font-family:'Courier New',monospace;font-size:11px;font-weight:700;color:#1a56db;background:#dbeafe;padding:2px 6px;border-radius:4px;letter-spacing:.04em}
+.email-preview .ev-af{font-size:11px;color:#64748b;margin-top:1px}
+.email-preview .ev-ct{font-size:11px;color:#64748b}
+.email-preview .ev-tm{font-family:'Courier New',monospace;font-size:24px;font-weight:700;color:#0f2044;margin-top:8px;line-height:1}
+.email-preview .ev-tp{font-size:13px;color:#1a56db;margin-left:3px}
+.email-preview .ev-dy{font-size:11px;color:#475569;font-weight:600;margin-top:3px}
+.email-preview .ev-dy strong{color:#1e293b}
+.email-preview .ev-db{display:inline-block;font-size:9px;font-weight:700;color:#fff;padding:1px 5px;border-radius:3px;margin-left:5px;letter-spacing:.04em;background:#d97706}
+.email-preview .ev-db.same{background:#059669}
+.email-preview .ev-mid{display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 6px;min-width:75px}
+.email-preview .ev-mid .ev-d{font-size:11px;color:#64748b;font-weight:600;font-family:'Courier New',monospace}
+.email-preview .ev-mid .ev-ln{width:100%;height:1.5px;background:linear-gradient(90deg,transparent 0%,#1a56db 20%,#1a56db 80%,transparent 100%);position:relative;margin:6px 0}
+.email-preview .ev-mid .ev-ln::after{content:'✈';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#f0f7ff;padding:0 5px;color:#1a56db;font-size:11px}
+.email-preview .ev-mid .ev-ds{font-size:10px;color:#64748b;font-weight:500}
+.email-preview .ev-mt{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-top:14px;border-top:1px solid #cfe1f7}
+.email-preview .ev-mi{display:flex;flex-direction:column;gap:2px}
+.email-preview .ev-ml{font-size:9.5px;color:#64748b;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.email-preview .ev-mv{font-size:12.5px;color:#1e293b;font-weight:600}
+@media (max-width:680px){
+  .email-preview .ev-row{grid-template-columns:1fr;gap:10px}
+  .email-preview .ev-mid{flex-direction:row;min-width:auto;justify-content:center;gap:10px}
+  .email-preview .ev-mid .ev-ln{display:none}
+  .email-preview .ev-end.right{text-align:left;align-items:flex-start}
+  .email-preview .ev-end.right .ev-cl{justify-content:flex-start}
+  .email-preview .ev-mt{grid-template-columns:1fr;gap:6px}
+}
+.email-preview .email-footer a{color:var(--blue);text-decoration:none}
+.email-preview .email-footer a:hover{text-decoration:underline}
+.email-preview .email-closing{margin-top:18px;color:#475569;font-style:italic}
+
+.modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:10px;background:#fff}
+.modal-footer .action-btn{flex:1}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);z-index:2000;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+
+/* ── RESPONSIVE ── */
+@media (max-width:900px){
+  #sidebar{transform:translateX(-100%)}
+  #sidebar.open{transform:none}
+  #sidebar.open ~ #sidebar-backdrop{display:block}
+  #main{margin-left:0}
+  #mobile-toggle{display:flex;align-items:center;justify-content:center}
+  #topbar{padding-left:60px}
+}
+@media (max-width:680px){
+  .leg-body{grid-template-columns:1fr;gap:14px}
+  .leg-arrow{flex-direction:row;min-width:auto;width:100%;justify-content:center;gap:14px}
+  .leg-arrow .arrow-line{display:none}
+  .leg-endpoint.right{text-align:left;align-items:flex-start}
+  .leg-endpoint.right .city-line{justify-content:flex-start}
+}
+@media (max-width:560px){
+  #content{padding:16px}
+  .flight-row{grid-template-columns:1fr;gap:10px}
+  .swap-btn{transform:rotate(90deg);margin:0 auto}
+  .swap-btn:hover{transform:rotate(270deg)}
+  .detail-row{grid-template-columns:1fr;gap:10px}
+  .detail-row.three{grid-template-columns:1fr}
+  .calc-head{padding:14px 16px}
+  .calc-body{padding:16px}
+  .leg-endpoint .city-name{font-size:18px}
+  .leg-endpoint .time-big{font-size:22px}
+  .action-row{flex-direction:column}
+  .email-preview{padding:20px 18px;margin:10px}
+}
+
+/* ── PRINT STYLES (for PDF) ── */
+@media print{
+  #sidebar,#mobile-toggle,#sidebar-backdrop,#topbar,.calc-card,.info-card,.action-row,#error,.modal-backdrop{display:none !important}
+  body{background:#fff;padding:0;margin:0;display:block}
+  #main{margin-left:0}
+  #content{padding:0;max-width:none}
+  .result-card{box-shadow:none;border:none;display:block !important}
+  .result-card.show{display:block !important}
+  .itinerary{break-inside:avoid;page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<button id="mobile-toggle" onclick="toggleSidebar()">☰</button>
+
+<!-- SIDEBAR (kept exactly as before) -->
+<aside id="sidebar">
+  <div id="sb-head">
+    <div class="logo"><span>🕐</span> Time Zone Tool</div>
+    <div class="sub">Wego · Flight Calculator</div>
+  </div>
+  <div id="sb-content">
+    <div class="sb-section" data-i18n="worldClock">🌍 Live World Clock</div>
+    <div id="world-clock"></div>
+
+    <div class="sb-section" data-i18n="quickRoutes">⚡ Quick Routes</div>
+    <div id="presets"></div>
+  </div>
+</aside>
+<div id="sidebar-backdrop" onclick="toggleSidebar()"></div>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <div>
+      <div class="tb-title" data-i18n="topTitle">Flight Calculator</div>
+      <div class="tb-sub" data-i18n="topSub">Distance · Duration · Arrival time · Customer-ready output</div>
+    </div>
+    <div class="lang-toggle">
+      <button class="active" data-lang="en" onclick="setLanguage('en')">🇬🇧 EN</button>
+      <button data-lang="ar" onclick="setLanguage('ar')">🇸🇦 AR</button>
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- Calculator -->
+    <div class="calc-card">
+      <div class="calc-head">
+        <h2 data-i18n="headerH2">✈️ Flight Calculator</h2>
+        <p data-i18n="headerP">Select trip type, route, and departure time. Duration and distance calculate automatically. Output is customer-ready.</p>
+      </div>
+      <div class="calc-body">
+
+        <!-- Booking References (optional) -->
+        <div class="section-label" data-section="booking"><span class="dot" style="background:var(--red)"></span> <span data-i18n="bookingTitle">📋 Booking References</span> <span style="color:var(--muted);font-size:10px;font-weight:500;margin-left:6px;text-transform:none;letter-spacing:0" data-i18n="optional">(optional)</span></div>
+        <div class="booking-row">
+          <div class="booking-cell">
+            <label data-i18n="wegoBookingRef">Wego Booking Reference</label>
+            <input id="wego-booking-ref" type="text" placeholder="e.g. WFSS2FPN9CY26" maxlength="30" oninput="this.value=this.value.toUpperCase()">
+            <div class="hint" data-i18n="wegoBookingRefHint">e.g. WFSS2FPN9CY26</div>
+          </div>
+          <div class="booking-cell">
+            <label data-i18n="wegoPnr">Wego PNR</label>
+            <input id="wego-pnr" type="text" placeholder="e.g. GHGTR5" maxlength="15" oninput="this.value=this.value.toUpperCase()">
+            <div class="hint" data-i18n="wegoPnrHint">Wego internal record locator (used in the GDS)</div>
+          </div>
+          <div class="booking-cell">
+            <label data-i18n="airlinePnr">Airline PNR</label>
+            <input id="airline-pnr" type="text" placeholder="e.g. DH3XJR" maxlength="15" oninput="this.value=this.value.toUpperCase()">
+            <div class="hint" data-i18n="airlinePnrHint">Airline record locator (the one customer uses on the airline website)</div>
+          </div>
+        </div>
+
+        <!-- Trip type tabs -->
+        <div class="trip-tabs">
+          <div class="trip-tab active" data-trip="OW" onclick="setTripType('OW')">
+            <span class="tag">OW</span> <span data-i18n="oneWay">One-way</span>
+          </div>
+          <div class="trip-tab" data-trip="RT" onclick="setTripType('RT')">
+            <span class="tag">RT</span> <span data-i18n="roundTrip">Round-trip</span>
+          </div>
+        </div>
+
+        <!-- From / To -->
+        <div class="flight-row">
+          <div class="flight-leg">
+            <label data-i18n="fromOrigin">From (Origin)</label>
+            <select id="from-airport"></select>
+          </div>
+          <button class="swap-btn" onclick="swapAirports()" title="Swap airports">⇄</button>
+          <div class="flight-leg">
+            <label data-i18n="toDestination">To (Destination)</label>
+            <select id="to-airport"></select>
+          </div>
+        </div>
+
+        <!-- Passengers + Cabin Class -->
+        <div class="section-label"><span class="dot"></span> <span data-i18n="passengersTitle">Passengers &amp; Cabin Class</span></div>
+        <div class="pax-row">
+          <div class="pax-cell">
+            <label data-i18n="adults">Adults</label>
+            <div class="pax-stepper">
+              <button type="button" onclick="paxStep('adults',-1)">−</button>
+              <input id="pax-adults" type="number" value="1" min="1" max="9" oninput="paxValidate()">
+              <button type="button" onclick="paxStep('adults',1)">+</button>
+            </div>
+            <div class="pax-hint" data-i18n="adultsHint">12+ years</div>
+          </div>
+          <div class="pax-cell">
+            <label data-i18n="children">Children</label>
+            <div class="pax-stepper">
+              <button type="button" onclick="paxStep('children',-1)">−</button>
+              <input id="pax-children" type="number" value="0" min="0" max="8" oninput="paxValidate()">
+              <button type="button" onclick="paxStep('children',1)">+</button>
+            </div>
+            <div class="pax-hint" data-i18n="childrenHint">2 to 11 years</div>
+          </div>
+          <div class="pax-cell">
+            <label data-i18n="infantsLap">Infants on lap</label>
+            <div class="pax-stepper">
+              <button type="button" onclick="paxStep('infantsLap',-1)">−</button>
+              <input id="pax-infants-lap" type="number" value="0" min="0" max="4" oninput="paxValidate()">
+              <button type="button" onclick="paxStep('infantsLap',1)">+</button>
+            </div>
+            <div class="pax-hint" data-i18n="infantsHint">Under 2 years</div>
+          </div>
+          <div class="pax-cell">
+            <label data-i18n="infantsSeat">Infants in seat</label>
+            <div class="pax-stepper">
+              <button type="button" onclick="paxStep('infantsSeat',-1)">−</button>
+              <input id="pax-infants-seat" type="number" value="0" min="0" max="4" oninput="paxValidate()">
+              <button type="button" onclick="paxStep('infantsSeat',1)">+</button>
+            </div>
+            <div class="pax-hint">Under 2 years</div>
+          </div>
+          <div class="pax-cell">
+            <label data-i18n="cabinClass">Cabin Class</label>
+            <select id="cabin-class">
+              <option value="Economy" data-i18n="economy">Economy</option>
+              <option value="Premium Economy" data-i18n="premEconomy">Premium Economy</option>
+              <option value="Business" data-i18n="business">Business</option>
+              <option value="First" data-i18n="first">First</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Outbound section -->
+        <div class="section-label"><span class="dot"></span> <span data-i18n="outboundFlight">Outbound Flight</span></div>
+        <div class="detail-row three">
+          <div class="detail-group">
+            <label data-i18n="depDate">Departure Date</label>
+            <input id="dep-date" type="date">
+          </div>
+          <div class="detail-group">
+            <label data-i18n="depTime">Departure Time (local)</label>
+            <input id="dep-time" type="time">
+            <button class="now-btn" onclick="setNow()"><span data-i18n="useCurrent">⏱ Use current time</span></button>
+          </div>
+          <div class="detail-group">
+            <label data-i18n="flightDuration">Flight Duration</label>
+            <div class="duration-inline">
+              <input id="dur-hours" type="number" min="0" max="24" placeholder="3" oninput="markDurationManual()">
+              <span data-i18n="hr">hr</span>
+              <input id="dur-mins" type="number" min="0" max="59" placeholder="00" oninput="markDurationManual()">
+              <span data-i18n="min">min</span>
+            </div>
+            <div class="duration-info" id="dur-info">Auto-calculated · select airports first</div>
+          </div>
+        </div>
+
+        <!-- Return section (RT only) -->
+        <div class="return-section" id="return-section">
+          <div class="section-label"><span class="dot"></span> <span data-i18n="returnFlight">Return Flight</span></div>
+          <div class="detail-row three">
+            <div class="detail-group">
+              <label data-i18n="retDate">Return Date</label>
+              <input id="ret-date" type="date">
+            </div>
+            <div class="detail-group">
+              <label data-i18n="retTime">Return Time (local)</label>
+              <input id="ret-time" type="time">
+            </div>
+            <div class="detail-group">
+              <label data-i18n="retDuration">Return Flight Duration</label>
+              <div class="duration-inline">
+                <input id="ret-dur-hours" type="number" min="0" max="24" placeholder="3" oninput="markReturnDurationManual()">
+                <span>hr</span>
+                <input id="ret-dur-mins" type="number" min="0" max="59" placeholder="00" oninput="markReturnDurationManual()">
+                <span>min</span>
+              </div>
+              <div class="duration-info" id="ret-dur-info">Auto-calculated</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="calc-btn" onclick="calculate()"><span data-i18n="calcBtn">⚡ Calculate Flight Details</span></button>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div id="error" class="error-banner" style="display:none"></div>
+
+    <!-- Result -->
+    <div class="result-card" id="result">
+      <div class="result-head">
+        <div class="left">
+          <span class="icon">🛫</span>
+          <div>
+            <div class="title" id="r-title" data-i18n="resultTitleDefault">Flight Itinerary</div>
+            <div class="subtitle" id="r-subtitle" data-i18n="resultSubDefault">Customer-ready output</div>
+          </div>
+        </div>
+        <span class="ref" id="r-ref">REF-000</span>
+      </div>
+      <div class="result-body" id="r-body">
+        <!-- Itineraries injected here -->
+      </div>
+      <div class="result-body" style="padding-top:0">
+        <div class="email-cta-banner">
+          <div class="left">
+            <span class="ico">📧</span>
+            <div>
+              <div class="title" data-i18n="ctaBannerTitle">Customer Email — Ready to send</div>
+              <div class="sub" data-i18n="ctaBannerSub">See the full email preview below ↓</div>
+            </div>
+          </div>
+          <button onclick="document.getElementById('email-card').scrollIntoView({behavior:'smooth',block:'start'})"><span data-i18n="ctaBannerBtn">View Email ↓</span></button>
+        </div>
+        <div class="action-row">
+          <button class="action-btn" onclick="shareItinerary()"><span data-i18n="share">🔗 Share</span></button>
+          <button class="action-btn" onclick="printItinerary()"><span data-i18n="printPDF">🖨️ Print / PDF</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INLINE EMAIL PREVIEW (shows after Calculate) -->
+    <div class="email-card" id="email-card">
+      <div class="email-head-bar">
+        <div class="title"><span>📧</span> <span data-i18n="emailHeadTitle">Customer Email Preview</span></div>
+        <span class="badge" data-i18n="emailReady">Ready to copy</span>
+      </div>
+      <div class="email-body-wrap">
+        <div class="email-preview" id="email-preview-inline"></div>
+      </div>
+      <div class="email-actions-bar">
+        <button class="action-btn primary" onclick="copyEmailHTML()"><span data-i18n="copyHTML">🎨 Copy as HTML (rich)</span></button>
+        <button class="action-btn" onclick="copyEmailText()"><span data-i18n="copyText">📋 Copy Text</span></button>
+        <button class="action-btn" onclick="openInMail()"><span data-i18n="openMail">📨 Open in Mail App</span></button>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <span class="icon">💡</span>
+      <div data-i18n="tipText"><strong>Tip:</strong> Flight duration is automatically estimated from the great-circle distance between the two airports plus typical commercial cruise speed. You can override it with the exact duration from the booking. Daylight Saving Time is handled automatically.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- EMAIL MODAL -->
+<div class="modal-backdrop" id="email-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>📧 Email Preview</h3>
+        <div class="sub">Ready to copy and paste into Outlook, Gmail, or your mail app</div>
+      </div>
+      <button class="modal-close" onclick="closeEmailModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="email-preview" id="email-preview"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="action-btn primary" onclick="copyEmailText()">📋 Copy Text</button>
+      <button class="action-btn" onclick="copyEmailHTML()">🎨 Copy as HTML</button>
+      <button class="action-btn" onclick="openInMail()">📨 Open in Mail App</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// AIRPORTS DATABASE — with coordinates + full names
+// ─────────────────────────────────────────────────────────────
+const AIRPORTS = [
+  // Egypt
+  {iata:'CAI', city:'Cairo', name:'Cairo International Airport', country:'Egypt', tz:'Africa/Cairo', lat:30.1219, lon:31.4056, region:'Egypt'},
+  {iata:'HBE', city:'Alexandria', name:'Borg El Arab International Airport', country:'Egypt', tz:'Africa/Cairo', lat:30.9177, lon:29.6964, region:'Egypt'},
+  {iata:'SSH', city:'Sharm El Sheikh', name:'Sharm El Sheikh International Airport', country:'Egypt', tz:'Africa/Cairo', lat:27.9773, lon:34.3950, region:'Egypt'},
+  {iata:'HRG', city:'Hurghada', name:'Hurghada International Airport', country:'Egypt', tz:'Africa/Cairo', lat:27.1783, lon:33.7994, region:'Egypt'},
+  {iata:'LXR', city:'Luxor', name:'Luxor International Airport', country:'Egypt', tz:'Africa/Cairo', lat:25.6710, lon:32.7066, region:'Egypt'},
+  {iata:'ASW', city:'Aswan', name:'Aswan International Airport', country:'Egypt', tz:'Africa/Cairo', lat:23.9644, lon:32.8200, region:'Egypt'},
+  // Gulf
+  {iata:'DXB', city:'Dubai', name:'Dubai International Airport', country:'UAE', tz:'Asia/Dubai', lat:25.2532, lon:55.3657, region:'Gulf'},
+  {iata:'AUH', city:'Abu Dhabi', name:'Zayed International Airport', country:'UAE', tz:'Asia/Dubai', lat:24.4330, lon:54.6511, region:'Gulf'},
+  {iata:'SHJ', city:'Sharjah', name:'Sharjah International Airport', country:'UAE', tz:'Asia/Dubai', lat:25.3286, lon:55.5172, region:'Gulf'},
+  {iata:'DOH', city:'Doha', name:'Hamad International Airport', country:'Qatar', tz:'Asia/Qatar', lat:25.2731, lon:51.6080, region:'Gulf'},
+  {iata:'JED', city:'Jeddah', name:'King Abdulaziz International Airport', country:'Saudi Arabia', tz:'Asia/Riyadh', lat:21.6796, lon:39.1565, region:'Gulf'},
+  {iata:'RUH', city:'Riyadh', name:'King Khalid International Airport', country:'Saudi Arabia', tz:'Asia/Riyadh', lat:24.9576, lon:46.6988, region:'Gulf'},
+  {iata:'DMM', city:'Dammam', name:'King Fahd International Airport', country:'Saudi Arabia', tz:'Asia/Riyadh', lat:26.4712, lon:49.7979, region:'Gulf'},
+  {iata:'MED', city:'Madinah', name:'Prince Mohammad bin Abdulaziz International Airport', country:'Saudi Arabia', tz:'Asia/Riyadh', lat:24.5534, lon:39.7051, region:'Gulf'},
+  {iata:'KWI', city:'Kuwait City', name:'Kuwait International Airport', country:'Kuwait', tz:'Asia/Kuwait', lat:29.2266, lon:47.9689, region:'Gulf'},
+  {iata:'BAH', city:'Manama', name:'Bahrain International Airport', country:'Bahrain', tz:'Asia/Bahrain', lat:26.2708, lon:50.6336, region:'Gulf'},
+  {iata:'MCT', city:'Muscat', name:'Muscat International Airport', country:'Oman', tz:'Asia/Muscat', lat:23.5933, lon:58.2844, region:'Gulf'},
+  {iata:'SLL', city:'Salalah', name:'Salalah International Airport', country:'Oman', tz:'Asia/Muscat', lat:17.0386, lon:54.0913, region:'Gulf'},
+  // Middle East
+  {iata:'AMM', city:'Amman', name:'Queen Alia International Airport', country:'Jordan', tz:'Asia/Amman', lat:31.7226, lon:35.9933, region:'Middle East'},
+  {iata:'BEY', city:'Beirut', name:'Rafic Hariri International Airport', country:'Lebanon', tz:'Asia/Beirut', lat:33.8208, lon:35.4884, region:'Middle East'},
+  {iata:'BGW', city:'Baghdad', name:'Baghdad International Airport', country:'Iraq', tz:'Asia/Baghdad', lat:33.2625, lon:44.2346, region:'Middle East'},
+  {iata:'DAM', city:'Damascus', name:'Damascus International Airport', country:'Syria', tz:'Asia/Damascus', lat:33.4115, lon:36.5145, region:'Middle East'},
+  {iata:'IST', city:'Istanbul', name:'Istanbul Airport', country:'Turkey', tz:'Europe/Istanbul', lat:41.2753, lon:28.7519, region:'Middle East'},
+  {iata:'SAW', city:'Istanbul', name:'Sabiha Gökçen International Airport', country:'Turkey', tz:'Europe/Istanbul', lat:40.8986, lon:29.3092, region:'Middle East'},
+  {iata:'TLV', city:'Tel Aviv', name:'Ben Gurion International Airport', country:'Israel', tz:'Asia/Jerusalem', lat:32.0114, lon:34.8867, region:'Middle East'},
+  {iata:'THR', city:'Tehran', name:'Mehrabad International Airport', country:'Iran', tz:'Asia/Tehran', lat:35.6892, lon:51.3134, region:'Middle East'},
+  // North Africa
+  {iata:'CMN', city:'Casablanca', name:'Mohammed V International Airport', country:'Morocco', tz:'Africa/Casablanca', lat:33.3675, lon:-7.5898, region:'North Africa'},
+  {iata:'RAK', city:'Marrakech', name:'Marrakech Menara Airport', country:'Morocco', tz:'Africa/Casablanca', lat:31.6069, lon:-8.0363, region:'North Africa'},
+  {iata:'TUN', city:'Tunis', name:'Tunis–Carthage International Airport', country:'Tunisia', tz:'Africa/Tunis', lat:36.8510, lon:10.2272, region:'North Africa'},
+  {iata:'ALG', city:'Algiers', name:'Houari Boumediene Airport', country:'Algeria', tz:'Africa/Algiers', lat:36.6910, lon:3.2155, region:'North Africa'},
+  {iata:'KRT', city:'Khartoum', name:'Khartoum International Airport', country:'Sudan', tz:'Africa/Khartoum', lat:15.5895, lon:32.5532, region:'North Africa'},
+  // Europe
+  {iata:'LHR', city:'London', name:'London Heathrow Airport', country:'UK', tz:'Europe/London', lat:51.4700, lon:-0.4543, region:'Europe'},
+  {iata:'LGW', city:'London', name:'London Gatwick Airport', country:'UK', tz:'Europe/London', lat:51.1481, lon:-0.1903, region:'Europe'},
+  {iata:'CDG', city:'Paris', name:'Paris Charles de Gaulle Airport', country:'France', tz:'Europe/Paris', lat:49.0097, lon:2.5479, region:'Europe'},
+  {iata:'ORY', city:'Paris', name:'Paris Orly Airport', country:'France', tz:'Europe/Paris', lat:48.7233, lon:2.3794, region:'Europe'},
+  {iata:'FRA', city:'Frankfurt', name:'Frankfurt Airport', country:'Germany', tz:'Europe/Berlin', lat:50.0379, lon:8.5622, region:'Europe'},
+  {iata:'MUC', city:'Munich', name:'Munich Airport', country:'Germany', tz:'Europe/Berlin', lat:48.3537, lon:11.7860, region:'Europe'},
+  {iata:'AMS', city:'Amsterdam', name:'Amsterdam Schiphol Airport', country:'Netherlands', tz:'Europe/Amsterdam', lat:52.3105, lon:4.7683, region:'Europe'},
+  {iata:'BRU', city:'Brussels', name:'Brussels Airport', country:'Belgium', tz:'Europe/Brussels', lat:50.9014, lon:4.4844, region:'Europe'},
+  {iata:'MAD', city:'Madrid', name:'Adolfo Suárez Madrid–Barajas Airport', country:'Spain', tz:'Europe/Madrid', lat:40.4719, lon:-3.5626, region:'Europe'},
+  {iata:'BCN', city:'Barcelona', name:'Barcelona–El Prat Airport', country:'Spain', tz:'Europe/Madrid', lat:41.2974, lon:2.0833, region:'Europe'},
+  {iata:'FCO', city:'Rome', name:'Leonardo da Vinci–Fiumicino Airport', country:'Italy', tz:'Europe/Rome', lat:41.8003, lon:12.2389, region:'Europe'},
+  {iata:'MXP', city:'Milan', name:'Milan Malpensa Airport', country:'Italy', tz:'Europe/Rome', lat:45.6306, lon:8.7281, region:'Europe'},
+  {iata:'ATH', city:'Athens', name:'Athens International Airport', country:'Greece', tz:'Europe/Athens', lat:37.9364, lon:23.9445, region:'Europe'},
+  {iata:'VIE', city:'Vienna', name:'Vienna International Airport', country:'Austria', tz:'Europe/Vienna', lat:48.1103, lon:16.5697, region:'Europe'},
+  {iata:'ZRH', city:'Zurich', name:'Zurich Airport', country:'Switzerland', tz:'Europe/Zurich', lat:47.4647, lon:8.5492, region:'Europe'},
+  {iata:'CPH', city:'Copenhagen', name:'Copenhagen Airport', country:'Denmark', tz:'Europe/Copenhagen', lat:55.6180, lon:12.6562, region:'Europe'},
+  {iata:'SVO', city:'Moscow', name:'Sheremetyevo International Airport', country:'Russia', tz:'Europe/Moscow', lat:55.9726, lon:37.4146, region:'Europe'},
+  // Asia
+  {iata:'BKK', city:'Bangkok', name:'Suvarnabhumi Airport', country:'Thailand', tz:'Asia/Bangkok', lat:13.6900, lon:100.7501, region:'Asia'},
+  {iata:'SIN', city:'Singapore', name:'Singapore Changi Airport', country:'Singapore', tz:'Asia/Singapore', lat:1.3644, lon:103.9915, region:'Asia'},
+  {iata:'KUL', city:'Kuala Lumpur', name:'Kuala Lumpur International Airport', country:'Malaysia', tz:'Asia/Kuala_Lumpur', lat:2.7456, lon:101.7099, region:'Asia'},
+  {iata:'HKG', city:'Hong Kong', name:'Hong Kong International Airport', country:'Hong Kong', tz:'Asia/Hong_Kong', lat:22.3080, lon:113.9185, region:'Asia'},
+  {iata:'PEK', city:'Beijing', name:'Beijing Capital International Airport', country:'China', tz:'Asia/Shanghai', lat:40.0801, lon:116.5847, region:'Asia'},
+  {iata:'PVG', city:'Shanghai', name:'Shanghai Pudong International Airport', country:'China', tz:'Asia/Shanghai', lat:31.1443, lon:121.8083, region:'Asia'},
+  {iata:'NRT', city:'Tokyo', name:'Narita International Airport', country:'Japan', tz:'Asia/Tokyo', lat:35.7720, lon:140.3929, region:'Asia'},
+  {iata:'HND', city:'Tokyo', name:'Haneda Airport', country:'Japan', tz:'Asia/Tokyo', lat:35.5494, lon:139.7798, region:'Asia'},
+  {iata:'ICN', city:'Seoul', name:'Incheon International Airport', country:'South Korea', tz:'Asia/Seoul', lat:37.4602, lon:126.4407, region:'Asia'},
+  {iata:'BOM', city:'Mumbai', name:'Chhatrapati Shivaji Maharaj International Airport', country:'India', tz:'Asia/Kolkata', lat:19.0887, lon:72.8679, region:'Asia'},
+  {iata:'DEL', city:'Delhi', name:'Indira Gandhi International Airport', country:'India', tz:'Asia/Kolkata', lat:28.5562, lon:77.1000, region:'Asia'},
+  {iata:'BLR', city:'Bangalore', name:'Kempegowda International Airport', country:'India', tz:'Asia/Kolkata', lat:13.1986, lon:77.7066, region:'Asia'},
+  {iata:'MAA', city:'Chennai', name:'Chennai International Airport', country:'India', tz:'Asia/Kolkata', lat:12.9941, lon:80.1709, region:'Asia'},
+  {iata:'COK', city:'Kochi', name:'Cochin International Airport', country:'India', tz:'Asia/Kolkata', lat:10.1517, lon:76.4019, region:'Asia'},
+  {iata:'CGK', city:'Jakarta', name:'Soekarno–Hatta International Airport', country:'Indonesia', tz:'Asia/Jakarta', lat:-6.1256, lon:106.6559, region:'Asia'},
+  {iata:'MNL', city:'Manila', name:'Ninoy Aquino International Airport', country:'Philippines', tz:'Asia/Manila', lat:14.5086, lon:121.0194, region:'Asia'},
+  {iata:'KHI', city:'Karachi', name:'Jinnah International Airport', country:'Pakistan', tz:'Asia/Karachi', lat:24.9056, lon:67.1608, region:'Asia'},
+  {iata:'LHE', city:'Lahore', name:'Allama Iqbal International Airport', country:'Pakistan', tz:'Asia/Karachi', lat:31.5216, lon:74.4036, region:'Asia'},
+  {iata:'ISB', city:'Islamabad', name:'Islamabad International Airport', country:'Pakistan', tz:'Asia/Karachi', lat:33.5483, lon:72.8253, region:'Asia'},
+  {iata:'DAC', city:'Dhaka', name:'Hazrat Shahjalal International Airport', country:'Bangladesh', tz:'Asia/Dhaka', lat:23.8513, lon:90.4084, region:'Asia'},
+  // Americas
+  {iata:'JFK', city:'New York', name:'John F. Kennedy International Airport', country:'USA', tz:'America/New_York', lat:40.6413, lon:-73.7781, region:'Americas'},
+  {iata:'EWR', city:'Newark', name:'Newark Liberty International Airport', country:'USA', tz:'America/New_York', lat:40.6925, lon:-74.1687, region:'Americas'},
+  {iata:'IAD', city:'Washington', name:'Washington Dulles International Airport', country:'USA', tz:'America/New_York', lat:38.9531, lon:-77.4565, region:'Americas'},
+  {iata:'MIA', city:'Miami', name:'Miami International Airport', country:'USA', tz:'America/New_York', lat:25.7959, lon:-80.2870, region:'Americas'},
+  {iata:'ORD', city:'Chicago', name:'O\u2019Hare International Airport', country:'USA', tz:'America/Chicago', lat:41.9742, lon:-87.9073, region:'Americas'},
+  {iata:'IAH', city:'Houston', name:'George Bush Intercontinental Airport', country:'USA', tz:'America/Chicago', lat:29.9844, lon:-95.3414, region:'Americas'},
+  {iata:'LAX', city:'Los Angeles', name:'Los Angeles International Airport', country:'USA', tz:'America/Los_Angeles', lat:33.9416, lon:-118.4085, region:'Americas'},
+  {iata:'SFO', city:'San Francisco', name:'San Francisco International Airport', country:'USA', tz:'America/Los_Angeles', lat:37.6213, lon:-122.3790, region:'Americas'},
+  {iata:'YYZ', city:'Toronto', name:'Toronto Pearson International Airport', country:'Canada', tz:'America/Toronto', lat:43.6777, lon:-79.6248, region:'Americas'},
+  {iata:'YUL', city:'Montreal', name:'Montréal–Trudeau International Airport', country:'Canada', tz:'America/Toronto', lat:45.4706, lon:-73.7408, region:'Americas'},
+  {iata:'MEX', city:'Mexico City', name:'Benito Juárez International Airport', country:'Mexico', tz:'America/Mexico_City', lat:19.4361, lon:-99.0719, region:'Americas'},
+  {iata:'GRU', city:'São Paulo', name:'São Paulo–Guarulhos International Airport', country:'Brazil', tz:'America/Sao_Paulo', lat:-23.4356, lon:-46.4731, region:'Americas'},
+  // Oceania
+  {iata:'SYD', city:'Sydney', name:'Sydney Kingsford Smith Airport', country:'Australia', tz:'Australia/Sydney', lat:-33.9399, lon:151.1753, region:'Oceania'},
+  {iata:'MEL', city:'Melbourne', name:'Melbourne Airport', country:'Australia', tz:'Australia/Melbourne', lat:-37.6690, lon:144.8410, region:'Oceania'},
+  {iata:'AKL', city:'Auckland', name:'Auckland Airport', country:'New Zealand', tz:'Pacific/Auckland', lat:-37.0082, lon:174.7850, region:'Oceania'},
+  // Africa
+  {iata:'JNB', city:'Johannesburg', name:'O. R. Tambo International Airport', country:'South Africa', tz:'Africa/Johannesburg', lat:-26.1339, lon:28.2420, region:'Africa'},
+  {iata:'NBO', city:'Nairobi', name:'Jomo Kenyatta International Airport', country:'Kenya', tz:'Africa/Nairobi', lat:-1.3192, lon:36.9278, region:'Africa'},
+  {iata:'LOS', city:'Lagos', name:'Murtala Muhammed International Airport', country:'Nigeria', tz:'Africa/Lagos', lat:6.5774, lon:3.3211, region:'Africa'},
+  {iata:'ADD', city:'Addis Ababa', name:'Bole International Airport', country:'Ethiopia', tz:'Africa/Addis_Ababa', lat:8.9779, lon:38.7993, region:'Africa'},
+];
+
+const PRESETS = [
+  {from:'CAI', to:'DXB'}, {from:'CAI', to:'JED'}, {from:'CAI', to:'RUH'},
+  {from:'CAI', to:'IST'}, {from:'CAI', to:'BEY'}, {from:'CAI', to:'LHR'},
+  {from:'CAI', to:'JFK'}, {from:'DXB', to:'CAI'}, {from:'JED', to:'CAI'},
+];
+
+const CLOCK_CITIES = ['CAI', 'BEY', 'DXB', 'JED', 'RUH', 'IST', 'KHI', 'BOM', 'SIN', 'BKK', 'LHR', 'CDG', 'JFK'];
+const REGION_ORDER = ['Egypt', 'Gulf', 'Middle East', 'North Africa', 'Europe', 'Asia', 'Americas', 'Oceania', 'Africa'];
+
+// ─────────────────────────────────────────────────────────────
+// I18N — translation table
+// ─────────────────────────────────────────────────────────────
+const I18N = {
+  en: {
+    worldClock:'🌍 Live World Clock', quickRoutes:'⚡ Quick Routes',
+    topTitle:'Flight Calculator', topSub:'Distance · Duration · Arrival time · Customer-ready output',
+    headerH2:'✈️ Flight Calculator',
+    headerP:'Select trip type, route, and departure time. Duration and distance calculate automatically. Output is customer-ready.',
+    oneWay:'One-way', roundTrip:'Round-trip',
+    fromOrigin:'From (Origin)', toDestination:'To (Destination)',
+    bookingTitle:'📋 Booking References', optional:'(optional)',
+    wegoBookingRef:'Wego Booking Reference', wegoBookingRefHint:'e.g. WFSS2FPN9CY26',
+    wegoPnr:'Wego PNR', wegoPnrHint:'Wego internal record locator (used in the GDS)',
+    airlinePnr:'Airline PNR', airlinePnrHint:'Airline record locator (the one customer uses on the airline website)',
+    notProvided:'— not provided —',
+    passengersTitle:'Passengers & Cabin Class',
+    adults:'Adults', adult:'Adult', children:'Children', child:'Child',
+    infantsLap:'Infants on lap', infantsSeat:'Infants in seat',
+    adultsHint:'12+ years', childrenHint:'2 to 11 years', infantsHint:'Under 2 years',
+    cabinClass:'Cabin Class',
+    economy:'Economy', premEconomy:'Premium Economy', business:'Business', first:'First',
+    outboundFlight:'Outbound Flight', returnFlight:'Return Flight',
+    depDate:'Departure Date', depTime:'Departure Time (local)',
+    retDate:'Return Date', retTime:'Return Time (local)',
+    flightDuration:'Flight Duration', retDuration:'Return Flight Duration',
+    useCurrent:'⏱ Use current time',
+    hr:'hr', min:'min',
+    autoSelect:'Auto-calculated · select airports first', autoCalc:'✓ Auto-calculated',
+    manualOverride:'✎ Manual override', resetAuto:'reset to auto',
+    calcBtn:'⚡ Calculate Flight Details',
+    resultTitleDefault:'Flight Itinerary',
+    resultTitleOW:'One-Way Flight Itinerary', resultTitleRT:'Round-Trip Itinerary',
+    resultSubDefault:'Customer-ready output',
+    resultSubOW:'Customer-ready output', resultSubRT:'Outbound + Return · Customer-ready',
+    legHeaderOutbound:'OUTBOUND FLIGHT', legHeaderReturn:'RETURN FLIGHT', legHeaderFlight:'FLIGHT DETAILS',
+    duration:'Flight Duration', distance:'Distance', timeDiff:'Time Difference',
+    sameDay:'SAME DAY', daySingle:'DAY', dayPlural:'DAYS',
+    passengers:'Passengers', cabin:'Cabin', traveler:'traveler', travelers:'travelers',
+    ctaBannerTitle:'Customer Email — Ready to send',
+    ctaBannerSub:'See the full email preview below ↓',
+    ctaBannerBtn:'View Email ↓',
+    emailHeadTitle:'Customer Email Preview', emailReady:'Ready to copy',
+    copyHTML:'🎨 Copy as HTML (rich)', copyText:'📋 Copy Text',
+    openMail:'📨 Open in Mail App', share:'🔗 Share', printPDF:'🖨️ Print / PDF',
+    tipText:'<strong>Tip:</strong> Flight duration is automatically estimated from the great-circle distance between the two airports plus typical commercial cruise speed. You can override it with the exact duration from the booking. Daylight Saving Time is handled automatically.',
+    // Email content
+    emailSubject:'Flight Details',
+    dearCustomer:'Dear Customer,',
+    emailIntroPart1:'Thank you for choosing Wego. We would like to inform you about your',
+    emailIntroPart2:'flight details below:',
+    tripOW:'one-way', tripRT:'round-trip',
+    legDeparture:'Departure', legArrival:'Arrival',
+    paxBlockTitle:'Passenger Details',
+    bookingBlockTitle:'Booking References',
+    emailFooterIntro:'Should you require any further assistance, please feel free to contact us through the following channels:',
+    emailClosing:'We remain at your service and look forward to assisting you.',
+    sameDayLong:'same day', dayAfter:'day after departure', daysAfter:'days after departure',
+    dayBefore:'day before departure', daysBefore:'days before departure',
+    aheadOf:'ahead of', behind:'behind', sameTz:'is in the same time zone as',
+    hourSingle:'hour', hourPlural:'hours',
+    // Errors
+    errorDate:'Please enter departure date and time.',
+    errorDuration:'Please enter flight duration.',
+    errorSame:'Origin and destination cannot be the same airport.',
+    errorReturnDate:'Please enter return date and time.',
+    errorReturnDur:'Please enter return flight duration.',
+    // Toasts
+    toastTextCopied:'✓ Email text copied — paste into any mail app',
+    toastHTMLCopied:'✓ Rich HTML email copied — paste into Outlook/Gmail',
+    toastShared:'✓ Itinerary copied to clipboard',
+    locale:'en-GB',
+  },
+  ar: {
+    worldClock:'🌍 الساعة العالمية', quickRoutes:'⚡ مسارات سريعة',
+    topTitle:'حاسبة الرحلات', topSub:'المسافة · المدة · الوصول · جاهز للعميل',
+    headerH2:'✈️ حاسبة الرحلات',
+    headerP:'اختر نوع الرحلة، المسار، ووقت المغادرة. يتم حساب المدة والمسافة تلقائياً. النتيجة جاهزة للإرسال للعميل.',
+    oneWay:'ذهاب فقط', roundTrip:'ذهاب وعودة',
+    fromOrigin:'من (المغادرة)', toDestination:'إلى (الوصول)',
+    bookingTitle:'📋 مراجع الحجز', optional:'(اختياري)',
+    wegoBookingRef:'رقم حجز Wego', wegoBookingRefHint:'مثال: WFSS2FPN9CY26',
+    wegoPnr:'Wego PNR', wegoPnrHint:'رمز الحجز الداخلي لـ Wego (المستخدم في GDS)',
+    airlinePnr:'PNR شركة الطيران', airlinePnrHint:'رمز الحجز لدى شركة الطيران (الذي يستخدمه العميل على موقع الشركة)',
+    notProvided:'— غير متوفر —',
+    passengersTitle:'الركاب ودرجة المقصورة',
+    adults:'بالغين', adult:'بالغ', children:'أطفال', child:'طفل',
+    infantsLap:'رضّع على الحضن', infantsSeat:'رضّع على مقعد',
+    adultsHint:'12 سنة فأكثر', childrenHint:'من 2 إلى 11 سنة', infantsHint:'أقل من سنتين',
+    cabinClass:'درجة المقصورة',
+    economy:'اقتصادي', premEconomy:'اقتصادي بريميوم', business:'رجال الأعمال', first:'الدرجة الأولى',
+    outboundFlight:'رحلة الذهاب', returnFlight:'رحلة العودة',
+    depDate:'تاريخ المغادرة', depTime:'وقت المغادرة (محلي)',
+    retDate:'تاريخ العودة', retTime:'وقت العودة (محلي)',
+    flightDuration:'مدة الرحلة', retDuration:'مدة رحلة العودة',
+    useCurrent:'⏱ استخدم الوقت الحالي',
+    hr:'س', min:'د',
+    autoSelect:'محسوب تلقائياً · اختر المطارات أولاً', autoCalc:'✓ محسوب تلقائياً',
+    manualOverride:'✎ تعديل يدوي', resetAuto:'استعادة التلقائي',
+    calcBtn:'⚡ احسب تفاصيل الرحلة',
+    resultTitleDefault:'تفاصيل الرحلة',
+    resultTitleOW:'تفاصيل رحلة الذهاب فقط', resultTitleRT:'تفاصيل رحلة الذهاب والعودة',
+    resultSubDefault:'جاهز للإرسال للعميل',
+    resultSubOW:'جاهز للإرسال للعميل', resultSubRT:'الذهاب + العودة · جاهز للعميل',
+    legHeaderOutbound:'رحلة الذهاب', legHeaderReturn:'رحلة العودة', legHeaderFlight:'تفاصيل الرحلة',
+    duration:'مدة الرحلة', distance:'المسافة', timeDiff:'فرق التوقيت',
+    sameDay:'نفس اليوم', daySingle:'يوم', dayPlural:'أيام',
+    passengers:'الركاب', cabin:'الدرجة', traveler:'مسافر', travelers:'مسافرين',
+    ctaBannerTitle:'بريد العميل — جاهز للإرسال',
+    ctaBannerSub:'معاينة البريد الكاملة بالأسفل ↓',
+    ctaBannerBtn:'عرض البريد ↓',
+    emailHeadTitle:'معاينة بريد العميل', emailReady:'جاهز للنسخ',
+    copyHTML:'🎨 نسخ HTML (منسّق)', copyText:'📋 نسخ النص',
+    openMail:'📨 فتح في تطبيق البريد', share:'🔗 مشاركة', printPDF:'🖨️ طباعة / PDF',
+    tipText:'<strong>تلميح:</strong> يتم حساب مدة الرحلة تلقائياً من المسافة بين المطارين بسرعة طيران الرحلات التجارية الاعتيادية. يمكنك التعديل اليدوي للمدة من جدول شركة الطيران. التوقيت الصيفي والمناطق الزمنية يتم معالجتها تلقائياً.',
+    emailSubject:'تفاصيل الرحلة',
+    dearCustomer:'عميلنا العزيز،',
+    emailIntroPart1:'شكراً لاختياركم Wego. نود إبلاغكم بتفاصيل رحلتكم',
+    emailIntroPart2:'أدناه:',
+    tripOW:'الذهاب فقط', tripRT:'الذهاب والعودة',
+    legDeparture:'المغادرة', legArrival:'الوصول',
+    paxBlockTitle:'تفاصيل الركاب',
+    bookingBlockTitle:'مراجع الحجز',
+    emailFooterIntro:'إذا احتجتم إلى أي مساعدة إضافية، يرجى التواصل معنا عبر القنوات التالية:',
+    emailClosing:'نبقى في خدمتكم ونتطلع إلى مساعدتكم.',
+    sameDayLong:'نفس اليوم', dayAfter:'يوم بعد المغادرة', daysAfter:'أيام بعد المغادرة',
+    dayBefore:'يوم قبل المغادرة', daysBefore:'أيام قبل المغادرة',
+    aheadOf:'يتقدم على', behind:'يتأخر عن', sameTz:'يقع في نفس المنطقة الزمنية لـ',
+    hourSingle:'ساعة', hourPlural:'ساعات',
+    errorDate:'الرجاء إدخال تاريخ ووقت المغادرة.',
+    errorDuration:'الرجاء إدخال مدة الرحلة.',
+    errorSame:'لا يمكن أن يكون مطار المغادرة والوصول نفس المطار.',
+    errorReturnDate:'الرجاء إدخال تاريخ ووقت العودة.',
+    errorReturnDur:'الرجاء إدخال مدة رحلة العودة.',
+    toastTextCopied:'✓ تم نسخ نص البريد — الصقه في أي تطبيق بريد',
+    toastHTMLCopied:'✓ تم نسخ البريد المنسّق — الصقه في Outlook/Gmail',
+    toastShared:'✓ تم نسخ تفاصيل الرحلة',
+    locale:'ar-EG',
+  }
+};
+
+// Arabic city + country translations (used only when lang === 'ar')
+const CITY_AR = {
+  CAI:'القاهرة', HBE:'الإسكندرية', SSH:'شرم الشيخ', HRG:'الغردقة', LXR:'الأقصر', ASW:'أسوان',
+  DXB:'دبي', AUH:'أبو ظبي', SHJ:'الشارقة', DOH:'الدوحة', JED:'جدة', RUH:'الرياض', DMM:'الدمام',
+  MED:'المدينة المنورة', KWI:'الكويت', BAH:'المنامة', MCT:'مسقط', SLL:'صلالة',
+  AMM:'عمّان', BEY:'بيروت', BGW:'بغداد', DAM:'دمشق', IST:'إسطنبول', SAW:'إسطنبول', TLV:'تل أبيب', THR:'طهران',
+  CMN:'الدار البيضاء', RAK:'مراكش', TUN:'تونس', ALG:'الجزائر', KRT:'الخرطوم',
+  LHR:'لندن', LGW:'لندن', CDG:'باريس', ORY:'باريس', FRA:'فرانكفورت', MUC:'ميونيخ', AMS:'أمستردام',
+  BRU:'بروكسل', MAD:'مدريد', BCN:'برشلونة', FCO:'روما', MXP:'ميلانو', ATH:'أثينا', VIE:'فيينا',
+  ZRH:'زيورخ', CPH:'كوبنهاغن', SVO:'موسكو',
+  BKK:'بانكوك', SIN:'سنغافورة', KUL:'كوالالمبور', HKG:'هونغ كونغ', PEK:'بكين', PVG:'شنغهاي',
+  NRT:'طوكيو', HND:'طوكيو', ICN:'سيول', BOM:'مومباي', DEL:'نيودلهي', BLR:'بنغالور', MAA:'تشيناي',
+  COK:'كوتشي', CGK:'جاكرتا', MNL:'مانيلا', KHI:'كراتشي', LHE:'لاهور', ISB:'إسلام أباد', DAC:'داكا',
+  JFK:'نيويورك', EWR:'نيوارك', IAD:'واشنطن', MIA:'ميامي', ORD:'شيكاغو', IAH:'هيوستن',
+  LAX:'لوس أنجلوس', SFO:'سان فرانسيسكو', YYZ:'تورنتو', YUL:'مونتريال', MEX:'مكسيكو سيتي', GRU:'ساو باولو',
+  SYD:'سيدني', MEL:'ملبورن', AKL:'أوكلاند',
+  JNB:'جوهانسبرغ', NBO:'نيروبي', LOS:'لاغوس', ADD:'أديس أبابا',
+};
+const COUNTRY_AR = {
+  Egypt:'مصر', UAE:'الإمارات', Qatar:'قطر', 'Saudi Arabia':'السعودية', Kuwait:'الكويت',
+  Bahrain:'البحرين', Oman:'عُمان', Jordan:'الأردن', Lebanon:'لبنان', Iraq:'العراق',
+  Syria:'سوريا', Turkey:'تركيا', Israel:'إسرائيل', Iran:'إيران', Morocco:'المغرب',
+  Tunisia:'تونس', Algeria:'الجزائر', Sudan:'السودان', UK:'المملكة المتحدة', France:'فرنسا',
+  Germany:'ألمانيا', Netherlands:'هولندا', Belgium:'بلجيكا', Spain:'إسبانيا', Italy:'إيطاليا',
+  Greece:'اليونان', Austria:'النمسا', Switzerland:'سويسرا', Denmark:'الدنمارك', Russia:'روسيا',
+  Thailand:'تايلاند', Singapore:'سنغافورة', Malaysia:'ماليزيا', 'Hong Kong':'هونغ كونغ',
+  China:'الصين', Japan:'اليابان', 'South Korea':'كوريا الجنوبية', India:'الهند',
+  Indonesia:'إندونيسيا', Philippines:'الفلبين', Pakistan:'باكستان', Bangladesh:'بنغلاديش',
+  USA:'الولايات المتحدة', Canada:'كندا', Mexico:'المكسيك', Brazil:'البرازيل',
+  Australia:'أستراليا', 'New Zealand':'نيوزيلندا', 'South Africa':'جنوب أفريقيا',
+  Kenya:'كينيا', Nigeria:'نيجيريا', Ethiopia:'إثيوبيا',
+};
+const REGION_AR = {
+  'Egypt':'مصر', 'Gulf':'الخليج', 'Middle East':'الشرق الأوسط', 'North Africa':'شمال أفريقيا',
+  'Europe':'أوروبا', 'Asia':'آسيا', 'Americas':'الأمريكتان', 'Oceania':'أوقيانوسيا', 'Africa':'أفريقيا'
+};
+
+let currentLang = 'en';
+function tA(key, fallback) {
+  return (I18N[currentLang] && I18N[currentLang][key] !== undefined) ? I18N[currentLang][key] : (fallback !== undefined ? fallback : key);
+}
+function cityName(a) { return currentLang === 'ar' ? (CITY_AR[a.iata] || a.city) : a.city; }
+function countryName(a) { return currentLang === 'ar' ? (COUNTRY_AR[a.country] || a.country) : a.country; }
+function regionName(r) { return currentLang === 'ar' ? (REGION_AR[r] || r) : r; }
+function cabinLabel(value) {
+  const map = { 'Economy':'economy', 'Premium Economy':'premEconomy', 'Business':'business', 'First':'first' };
+  return tA(map[value] || 'economy', value);
+}
+
+function setLanguage(lang) {
+  currentLang = lang;
+  document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.documentElement.lang = lang;
+  document.querySelectorAll('.lang-toggle button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  // Update all data-i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const v = tA(el.dataset.i18n, null);
+    if (v !== null) el.innerHTML = v;
+  });
+  // Repopulate selects
+  populateAirportSelects();
+  renderWorldClock();
+  renderPresets();
+  // Update duration info labels
+  if (durationManual) updateDurationLabel(true);
+  else {
+    const fromI = document.getElementById('from-airport').value;
+    const toI = document.getElementById('to-airport').value;
+    const from = AIRPORTS.find(a => a.iata === fromI);
+    const to = AIRPORTS.find(a => a.iata === toI);
+    if (from && to && from !== to) updateDurationLabel(false, haversineKm(from.lat, from.lon, to.lat, to.lon));
+    else document.getElementById('dur-info').textContent = tA('autoSelect');
+  }
+  if (returnDurationManual) updateReturnDurationLabel(true);
+  else updateReturnDurationLabel(false);
+  // Re-render result and email if present
+  if (lastResult) {
+    renderResult();
+    document.getElementById('email-preview-inline').innerHTML = buildEmailHTML();
+  }
+}
+
+// State
+let tripType = 'OW';
+let durationManual = false;
+let returnDurationManual = false;
+let lastResult = null; // for email/share/print
+
+// ─────────────────────────────────────────────────────────────
+// PASSENGERS
+// ─────────────────────────────────────────────────────────────
+function paxStep(field, delta) {
+  const ids = { adults:'pax-adults', children:'pax-children', infantsLap:'pax-infants-lap', infantsSeat:'pax-infants-seat' };
+  const el = document.getElementById(ids[field]);
+  const v = (parseInt(el.value) || 0) + delta;
+  const min = parseInt(el.min) || 0;
+  const max = parseInt(el.max) || 9;
+  el.value = Math.max(min, Math.min(max, v));
+  paxValidate();
+}
+function paxValidate() {
+  const adults = parseInt(document.getElementById('pax-adults').value) || 1;
+  const lap = document.getElementById('pax-infants-lap');
+  if (parseInt(lap.value) > adults) lap.value = adults;
+  lap.max = adults;
+}
+function paxData() {
+  return {
+    adults: parseInt(document.getElementById('pax-adults').value) || 1,
+    children: parseInt(document.getElementById('pax-children').value) || 0,
+    infantsLap: parseInt(document.getElementById('pax-infants-lap').value) || 0,
+    infantsSeat: parseInt(document.getElementById('pax-infants-seat').value) || 0,
+    cabin: document.getElementById('cabin-class').value,
+  };
+}
+function paxTotal(p) { return p.adults + p.children + p.infantsLap + p.infantsSeat; }
+
+// ─────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────
+function init() {
+  populateAirportSelects();
+  renderWorldClock();
+  renderPresets();
+  setDefaultDateTime();
+  startWorldClock();
+  document.getElementById('from-airport').value = 'CAI';
+  document.getElementById('to-airport').value = 'DXB';
+  document.getElementById('from-airport').addEventListener('change', onAirportsChange);
+  document.getElementById('to-airport').addEventListener('change', onAirportsChange);
+  onAirportsChange();
+}
+
+function populateAirportSelects() {
+  const fromSel = document.getElementById('from-airport');
+  const toSel = document.getElementById('to-airport');
+  const prevFrom = fromSel.value || 'CAI';
+  const prevTo = toSel.value || 'DXB';
+  const byRegion = {};
+  AIRPORTS.forEach(a => {
+    if (!byRegion[a.region]) byRegion[a.region] = [];
+    byRegion[a.region].push(a);
+  });
+  let html = '';
+  REGION_ORDER.forEach(region => {
+    if (!byRegion[region]) return;
+    html += `<optgroup label="── ${regionName(region)} ──">`;
+    byRegion[region].forEach(a => {
+      html += `<option value="${a.iata}">${cityName(a)} (${a.iata}) · ${countryName(a)}</option>`;
+    });
+    html += `</optgroup>`;
+  });
+  fromSel.innerHTML = html;
+  toSel.innerHTML = html;
+  fromSel.value = prevFrom;
+  toSel.value = prevTo;
+}
+
+function renderPresets() {
+  const html = PRESETS.map(p => {
+    const from = AIRPORTS.find(a => a.iata === p.from);
+    const to = AIRPORTS.find(a => a.iata === p.to);
+    return `<div class="preset-btn" onclick="applyPreset('${p.from}','${p.to}')">
+      <span class="from-iata">${p.from}</span>
+      <span class="arrow">→</span>
+      <span class="to-iata">${p.to}</span>
+      <span style="font-size:11px;color:rgba(255,255,255,.5);margin-${currentLang==='ar'?'right':'left'}:4px">${cityName(from)} → ${cityName(to)}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('presets').innerHTML = html;
+}
+
+function applyPreset(fromIata, toIata) {
+  document.getElementById('from-airport').value = fromIata;
+  document.getElementById('to-airport').value = toIata;
+  if (window.innerWidth <= 900) toggleSidebar();
+  onAirportsChange();
+  const card = document.querySelector('.calc-card');
+  card.style.transition = 'box-shadow .4s';
+  card.style.boxShadow = '0 0 0 3px rgba(26,86,219,.3)';
+  setTimeout(() => card.style.boxShadow = '', 600);
+}
+
+function setDefaultDateTime() {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  document.getElementById('dep-date').value = `${yyyy}-${mm}-${dd}`;
+  const totalMins = now.getHours() * 60 + now.getMinutes();
+  const rounded = Math.ceil(totalMins / 15) * 15;
+  const h = String(Math.floor(rounded / 60) % 24).padStart(2, '0');
+  const m = String(rounded % 60).padStart(2, '0');
+  document.getElementById('dep-time').value = `${h}:${m}`;
+  // Default return = +7 days, same time
+  const ret = new Date(now.getTime() + 7 * 86400000);
+  const ryyyy = ret.getFullYear();
+  const rmm = String(ret.getMonth() + 1).padStart(2, '0');
+  const rdd = String(ret.getDate()).padStart(2, '0');
+  document.getElementById('ret-date').value = `${ryyyy}-${rmm}-${rdd}`;
+  document.getElementById('ret-time').value = `${h}:${m}`;
+}
+
+function setNow() { setDefaultDateTime(); }
+
+// Trip-type tabs
+function setTripType(type) {
+  tripType = type;
+  document.querySelectorAll('.trip-tab').forEach(t => t.classList.toggle('active', t.dataset.trip === type));
+  document.getElementById('return-section').classList.toggle('show', type === 'RT');
+}
+
+// ─────────────────────────────────────────────────────────────
+// DISTANCE & DURATION (Haversine + commercial speed model)
+// ─────────────────────────────────────────────────────────────
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function estimateDurationMin(km) {
+  // 30 min for taxi/takeoff/climb/descent/landing + cruise at ~850 km/h with 7% routing factor
+  const minutes = 30 + (km * 1.07 / 850) * 60;
+  // Round to nearest 5 min
+  return Math.round(minutes / 5) * 5;
+}
+
+function onAirportsChange() {
+  const fromIata = document.getElementById('from-airport').value;
+  const toIata = document.getElementById('to-airport').value;
+  const from = AIRPORTS.find(a => a.iata === fromIata);
+  const to = AIRPORTS.find(a => a.iata === toIata);
+  if (!from || !to || from === to) {
+    document.getElementById('dur-info').textContent = tA('autoSelect');
+    return;
+  }
+  const km = haversineKm(from.lat, from.lon, to.lat, to.lon);
+  const mins = estimateDurationMin(km);
+  // Outbound auto-fill (if not manually overridden)
+  if (!durationManual) {
+    document.getElementById('dur-hours').value = Math.floor(mins / 60);
+    document.getElementById('dur-mins').value = mins % 60;
+    updateDurationLabel(false, km);
+  }
+  // Return auto-fill (same distance)
+  if (!returnDurationManual) {
+    document.getElementById('ret-dur-hours').value = Math.floor(mins / 60);
+    document.getElementById('ret-dur-mins').value = mins % 60;
+    updateReturnDurationLabel(false);
+  }
+}
+
+function updateDurationLabel(manual, km) {
+  const el = document.getElementById('dur-info');
+  if (manual) {
+    el.className = 'duration-info manual';
+    el.innerHTML = `${tA('manualOverride')} · <button onclick="resetDuration()">${tA('resetAuto')}</button>`;
+  } else {
+    el.className = 'duration-info';
+    const distStr = km ? ` · ${Math.round(km).toLocaleString()} km / ${Math.round(km*0.6214).toLocaleString()} mi` : '';
+    el.textContent = `${tA('autoCalc')}${distStr}`;
+  }
+}
+
+function updateReturnDurationLabel(manual) {
+  const el = document.getElementById('ret-dur-info');
+  if (manual) {
+    el.className = 'duration-info manual';
+    el.innerHTML = `${tA('manualOverride')} · <button onclick="resetReturnDuration()">${tA('resetAuto')}</button>`;
+  } else {
+    el.className = 'duration-info';
+    el.textContent = tA('autoCalc');
+  }
+}
+
+function markDurationManual() { durationManual = true; updateDurationLabel(true); }
+function markReturnDurationManual() { returnDurationManual = true; updateReturnDurationLabel(true); }
+function resetDuration() { durationManual = false; onAirportsChange(); }
+function resetReturnDuration() { returnDurationManual = false; onAirportsChange(); }
+
+// ─────────────────────────────────────────────────────────────
+// WORLD CLOCK
+// ─────────────────────────────────────────────────────────────
+function renderWorldClock() {
+  const html = CLOCK_CITIES.map(iata => {
+    const a = AIRPORTS.find(x => x.iata === iata);
+    return `<div class="world-clock-item" data-iata="${iata}" data-tz="${a.tz}">
+      <span class="iata">${iata}</span>
+      <span class="city">${cityName(a)}</span>
+      <span class="time" data-clock-time>—</span>
+    </div>`;
+  }).join('');
+  document.getElementById('world-clock').innerHTML = html;
+}
+
+function startWorldClock() { updateWorldClock(); setInterval(updateWorldClock, 1000); }
+
+function updateWorldClock() {
+  document.querySelectorAll('#world-clock .world-clock-item').forEach(el => {
+    const tz = el.dataset.tz;
+    const t = new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(new Date());
+    el.querySelector('[data-clock-time]').textContent = t;
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// SWAP
+// ─────────────────────────────────────────────────────────────
+function swapAirports() {
+  const from = document.getElementById('from-airport');
+  const to = document.getElementById('to-airport');
+  [from.value, to.value] = [to.value, from.value];
+  onAirportsChange();
+}
+
+// ─────────────────────────────────────────────────────────────
+// CALCULATION
+// ─────────────────────────────────────────────────────────────
+function calculate() {
+  hideError();
+  const fromIata = document.getElementById('from-airport').value;
+  const toIata = document.getElementById('to-airport').value;
+  const dateStr = document.getElementById('dep-date').value;
+  const timeStr = document.getElementById('dep-time').value;
+  const hours = parseInt(document.getElementById('dur-hours').value) || 0;
+  const mins = parseInt(document.getElementById('dur-mins').value) || 0;
+
+  if (!dateStr || !timeStr) { showError(tA('errorDate')); return; }
+  if (hours === 0 && mins === 0) { showError(tA('errorDuration')); return; }
+  if (fromIata === toIata) { showError(tA('errorSame')); return; }
+
+  const from = AIRPORTS.find(a => a.iata === fromIata);
+  const to = AIRPORTS.find(a => a.iata === toIata);
+  const distanceKm = haversineKm(from.lat, from.lon, to.lat, to.lon);
+  const outbound = computeLeg(from, to, dateStr, timeStr, hours, mins, distanceKm);
+
+  let returnLeg = null;
+  if (tripType === 'RT') {
+    const rDate = document.getElementById('ret-date').value;
+    const rTime = document.getElementById('ret-time').value;
+    const rH = parseInt(document.getElementById('ret-dur-hours').value) || 0;
+    const rM = parseInt(document.getElementById('ret-dur-mins').value) || 0;
+    if (!rDate || !rTime) { showError(tA('errorReturnDate')); return; }
+    if (rH === 0 && rM === 0) { showError(tA('errorReturnDur')); return; }
+    returnLeg = computeLeg(to, from, rDate, rTime, rH, rM, distanceKm);
+  }
+
+  lastResult = {
+    tripType, outbound, returnLeg, distanceKm,
+    distanceMi: Math.round(distanceKm * 0.6214),
+    pax: paxData(),
+    booking: {
+      wegoRef: document.getElementById('wego-booking-ref').value.trim(),
+      wegoPnr: document.getElementById('wego-pnr').value.trim(),
+      airlinePnr: document.getElementById('airline-pnr').value.trim(),
+    },
+    ref: 'WG-' + Date.now().toString().slice(-6),
+  };
+
+  renderResult();
+  // Render inline email preview (always visible after calc)
+  document.getElementById('email-preview-inline').innerHTML = buildEmailHTML();
+  document.getElementById('result').classList.add('show');
+  document.getElementById('email-card').classList.add('show');
+  setTimeout(() => document.getElementById('result').scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
+}
+
+function computeLeg(from, to, dateStr, timeStr, hours, mins, distanceKm) {
+  const [yyyy, mm, dd] = dateStr.split('-').map(Number);
+  const [h, m] = timeStr.split(':').map(Number);
+  const utcDeparture = wallTimeToUTC(yyyy, mm, dd, h, m, from.tz);
+  const durationMs = (hours * 60 + mins) * 60 * 1000;
+  const utcArrival = new Date(utcDeparture.getTime() + durationMs);
+  const offsetDiff = getTimezoneOffsetDiff(from.tz, to.tz, utcDeparture);
+  const depFmt = formatInTimezone(utcDeparture, from.tz);
+  const arrFmt = formatInTimezone(utcArrival, to.tz);
+  // Day delta: compare arrival date (in destination TZ) with departure date (in origin TZ)
+  const depDateKey = formatDateKey(utcDeparture, from.tz);
+  const arrDateKey = formatDateKey(utcArrival, to.tz);
+  const dayDelta = dateKeyDelta(depDateKey, arrDateKey);
+  return {
+    from, to, hours, mins, durationMs,
+    utcDeparture, utcArrival, offsetDiff,
+    departure: depFmt, arrival: arrFmt,
+    dayDelta, distanceKm,
+  };
+}
+
+function formatDateKey(date, tz) {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit' }).format(date);
+}
+
+function dateKeyDelta(k1, k2) {
+  const d1 = new Date(k1 + 'T00:00:00Z');
+  const d2 = new Date(k2 + 'T00:00:00Z');
+  return Math.round((d2 - d1) / 86400000);
+}
+
+function wallTimeToUTC(year, month, day, hour, minute, timezone) {
+  const fakeUTC = new Date(Date.UTC(year, month - 1, day, hour, minute));
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false
+  }).formatToParts(fakeUTC);
+  const obj = {};
+  parts.forEach(p => obj[p.type] = parseInt(p.value));
+  if (obj.hour === 24) obj.hour = 0;
+  const candidateInTzMs = Date.UTC(obj.year, obj.month - 1, obj.day, obj.hour, obj.minute);
+  const offsetMs = candidateInTzMs - fakeUTC.getTime();
+  return new Date(fakeUTC.getTime() - offsetMs);
+}
+
+function formatInTimezone(date, timezone) {
+  const locale = tA('locale', 'en-GB');
+  const fmtTime12 = new Intl.DateTimeFormat('en-US', { timeZone: timezone, hour:'numeric', minute:'2-digit', hour12:true });
+  const fmtTime24 = new Intl.DateTimeFormat('en-GB', { timeZone: timezone, hour:'2-digit', minute:'2-digit', hour12:false });
+  const fmtDateLong = new Intl.DateTimeFormat(locale, { timeZone: timezone, weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  const fmtDateShort = new Intl.DateTimeFormat(locale, { timeZone: timezone, day:'2-digit', month:'short', year:'numeric' });
+  const fmtWeekday = new Intl.DateTimeFormat(locale, { timeZone: timezone, weekday:'long' });
+  const t12 = fmtTime12.format(date); // e.g. "6:45 AM"
+  const parts = t12.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i) || [];
+  return {
+    time12: t12,
+    timeOnly: parts[1] ? `${parts[1]}:${parts[2]}` : t12,
+    period: (parts[3] || '').toUpperCase(),
+    time24: fmtTime24.format(date),
+    dateLong: fmtDateLong.format(date),
+    dateShort: fmtDateShort.format(date),
+    weekday: fmtWeekday.format(date),
+  };
+}
+
+function getTimezoneOffsetDiff(tzFrom, tzTo, atDate) {
+  function offsetOf(tz, dt) {
+    const fakeUTC = new Date(Date.UTC(dt.getUTCFullYear(), dt.getUTCMonth(), dt.getUTCDate(), dt.getUTCHours(), dt.getUTCMinutes()));
+    const parts = new Intl.DateTimeFormat('en-US', { timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false }).formatToParts(dt);
+    const obj = {};
+    parts.forEach(p => obj[p.type] = parseInt(p.value));
+    if (obj.hour === 24) obj.hour = 0;
+    const tzMs = Date.UTC(obj.year, obj.month-1, obj.day, obj.hour, obj.minute);
+    return (tzMs - fakeUTC.getTime()) / 60000;
+  }
+  return Math.round(offsetOf(tzTo, atDate) - offsetOf(tzFrom, atDate));
+}
+
+function formatOffsetText(offsetMin, fromName, toName) {
+  if (offsetMin === 0) return `${toName} ${tA('sameTz')} ${fromName}`;
+  const absH = Math.floor(Math.abs(offsetMin) / 60);
+  const absM = Math.abs(offsetMin) % 60;
+  let span = `${absH} ${absH !== 1 ? tA('hourPlural') : tA('hourSingle')}`;
+  if (absM > 0) span += ` ${absM} ${tA('min')}`;
+  return `${toName} ${span} ${offsetMin > 0 ? tA('aheadOf') : tA('behind')} ${fromName}`;
+}
+
+function dayBadge(delta) {
+  if (delta === 0) return `<span class="day-badge same">${tA('sameDay')}</span>`;
+  if (delta > 0) {
+    const sfx = delta > 1 ? tA('dayPlural') : tA('daySingle');
+    return `<span class="day-badge">+${delta} ${sfx}</span>`;
+  }
+  const sfx = Math.abs(delta) > 1 ? tA('dayPlural') : tA('daySingle');
+  return `<span class="day-badge">${delta} ${sfx}</span>`;
+}
+
+// ─────────────────────────────────────────────────────────────
+// RESULT RENDERING
+// ─────────────────────────────────────────────────────────────
+function renderResult() {
+  const r = lastResult;
+  document.getElementById('r-title').textContent = r.tripType === 'RT' ? tA('resultTitleRT') : tA('resultTitleOW');
+  document.getElementById('r-subtitle').textContent = r.tripType === 'RT' ? tA('resultSubRT') : tA('resultSubOW');
+  document.getElementById('r-ref').textContent = r.ref;
+
+  const p = r.pax;
+  const total = paxTotal(p);
+  const b = r.booking || {};
+  const hasAnyBooking = b.wegoRef || b.wegoPnr || b.airlinePnr;
+  const bookingBar = hasAnyBooking ? `<div class="booking-summary">
+    <div class="b-item"><span class="b-label">${tA('wegoBookingRef','Wego Booking Reference')}</span><span class="b-value ${b.wegoRef?'':'empty'}">${b.wegoRef || tA('notProvided','— not provided —')}</span></div>
+    <div class="b-item"><span class="b-label">${tA('wegoPnr','Wego PNR')}</span><span class="b-value ${b.wegoPnr?'':'empty'}">${b.wegoPnr || tA('notProvided','— not provided —')}</span></div>
+    <div class="b-item"><span class="b-label">${tA('airlinePnr','Airline PNR')}</span><span class="b-value ${b.airlinePnr?'':'empty'}">${b.airlinePnr || tA('notProvided','— not provided —')}</span></div>
+  </div>` : '';
+
+  const paxBar = `<div class="pax-summary">
+    <div class="pax-item"><span class="ico">👥</span><span class="lbl">${tA('passengers','Passengers')}:</span> ${total} ${total===1?tA('traveler','traveler'):tA('travelers','travelers')}</div>
+    ${p.adults>0?`<div class="pax-item"><span class="ico">🧑</span> ${p.adults} ${p.adults===1?tA('adult','Adult'):tA('adults','Adults')}</div>`:''}
+    ${p.children>0?`<div class="pax-item"><span class="ico">🧒</span> ${p.children} ${p.children===1?tA('child','Child'):tA('children','Children')}</div>`:''}
+    ${p.infantsLap>0?`<div class="pax-item"><span class="ico">🍼</span> ${p.infantsLap} ${tA('infantsLap','Infants on lap')}</div>`:''}
+    ${p.infantsSeat>0?`<div class="pax-item"><span class="ico">🍼</span> ${p.infantsSeat} ${tA('infantsSeat','Infants in seat')}</div>`:''}
+    <div class="pax-item"><span class="ico">💺</span><span class="lbl">${tA('cabin','Cabin')}:</span> ${cabinLabel(p.cabin)}</div>
+  </div>`;
+
+  let html = bookingBar + paxBar;
+  html += renderLeg(r.outbound, r.tripType === 'RT' ? tA('legHeaderOutbound') : tA('legHeaderFlight'), r.tripType === 'RT' ? 'OW 1' : 'OW');
+  if (r.returnLeg) html += renderLeg(r.returnLeg, tA('legHeaderReturn'), 'RT 2');
+  document.getElementById('r-body').innerHTML = html;
+}
+
+function renderLeg(leg, label, badge) {
+  const durHM = `${leg.hours}h ${String(leg.mins).padStart(2,'0')}m`;
+  const distKm = Math.round(leg.distanceKm).toLocaleString();
+  const distMi = Math.round(leg.distanceKm * 0.6214).toLocaleString();
+  const offsetTxt = formatOffsetText(leg.offsetDiff, cityName(leg.from), cityName(leg.to));
+  return `
+    <div class="itinerary">
+      <div class="leg-header">
+        <span class="badge">${badge}</span>
+        ${label}
+      </div>
+      <div class="leg-body">
+        <div class="leg-endpoint">
+          <div class="city-line">
+            <div class="city-name">${cityName(leg.from)}</div>
+            <span class="iata-badge">${leg.from.iata}</span>
+          </div>
+          <div class="airport-full">${leg.from.name}</div>
+          <div class="country">${countryName(leg.from)}</div>
+          <div class="time-block">
+            <span class="time-big">${leg.departure.timeOnly}</span><span class="time-period">${leg.departure.period}</span>
+          </div>
+          <div class="day-label"><strong>${leg.departure.weekday}</strong>, ${leg.departure.dateShort}</div>
+        </div>
+        <div class="leg-arrow">
+          <div class="duration-text">${durHM}</div>
+          <div class="arrow-line"></div>
+          <div class="distance-text">${distKm} km · ${distMi} mi</div>
+        </div>
+        <div class="leg-endpoint right">
+          <div class="city-line">
+            <span class="iata-badge">${leg.to.iata}</span>
+            <div class="city-name">${cityName(leg.to)}</div>
+          </div>
+          <div class="airport-full">${leg.to.name}</div>
+          <div class="country">${countryName(leg.to)}</div>
+          <div class="time-block">
+            <span class="time-big">${leg.arrival.timeOnly}</span><span class="time-period">${leg.arrival.period}</span>
+            ${dayBadge(leg.dayDelta)}
+          </div>
+          <div class="day-label"><strong>${leg.arrival.weekday}</strong>, ${leg.arrival.dateShort}</div>
+        </div>
+      </div>
+      <div class="itinerary-meta">
+        <div class="meta-item"><span class="label">${tA('duration')}</span><span class="value">${durHM}</span></div>
+        <div class="meta-item"><span class="label">${tA('distance')}</span><span class="value">${distKm} km · ${distMi} mi</span></div>
+        <div class="meta-item"><span class="label">${tA('timeDiff')}</span><span class="value text">${offsetTxt}</span></div>
+      </div>
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────────────────────────────
+// EMAIL — preview + copy + open in mail
+// ─────────────────────────────────────────────────────────────
+function buildEmailHTML() {
+  const r = lastResult;
+  if (!r) return '';
+  const tripLabel = r.tripType === 'RT' ? tA('tripRT') : tA('tripOW');
+
+  let flightBoxes = renderEmailLeg(r.outbound, r.tripType === 'RT' ? tA('legHeaderOutbound') : tA('legHeaderFlight'), r.tripType === 'RT' ? 'OW 1' : 'OW');
+  if (r.returnLeg) flightBoxes += renderEmailLeg(r.returnLeg, tA('legHeaderReturn'), 'RT 2');
+
+  // Booking block (only if any field is filled)
+  const b = r.booking || {};
+  const hasAnyBooking = b.wegoRef || b.wegoPnr || b.airlinePnr;
+  const bookingBlock = hasAnyBooking ? `<div class="email-booking-block">
+    <div class="bb-title">📋 ${tA('bookingBlockTitle')}</div>
+    <div class="bb-grid">
+      <div class="bb-item"><span class="bb-l">${tA('wegoBookingRef')}</span><span class="bb-v ${b.wegoRef?'':'empty'}">${b.wegoRef || tA('notProvided')}</span></div>
+      <div class="bb-item"><span class="bb-l">${tA('wegoPnr')}</span><span class="bb-v ${b.wegoPnr?'':'empty'}">${b.wegoPnr || tA('notProvided')}</span></div>
+      <div class="bb-item"><span class="bb-l">${tA('airlinePnr')}</span><span class="bb-v ${b.airlinePnr?'':'empty'}">${b.airlinePnr || tA('notProvided')}</span></div>
+    </div>
+  </div>` : '';
+
+  const p = r.pax;
+  const paxLines = [];
+  if (p.adults > 0) paxLines.push(`<div class="pl">• ${p.adults} × <strong>${p.adults===1?tA('adult'):tA('adults')}</strong></div>`);
+  if (p.children > 0) paxLines.push(`<div class="pl">• ${p.children} × <strong>${p.children===1?tA('child'):tA('children')}</strong></div>`);
+  if (p.infantsLap > 0) paxLines.push(`<div class="pl">• ${p.infantsLap} × <strong>${tA('infantsLap')}</strong></div>`);
+  if (p.infantsSeat > 0) paxLines.push(`<div class="pl">• ${p.infantsSeat} × <strong>${tA('infantsSeat')}</strong></div>`);
+  const paxBlock = `<div class="email-pax-block">
+    <div style="font-weight:700;color:#1e293b;margin-bottom:6px">👥 ${tA('paxBlockTitle')}</div>
+    ${paxLines.join('')}
+    <div class="pl" style="margin-top:6px;padding-top:6px;border-top:1px dashed #fde4c6">💺 <strong>${tA('cabinClass')}:</strong> ${cabinLabel(p.cabin)}</div>
+  </div>`;
+
+  return `
+<div class="email-greeting">${tA('dearCustomer')}</div>
+<div class="email-intro">
+  ${tA('emailIntroPart1')} <strong>${tripLabel}</strong> ${tA('emailIntroPart2')}
+</div>
+${bookingBlock}
+${flightBoxes}
+${paxBlock}
+<div class="email-footer">
+  <div class="footer-intro">${tA('emailFooterIntro')}</div>
+  <div class="channel"><span class="channel-icon">📞</span> <strong>Egypt&nbsp;&nbsp;&nbsp;&nbsp;:</strong> <a href="tel:0020221279930">0020 2 21279930</a></div>
+  <div class="channel"><span class="channel-icon">📞</span> <strong>UAE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</strong> <a href="tel:0097145810300">0097 1 45810300</a></div>
+  <div class="channel"><span class="channel-icon">💬</span> <strong>WhatsApp :</strong> <a href="https://wa.me/971588250786">00971 588 250 786</a></div>
+  <div class="channel"><span class="channel-icon">📧</span> <strong>Email&nbsp;&nbsp;&nbsp;&nbsp;:</strong> <a href="mailto:CustomerSupport@wego.com">CustomerSupport@wego.com</a></div>
+</div>
+<div class="email-closing">${tA('emailClosing')}</div>
+`;
+}
+
+function renderEmailLeg(leg, label, badge) {
+  const durHM = `${leg.hours}h ${String(leg.mins).padStart(2,'0')}m`;
+  const distKm = Math.round(leg.distanceKm).toLocaleString();
+  const distMi = Math.round(leg.distanceKm * 0.6214).toLocaleString();
+  const offsetTxt = formatOffsetText(leg.offsetDiff, cityName(leg.from), cityName(leg.to));
+  const dayClass = leg.dayDelta === 0 ? 'ev-db same' : 'ev-db';
+  let dayText;
+  if (leg.dayDelta === 0) dayText = tA('sameDay');
+  else if (leg.dayDelta > 0) dayText = `+${leg.dayDelta} ${leg.dayDelta>1?tA('dayPlural'):tA('daySingle')}`;
+  else dayText = `${leg.dayDelta} ${Math.abs(leg.dayDelta)>1?tA('dayPlural'):tA('daySingle')}`;
+  return `
+<div class="ev-box">
+  <div class="ev-title"><span class="ev-bdg">${badge}</span> ✈️ ${label}: ${cityName(leg.from)} → ${cityName(leg.to)}</div>
+  <div class="ev-row">
+    <div class="ev-end">
+      <div class="ev-cl">
+        <div class="ev-cn">${cityName(leg.from)}</div>
+        <span class="ev-iata">${leg.from.iata}</span>
+      </div>
+      <div class="ev-af">${leg.from.name}</div>
+      <div class="ev-ct">${countryName(leg.from)}</div>
+      <div class="ev-tm">${leg.departure.timeOnly}<span class="ev-tp">${leg.departure.period}</span></div>
+      <div class="ev-dy"><strong>${leg.departure.weekday}</strong>, ${leg.departure.dateShort}</div>
+    </div>
+    <div class="ev-mid">
+      <div class="ev-d">${durHM}</div>
+      <div class="ev-ln"></div>
+      <div class="ev-ds">${distKm} km · ${distMi} mi</div>
+    </div>
+    <div class="ev-end right">
+      <div class="ev-cl">
+        <span class="ev-iata">${leg.to.iata}</span>
+        <div class="ev-cn">${cityName(leg.to)}</div>
+      </div>
+      <div class="ev-af">${leg.to.name}</div>
+      <div class="ev-ct">${countryName(leg.to)}</div>
+      <div class="ev-tm">${leg.arrival.timeOnly}<span class="ev-tp">${leg.arrival.period}</span> <span class="${dayClass}">${dayText}</span></div>
+      <div class="ev-dy"><strong>${leg.arrival.weekday}</strong>, ${leg.arrival.dateShort}</div>
+    </div>
+  </div>
+  <div class="ev-mt">
+    <div class="ev-mi"><span class="ev-ml">${tA('duration')}</span><span class="ev-mv">${durHM}</span></div>
+    <div class="ev-mi"><span class="ev-ml">${tA('distance')}</span><span class="ev-mv">${distKm} km · ${distMi} mi</span></div>
+    <div class="ev-mi"><span class="ev-ml">${tA('timeDiff')}</span><span class="ev-mv">${offsetTxt}</span></div>
+  </div>
+</div>`;
+}
+
+function buildEmailPlainText() {
+  const r = lastResult;
+  if (!r) return '';
+  const tripLabel = r.tripType === 'RT' ? tA('tripRT') : tA('tripOW');
+  let txt = `${tA('dearCustomer')}\n\n${tA('emailIntroPart1')} ${tripLabel} ${tA('emailIntroPart2')}\n\n`;
+  // Booking refs (if any)
+  const b = r.booking || {};
+  if (b.wegoRef || b.wegoPnr || b.airlinePnr) {
+    txt += `📋 ${tA('bookingBlockTitle').toUpperCase()}\n─────────────────────────────────────\n`;
+    txt += `   ${tA('wegoBookingRef')}: ${b.wegoRef || tA('notProvided')}\n`;
+    txt += `   ${tA('wegoPnr')}: ${b.wegoPnr || tA('notProvided')}\n`;
+    txt += `   ${tA('airlinePnr')}: ${b.airlinePnr || tA('notProvided')}\n\n`;
+  }
+  txt += plainTextLeg(r.outbound, r.tripType === 'RT' ? tA('legHeaderOutbound') : tA('legHeaderFlight'));
+  if (r.returnLeg) txt += '\n' + plainTextLeg(r.returnLeg, tA('legHeaderReturn'));
+  // Passengers
+  const p = r.pax;
+  txt += `👥 ${tA('paxBlockTitle').toUpperCase()}\n─────────────────────────────────────\n`;
+  if (p.adults > 0) txt += `   • ${p.adults} × ${p.adults===1?tA('adult'):tA('adults')}\n`;
+  if (p.children > 0) txt += `   • ${p.children} × ${p.children===1?tA('child'):tA('children')}\n`;
+  if (p.infantsLap > 0) txt += `   • ${p.infantsLap} × ${tA('infantsLap')}\n`;
+  if (p.infantsSeat > 0) txt += `   • ${p.infantsSeat} × ${tA('infantsSeat')}\n`;
+  txt += `   💺 ${tA('cabinClass')}: ${cabinLabel(p.cabin)}\n\n`;
+  txt += `${tA('emailFooterIntro')}\n\n`;
+  txt += `📞 Egypt    : 0020 2 21279930\n`;
+  txt += `📞 UAE      : 0097 1 45810300\n`;
+  txt += `💬 WhatsApp : 00971 588 250 786\n`;
+  txt += `📧 Email    : CustomerSupport@wego.com\n\n`;
+  txt += `${tA('emailClosing')}\n`;
+  return txt;
+}
+
+function plainTextLeg(leg, label) {
+  const durHM = `${leg.hours} ${leg.hours !== 1 ? tA('hourPlural') : tA('hourSingle')} ${leg.mins} ${tA('min')}`;
+  const distKm = Math.round(leg.distanceKm).toLocaleString();
+  const distMi = Math.round(leg.distanceKm * 0.6214).toLocaleString();
+  const offsetTxt = formatOffsetText(leg.offsetDiff, cityName(leg.from), cityName(leg.to));
+  let dayNote;
+  if (leg.dayDelta === 0) dayNote = tA('sameDayLong');
+  else if (leg.dayDelta > 0) dayNote = `+${leg.dayDelta} ${leg.dayDelta>1?tA('daysAfter'):tA('dayAfter')}`;
+  else dayNote = `${leg.dayDelta} ${Math.abs(leg.dayDelta)>1?tA('daysBefore'):tA('dayBefore')}`;
+  return `✈️ ${label}: ${cityName(leg.from)} → ${cityName(leg.to)}\n` +
+         `─────────────────────────────────────\n` +
+         `🛫 ${tA('legDeparture')}:\n` +
+         `   ${leg.from.name} (${leg.from.iata})\n` +
+         `   ${cityName(leg.from)}, ${countryName(leg.from)}\n` +
+         `   ${leg.departure.weekday}, ${leg.departure.dateLong} — ${leg.departure.time12}\n\n` +
+         `🛬 ${tA('legArrival')}:\n` +
+         `   ${leg.to.name} (${leg.to.iata})\n` +
+         `   ${cityName(leg.to)}, ${countryName(leg.to)}\n` +
+         `   ${leg.arrival.weekday}, ${leg.arrival.dateLong} — ${leg.arrival.time12} (${dayNote})\n\n` +
+         `⏱  ${tA('duration')}: ${durHM}\n` +
+         `📏 ${tA('distance')}: ${distKm} km / ${distMi} mi\n` +
+         `🌐 ${tA('timeDiff')}: ${offsetTxt}\n\n`;
+}
+
+function emailSubject() {
+  const r = lastResult;
+  if (!r) return tA('emailSubject');
+  const trip = r.returnLeg ? ` (${tA('tripRT')})` : '';
+  return `${tA('emailSubject')}: ${cityName(r.outbound.from)} → ${cityName(r.outbound.to)}${trip}`;
+}
+
+function openEmailModal() {
+  if (!lastResult) return;
+  document.getElementById('email-preview').innerHTML = buildEmailHTML();
+  document.getElementById('email-modal').classList.add('show');
+}
+
+function closeEmailModal() {
+  document.getElementById('email-modal').classList.remove('show');
+}
+
+function getEmailPreviewEl() {
+  // Prefer inline preview if visible, else modal
+  const inline = document.getElementById('email-preview-inline');
+  if (inline && inline.innerHTML.trim()) return inline;
+  return document.getElementById('email-preview');
+}
+
+function copyEmailText() {
+  const text = buildEmailPlainText();
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(tA('toastTextCopied'));
+  }).catch(() => fallbackCopy(text));
+}
+
+function copyEmailHTML() {
+  const html = getEmailPreviewEl().innerHTML;
+  if (navigator.clipboard && window.ClipboardItem) {
+    const htmlBlob = new Blob([`<div style="font-family:'Segoe UI',Tahoma,Arial,sans-serif;color:#333;line-height:1.65;">${html}</div>`], { type: 'text/html' });
+    navigator.clipboard.write([new ClipboardItem({ 'text/html': htmlBlob, 'text/plain': new Blob([buildEmailPlainText()], {type:'text/plain'}) })])
+      .then(() => showToast(tA('toastHTMLCopied')))
+      .catch(() => copyEmailText());
+  } else {
+    copyEmailText();
+  }
+}
+
+function openInMail() {
+  const subject = emailSubject();
+  const body = buildEmailPlainText();
+  const url = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = url;
+}
+
+function fallbackCopy(text) {
+  const t = document.createElement('textarea');
+  t.value = text; document.body.appendChild(t); t.select();
+  try { document.execCommand('copy'); showToast('✓ Copied'); } catch (e) { showToast('Copy failed'); }
+  document.body.removeChild(t);
+}
+
+// ─────────────────────────────────────────────────────────────
+// SHARE & PRINT
+// ─────────────────────────────────────────────────────────────
+function shareItinerary() {
+  if (!lastResult) return;
+  const text = buildEmailPlainText();
+  const title = emailSubject();
+  if (navigator.share) {
+    navigator.share({ title, text }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(text).then(() => showToast(tA('toastShared')));
+  }
+}
+
+function printItinerary() {
+  if (!lastResult) return;
+  window.print();
+}
+
+// ─────────────────────────────────────────────────────────────
+// UI HELPERS
+// ─────────────────────────────────────────────────────────────
+function showError(msg) {
+  const el = document.getElementById('error');
+  el.textContent = '⚠️ ' + msg;
+  el.style.display = 'flex';
+  document.getElementById('result').classList.remove('show');
+}
+function hideError() { document.getElementById('error').style.display = 'none'; }
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+// Keyboard
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeEmailModal();
+  if (e.key === 'Enter' && !e.target.matches('button, select, textarea')) {
+    if (document.getElementById('email-modal').classList.contains('show')) return;
+    calculate();
+  }
+});
+
+// Boot
+init();
+</script>
+
+</body>
+</html>

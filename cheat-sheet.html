@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Refund & Fare Rules Cheat Sheet — Wego Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0f2044; --navy2:#162d5c; --blue:#1a56db; --blue2:#1e40af;
+  --teal:#0891b2; --green:#059669; --amber:#d97706; --red:#dc2626;
+  --purple:#7c3aed; --purple2:#6d28d9;
+  --bg:#f0f4f8; --card:#ffffff; --border:#dde3ec; --text:#1e293b;
+  --muted:#64748b; --light:#f8fafc; --sidebar:#0f2044;
+  --sidebar-w:265px;
+  --shadow-sm:0 1px 3px rgba(15,32,68,.06);
+  --shadow-md:0 4px 12px rgba(15,32,68,.08);
+  --shadow-lg:0 12px 32px rgba(15,32,68,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px}
+
+/* ── SIDEBAR ── */
+#sidebar{width:var(--sidebar-w);background:var(--sidebar);position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;overflow:hidden;z-index:100;box-shadow:4px 0 20px rgba(0,0,0,.2);transition:transform .25s}
+#sb-head{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+#sb-head .logo{color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+#sb-head .logo span{background:linear-gradient(135deg,#7c3aed,#a78bfa);padding:5px 9px;border-radius:6px;font-size:12px}
+#sb-head .sub{color:rgba(255,255,255,.4);font-size:10.5px;margin-top:4px;letter-spacing:.05em;text-transform:uppercase}
+#sb-nav{flex:1;overflow-y:auto;padding:10px 0}
+#sb-nav::-webkit-scrollbar{width:3px}
+#sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px}
+.nav-section{padding:14px 16px 6px;font-size:9px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em}
+.nav-btn{display:flex;align-items:center;gap:11px;padding:10px 16px;cursor:pointer;border-left:3px solid transparent;transition:all .15s;color:rgba(255,255,255,.78);font-size:13px;font-weight:500}
+.nav-btn:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav-btn.active{background:rgba(124,58,237,.2);border-left-color:#a78bfa;color:#fff;font-weight:600}
+.nav-btn .nb-icon{font-size:15px;width:20px;text-align:center}
+.nav-btn .nb-count{margin-left:auto;font-size:10.5px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);padding:2px 7px;border-radius:10px;font-weight:600;font-family:'JetBrains Mono',monospace}
+.nav-btn.active .nb-count{background:rgba(167,139,250,.3);color:#fff}
+
+/* mobile */
+#mobile-toggle{display:none;position:fixed;top:12px;left:12px;z-index:200;background:var(--navy);color:#fff;border:none;width:40px;height:40px;border-radius:8px;font-size:18px;cursor:pointer;box-shadow:var(--shadow-md)}
+#sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:90}
+
+/* ── MAIN ── */
+#main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+#topbar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:50;box-shadow:var(--shadow-sm);flex-wrap:wrap}
+.tb-title{font-size:15px;font-weight:700;color:var(--navy)}
+.tb-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.search-box{flex:1;min-width:220px;max-width:420px;position:relative}
+.search-box input{width:100%;padding:9px 14px 9px 38px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;outline:none;background:var(--light);transition:all .15s}
+.search-box input:focus{border-color:var(--purple);background:#fff;box-shadow:0 0 0 3px rgba(124,58,237,.1)}
+.search-box::before{content:'🔍';position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:13px;opacity:.6}
+.tb-actions{display:flex;gap:8px;margin-left:auto}
+.btn{padding:9px 16px;border-radius:9px;border:none;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.btn-primary{background:var(--purple);color:#fff}
+.btn-primary:hover{background:var(--purple2);transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.btn-ghost{background:#fff;color:var(--text);border:1.5px solid var(--border)}
+.btn-ghost:hover{border-color:var(--purple);color:var(--purple)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{background:#b91c1c}
+.btn-sm{padding:6px 11px;font-size:11.5px}
+
+/* ── CONTENT ── */
+#content{padding:22px 24px;flex:1;max-width:1200px;margin:0 auto;width:100%}
+.results-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.results-count{font-size:12px;color:var(--muted)}
+.results-count strong{color:var(--text);font-weight:700}
+
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.empty-state{padding:60px 20px;text-align:center;color:var(--muted);background:var(--card);border:2px dashed var(--border);border-radius:14px}
+.empty-state .icon{font-size:48px;opacity:.4;margin-bottom:10px}
+.empty-state h3{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+
+/* ── SCENARIO CARD ── */
+.sc-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .18s;position:relative;display:flex;flex-direction:column}
+.sc-card:hover{border-color:var(--purple);box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.sc-card .accent{position:absolute;top:0;left:0;width:4px;height:100%;background:var(--cat-color,var(--purple))}
+.sc-head{padding:14px 16px 10px 18px}
+.cat-pill{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.05em;text-transform:uppercase;background:var(--cat-bg,#ede9fe);color:var(--cat-color,#7c3aed)}
+.sc-title{font-size:14.5px;font-weight:700;color:var(--navy);margin-top:8px;line-height:1.35}
+.sc-quick{padding:0 16px 12px 18px;font-size:12.5px;color:var(--text);line-height:1.55;font-style:italic;border-bottom:1px solid var(--border)}
+.sc-quick::before{content:'💬 ';opacity:.6;font-style:normal}
+.sc-foot{padding:10px 16px 12px 18px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;font-size:11px}
+.sc-tag{background:#f1f5f9;color:var(--muted);padding:3px 9px;border-radius:15px;font-weight:600;font-size:10.5px}
+.sc-cr{margin-top:6px;padding:6px 10px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px;color:#1e40af;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;width:100%}
+.sc-cr-label{opacity:.6;font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.04em}
+
+/* ── MODAL ── */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(15,32,68,.55);z-index:300;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-backdrop.show{display:flex;animation:fadeIn .18s}
+.modal{background:#fff;border-radius:14px;max-width:680px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);animation:slideUp .22s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.m-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;flex-shrink:0}
+.m-titles{flex:1;min-width:0}
+.m-cat{margin-bottom:8px}
+.m-name{font-size:16px;font-weight:800;color:var(--navy);line-height:1.3}
+.m-close{background:transparent;border:none;font-size:22px;cursor:pointer;color:var(--muted);width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.m-close:hover{background:#f1f5f9;color:var(--text)}
+.m-body{padding:18px 22px;overflow-y:auto;flex:1}
+.m-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0;background:var(--light);border-radius:0 0 14px 14px}
+
+.detail-section{margin-bottom:16px}
+.detail-section:last-child{margin-bottom:0}
+.detail-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.detail-text{font-size:13px;color:var(--text);line-height:1.7;background:var(--light);padding:12px 14px;border-radius:8px;border:1px solid var(--border);white-space:pre-wrap;word-wrap:break-word}
+.detail-text.empty{color:#94a3b8;font-style:italic;border-style:dashed}
+.detail-text.highlight{background:linear-gradient(to right,#f5f3ff,#faf5ff);border-color:#ddd6fe;color:var(--navy);font-weight:600;font-size:14px}
+.detail-text.highlight::before{content:'💬 ';opacity:.5;font-weight:400}
+.steps-list{display:flex;flex-direction:column;gap:8px}
+.step-item{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:var(--light);border-radius:8px;border:1px solid var(--border);font-size:13px;color:var(--text);line-height:1.5}
+.step-num{flex-shrink:0;width:22px;height:22px;background:var(--purple);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.cr-link-display{padding:11px 14px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:9px;font-size:13px;color:#1e40af;font-weight:600;display:flex;align-items:center;gap:8px}
+.cr-link-display .icon{font-size:16px}
+.cr-link-display .label{font-size:10px;color:#3b82f6;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-right:4px}
+.warning-box{padding:11px 14px;background:#fffbeb;border:1px solid #fcd34d;border-radius:9px;font-size:13px;color:#92400e;line-height:1.55;display:flex;gap:8px}
+.warning-box .icon{font-size:16px;flex-shrink:0}
+.tags-display{display:flex;flex-wrap:wrap;gap:5px}
+
+/* ── FORM ── */
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.form-group label{font-size:11.5px;font-weight:600;color:var(--text)}
+.form-group label .req{color:var(--red)}
+.form-group label .helper{color:var(--muted);font-weight:400;font-size:11px}
+.form-group input,.form-group select,.form-group textarea{padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;outline:none;transition:border-color .15s;background:#fff;color:var(--text);width:100%}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(124,58,237,.1)}
+.form-group textarea{resize:vertical;min-height:64px;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.55}
+.form-group .hint{font-size:10.5px;color:var(--muted);margin-top:2px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.form-row .form-group{margin-bottom:0}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);z-index:500;display:none;animation:slideUp .22s}
+.toast.show{display:block}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+
+/* ── RESPONSIVE ── */
+@media (max-width:900px){
+  #sidebar{transform:translateX(-100%)}
+  #sidebar.open{transform:none}
+  #sidebar.open ~ #sidebar-backdrop{display:block}
+  #main{margin-left:0}
+  #mobile-toggle{display:flex;align-items:center;justify-content:center}
+  #topbar{padding-left:60px}
+  .form-row{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  #content{padding:14px}
+  .cards-grid{grid-template-columns:1fr}
+  .modal{max-height:95vh}
+}
+</style>
+</head>
+<body>
+
+<button id="mobile-toggle" onclick="toggleSidebar()">☰</button>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div id="sb-head">
+    <div class="logo"><span>📋</span> Cheat Sheet</div>
+    <div class="sub">Wego · Refund & Fare Rules</div>
+  </div>
+  <nav id="sb-nav"></nav>
+</aside>
+<div id="sidebar-backdrop" onclick="toggleSidebar()"></div>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <div>
+      <div class="tb-title">Refund & Fare Rules</div>
+      <div class="tb-sub" id="tb-sub">— scenarios</div>
+    </div>
+    <div class="search-box">
+      <input id="search" type="text" placeholder="Search title, answer, tags (e.g. tabby, refund, LCC)…" autocomplete="off" oninput="onSearch()">
+    </div>
+    <div class="tb-actions">
+      <button class="btn btn-ghost btn-sm" onclick="exportData()">📤 Export</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('import-file').click()">📥 Import</button>
+      <input id="import-file" type="file" accept=".json" style="display:none" onchange="importData(event)">
+      <button class="btn btn-primary" onclick="openAddModal()">+ Add Scenario</button>
+    </div>
+  </div>
+
+  <div id="content">
+    <div class="results-bar">
+      <div class="results-count" id="count">Loading…</div>
+    </div>
+    <div class="cards-grid" id="cards"></div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-backdrop" id="detail-modal" onclick="if(event.target===this)closeModal('detail-modal')">
+  <div class="modal" id="detail-content"></div>
+</div>
+
+<!-- FORM MODAL -->
+<div class="modal-backdrop" id="form-modal" onclick="if(event.target===this)closeModal('form-modal')">
+  <div class="modal">
+    <div class="m-head">
+      <div class="m-titles">
+        <div class="m-name" id="form-title">Add Scenario</div>
+      </div>
+      <button class="m-close" onclick="closeModal('form-modal')">✕</button>
+    </div>
+    <div class="m-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category <span class="req">*</span></label>
+          <select id="f-category">
+            <option value="refund">💰 Refund</option>
+            <option value="cancellation">🚫 Cancellation</option>
+            <option value="change">🔄 Change</option>
+            <option value="schedule-change">🔔 Schedule Change</option>
+            <option value="special">⚠️ Special Cases</option>
+            <option value="other">📋 Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tags <span class="helper">(comma-separated)</span></label>
+          <input id="f-tags" type="text" placeholder="e.g. Tabby, Auto Refund, LCC">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Title <span class="req">*</span></label>
+        <input id="f-title" type="text" placeholder="e.g. Booking Failed — Normal Payment">
+      </div>
+
+      <div class="form-group">
+        <label>Customer typically asks <span class="helper">(what they say or ask)</span></label>
+        <textarea id="f-customer-says" placeholder="e.g. My booking failed, when will I get my money back?"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Quick Answer <span class="req">*</span> <span class="helper">(one-liner to tell customer)</span></label>
+        <textarea id="f-quick-answer" placeholder="e.g. Refund will be processed automatically within 7-10 business days to your original payment method." rows="2"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Detailed Rules <span class="helper">(full policy explanation)</span></label>
+        <textarea id="f-rules" placeholder="When booking fails on Wego with normal card payment, the amount is automatically refunded…" rows="4"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Steps to Follow <span class="helper">(one per line, in order)</span></label>
+        <textarea id="f-steps" placeholder="1. Confirm the booking is indeed failed.&#10;2. Use the canned response template.&#10;3. Confirm refund amount with customer." rows="4"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Related Canned Response Template <span class="helper">(name from your canned responses tool)</span></label>
+        <input id="f-canned-response" type="text" placeholder="e.g. Booking Failed — One Way (Normal Payment)">
+      </div>
+
+      <div class="form-group">
+        <label>Warnings / Edge Cases <span class="helper">(things to watch out for)</span></label>
+        <textarea id="f-warnings" placeholder="e.g. If customer used Tabby, do NOT process refund directly — refer to Tabby support." rows="3"></textarea>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('form-modal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="saveScenario()">💾 Save Scenario</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'wego_cheat_sheet_v1';
+const TODAY = new Date().toISOString().slice(0,10).replace(/-/g,'');
+
+// ── CATEGORIES ──────────────────────────────────────────────
+const CATEGORIES = {
+  refund:           { label:'Refund',          icon:'💰', color:'#059669', bg:'#d1fae5' },
+  cancellation:     { label:'Cancellation',    icon:'🚫', color:'#dc2626', bg:'#fee2e2' },
+  change:           { label:'Change',          icon:'🔄', color:'#1a56db', bg:'#dbeafe' },
+  'schedule-change':{ label:'Schedule Change', icon:'🔔', color:'#7c3aed', bg:'#ede9fe' },
+  special:          { label:'Special Cases',   icon:'⚠️', color:'#d97706', bg:'#fef3c7' },
+  other:            { label:'Other',           icon:'📋', color:'#475569', bg:'#f1f5f9' },
+};
+
+// ── STARTER SCENARIOS (derived from canned responses — confirmed Wego policy) ──
+const STARTER_SCENARIOS = [
+  {
+    id:'sc-booking-failed-normal',
+    category:'refund',
+    title:'Booking Failed — Normal Payment',
+    customerSays:'My booking failed and the money was deducted from my card. When will I get my refund?',
+    quickAnswer:'The refund is processed automatically — you should see it back on your card within 7–10 business days.',
+    rules:'When a Wego booking fails with normal card payment, the deducted amount is refunded automatically to the original payment method. No customer action is needed. The 7–10 business day window depends on the customer\'s bank.',
+    steps:'Confirm the booking is indeed failed (check status in the system).\nUse the "Booking Failed — One Way" canned response (Normal Payment variant).\nReassure the customer no action is needed on their side.\nIf customer reports no refund after 10 business days, escalate to finance team.',
+    cannedResponse:'Booking Failed — One Way (Normal Payment)',
+    warnings:'Always verify the payment method first. If it was Tabby, the process is different — see "Booking Failed — Tabby" scenario.',
+    tags:['Booking Failed','Auto Refund','7-10 Days']
+  },
+  {
+    id:'sc-booking-failed-tabby',
+    category:'refund',
+    title:'Booking Failed — Tabby Payment',
+    customerSays:'I paid with Tabby and my booking failed. Where is my money?',
+    quickAnswer:'Since you paid through Tabby, please contact Tabby directly — they hold the funds and will process the refund and tell you the timeframe.',
+    rules:'Tabby holds the payment funds, so refunds for Tabby-paid bookings must be initiated through Tabby\'s customer service. Wego cannot process Tabby refunds directly because we never received the money — Tabby pays us when the booking succeeds.',
+    steps:'Confirm booking failed and payment method was Tabby.\nUse the "Booking Failed — One Way (Tabby Payment)" canned response.\nProvide Tabby\'s contact details if customer asks.\nLog the case for tracking.',
+    cannedResponse:'Booking Failed — One Way (Tabby Payment)',
+    warnings:'Do NOT promise a refund timeframe — that\'s Tabby\'s decision, not Wego\'s. Refer them to Tabby for ETA.',
+    tags:['Booking Failed','Tabby','Contact Tabby']
+  },
+  {
+    id:'sc-soow-failed',
+    category:'refund',
+    title:'SOOW — One Leg Failed (Departure or Return)',
+    customerSays:'My departure flight failed but the return is confirmed (or vice versa). What happens?',
+    quickAnswer:'The failed leg\'s amount is refunded automatically. The confirmed leg remains active. Refund within 7–10 business days for normal payment.',
+    rules:'Split One-Way (SOOW) bookings have departure and return as separate transactions. If one leg fails, only that amount is refunded; the other leg stays confirmed. Customer can rebook the failed leg or proceed with just the confirmed one.',
+    steps:'Identify exactly which leg failed (departure or return).\nConfirm payment method (Normal or Tabby — affects refund process).\nUse "Booking Failed — SOOW" canned response, choose appropriate sub-option.\nClarify which PNR is still active.',
+    cannedResponse:'Booking Failed — SOOW',
+    warnings:'Always verify with the customer that they understand only one leg is confirmed. They may need a new ticket for the failed leg if they still want to travel.',
+    tags:['SOOW','Booking Failed','Partial']
+  },
+  {
+    id:'sc-lcc-no-refund',
+    category:'cancellation',
+    title:'LCC Ticket — Cancellation Not Allowed',
+    customerSays:'I want to cancel my flight on flydubai (or AirArabia/Flynas/FlyEgypt etc.) and get a refund.',
+    quickAnswer:'Low-cost carriers don\'t allow cancellation or refund on confirmed tickets — this is the airline\'s fare rule, not Wego\'s policy.',
+    rules:'LCCs (flydubai, Air Arabia, Flynas, FlyEgypt, Air Cairo, Jazeera, SalamAir, IndiGo, etc.) have strict no-refund/no-change policies on issued tickets, regardless of whether the ticket is used or unused. This restriction is set directly by the airline; Wego as the booking agent cannot override it.',
+    steps:'Verify the ticket is confirmed and on a low-cost carrier.\nUse the "LCC Cancellation Refusal" canned response.\nClearly explain it\'s the airline\'s policy, not Wego\'s.\nIf customer is on a SOOW with one leg confirmed and one failed, the failed leg amount may already be refunded — clarify both legs.\nOffer to help with a new booking through our website.',
+    cannedResponse:'LCC Cancellation Refusal — SOOW',
+    warnings:'Be empathetic but firm — customers often push back. The rule is non-negotiable as it\'s an airline contract. Avoid promising any voucher unless authorised by team lead.',
+    tags:['LCC','Cancellation','Non-refundable','Airline Policy']
+  },
+  {
+    id:'sc-change-cancel-request',
+    category:'change',
+    title:'Change or Cancel Request — Standard Process',
+    customerSays:'I want to change/cancel my booking. Can you help?',
+    quickAnswer:'For security reasons, all change and cancellation requests must go through our contact center. Please call us — agents on the line can verify and process it.',
+    rules:'Wego policy requires phone-based verification for any modifications to a booking. This protects customer accounts and ensures proper authentication. Email/chat-based changes are not permitted for amendment or cancellation.',
+    steps:'Listen to the customer\'s request to understand the urgency.\nUse the "Change or Cancel Request" canned response.\nProvide all contact channels (phone is preferred).\nIf departure is within 24 hours, suggest contacting the airline directly for fastest resolution — they may have more authority for last-minute changes.',
+    cannedResponse:'Change or Cancel Request',
+    warnings:'Never process a change/cancel via chat or email — it\'s a security policy. Always direct to contact center even if the customer is frustrated.',
+    tags:['Change','Cancel','Contact Center','Security','Verification']
+  },
+  {
+    id:'sc-voucher-compensation',
+    category:'refund',
+    title:'Voucher Compensation Case',
+    customerSays:'(Agent decision after escalation: issue voucher as goodwill compensation)',
+    quickAnswer:'As a gesture of goodwill, we are issuing you a voucher of [amount], valid until [expiry], usable on your next booking with Wego.',
+    rules:'When a refund isn\'t possible (e.g., LCC ticket already issued) but goodwill compensation is appropriate based on customer experience or service issue, a voucher can be issued. Voucher is applied at checkout for the customer\'s next booking through Wego.',
+    steps:'Get voucher details (number, value, expiry) from team lead/manager — don\'t issue without authorisation.\nUse "Booking Failed — Voucher Compensation" canned response.\nSend voucher details to customer in writing (email).\nLog voucher number for tracking.',
+    cannedResponse:'Booking Failed — Voucher Compensation',
+    warnings:'Voucher amount and expiry must be approved. Never promise a voucher to a customer before getting approval. Voucher is for next booking — not refundable to original payment method.',
+    tags:['Voucher','Compensation','Goodwill','Manager Approval']
+  },
+  {
+    id:'sc-schedule-change',
+    category:'schedule-change',
+    title:'Airline-Initiated Schedule Change (Involuntary)',
+    customerSays:'My flight time changed / was cancelled by the airline. What are my options?',
+    quickAnswer:'Your airline has changed your schedule. Options typically include: accept the new time, request a rebooking, or in major-change cases, request a refund.',
+    rules:'When the airline involuntarily changes the flight time/route/cancels, the passenger has rights as set by airline policy and applicable regulations. Options vary by airline and severity (minor vs major change), but typically include rebooking, accepting the new flight, or refund eligibility.',
+    steps:'Confirm the change details (original time, new time, route).\nCheck airline policy for major vs minor change classification (consult Airline Directory).\nUse "Involuntary Schedule Change" canned response — pick the appropriate tone (warm/direct/formal).\nDiscuss options with customer and document their choice.\nIf customer accepts, log acceptance. If they want rebooking, escalate to airline desk.',
+    cannedResponse:'Involuntary Schedule Change (Warm / Direct / Formal)',
+    warnings:'This is the airline\'s responsibility, not Wego\'s. Don\'t take blame. Major changes (>2h delay or route change) usually qualify for full refund. Minor changes may not.',
+    tags:['Schedule Change','Airline','Involuntary','Rebooking']
+  },
+  {
+    id:'sc-extra-baggage-failed',
+    category:'refund',
+    title:'Extra Baggage Failed — Auto Refund',
+    customerSays:'I paid for extra baggage but it wasn\'t added to my ticket. Where\'s my refund?',
+    quickAnswer:'The extra baggage payment is refunded automatically to your original payment method within 7–10 business days. Your flight booking remains intact.',
+    rules:'When the extra baggage add-on fails to be added to a confirmed booking, the baggage charge is refunded automatically — but the flight booking itself remains active. The two are processed separately.',
+    steps:'Verify failed extra baggage on the booking (check confirmation).\nVerify payment method (Normal or Tabby).\nUse "Extra Baggage Failed" canned response (matching payment method).\nConfirm refund amount and method with customer.\nLog case for tracking.',
+    cannedResponse:'Extra Baggage Failed (Normal Payment / Tabby Payment)',
+    warnings:'Don\'t confuse this with booking-failure scenarios — the flight is fine, only the baggage add-on failed. If customer needs the extra baggage, they need to add it directly with the airline.',
+    tags:['Extra Baggage','Failed','Auto Refund']
+  },
+  {
+    id:'sc-payment-link',
+    category:'other',
+    title:'Payment Link — Pending Confirmation',
+    customerSays:'How do I pay for my booking? / I haven\'t paid yet, what\'s next?',
+    quickAnswer:'I\'ll send you a secure payment link valid for 10 minutes. Once you complete payment, your booking is confirmed at the quoted fare.',
+    rules:'Wego uses 10-minute secure payment links to confirm bookings that haven\'t been paid yet. The customer must complete payment within the timeframe to lock in the fare; otherwise the link expires and the fare may change.',
+    steps:'Generate the payment link from the system.\nUse the "Payment Link" canned response.\nSend link to customer via their preferred channel (email or WhatsApp).\nMonitor — if expired, regenerate (fare may change).\nOnce paid, send confirmation email using "Booking Confirmed" template.',
+    cannedResponse:'Payment Link',
+    warnings:'10 minutes is short — make sure customer is ready to pay before sending. Fare is not guaranteed if the link expires; a new search may show a different price.',
+    tags:['Payment','Link','10-min','Pending']
+  },
+  {
+    id:'sc-booking-confirmed',
+    category:'other',
+    title:'Booking Confirmed — Send Confirmation',
+    customerSays:'Did my booking go through? Can you send me the confirmation and ticket?',
+    quickAnswer:'Your booking is confirmed. I\'m sending you the full reservation details now, with the e-ticket attached.',
+    rules:'After successful booking, send confirmation email containing: Wego Booking Reference, Wego Ticket PNR, Airline Ticket PNR, ticket number(s) and passenger name(s). Attach the e-ticket PDF.',
+    steps:'Confirm the booking is fully issued (PNR + ticket numbers issued).\nGather all reservation details.\nAttach the e-ticket PDF to the email.\nUse the "Booking Confirmed" canned response.\nFor multi-passenger bookings (groups/families), include each passenger\'s ticket number.',
+    cannedResponse:'Booking Confirmed',
+    warnings:'Wego Ticket PNR and Airline Ticket PNR are the same value — don\'t confuse customers. Wego Ticket PNR is what we use in GDS; Airline Ticket PNR is what the customer uses on the airline\'s website. Verify the e-ticket attachment matches the booking.',
+    tags:['Confirmation','Ticket Issued','Send Email']
+  },
+];
+
+// ── STATE ──────────────────────────────────────────────────
+let scenarios = [];
+let activeFilter = 'all';
+let searchQuery = '';
+let editingId = null;
+
+// ── INIT ───────────────────────────────────────────────────
+function init(){
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if(stored){
+    try{ scenarios = JSON.parse(stored); }
+    catch(e){ scenarios = JSON.parse(JSON.stringify(STARTER_SCENARIOS)); }
+  } else {
+    scenarios = JSON.parse(JSON.stringify(STARTER_SCENARIOS));
+    save();
+  }
+  renderSidebar();
+  render();
+}
+
+function save(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(scenarios));
+}
+
+// ── SIDEBAR ────────────────────────────────────────────────
+function renderSidebar(){
+  const counts = {all: scenarios.length};
+  Object.keys(CATEGORIES).forEach(k => counts[k] = scenarios.filter(s => s.category === k).length);
+
+  let html = '<div class="nav-section">View</div>';
+  html += `<div class="nav-btn ${activeFilter==='all'?'active':''}" onclick="setFilter('all')">
+    <span class="nb-icon">⭐</span><span>All Scenarios</span><span class="nb-count">${counts.all}</span>
+  </div>`;
+
+  html += '<div class="nav-section">By Category</div>';
+  Object.keys(CATEGORIES).forEach(key => {
+    const c = CATEGORIES[key];
+    html += `<div class="nav-btn ${activeFilter===key?'active':''}" onclick="setFilter('${key}')">
+      <span class="nb-icon">${c.icon}</span><span>${c.label}</span><span class="nb-count">${counts[key]}</span>
+    </div>`;
+  });
+  document.getElementById('sb-nav').innerHTML = html;
+}
+
+function setFilter(id){
+  activeFilter = id;
+  if(window.innerWidth <= 900) toggleSidebar();
+  renderSidebar();
+  render();
+}
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ── SEARCH ─────────────────────────────────────────────────
+function onSearch(){
+  searchQuery = document.getElementById('search').value.trim().toLowerCase();
+  render();
+}
+
+// ── RENDER CARDS ───────────────────────────────────────────
+function getFiltered(){
+  return scenarios.filter(s => {
+    if(activeFilter !== 'all' && s.category !== activeFilter) return false;
+    if(searchQuery){
+      const q = searchQuery;
+      const blob = [s.title, s.customerSays, s.quickAnswer, s.rules, s.cannedResponse, (s.tags||[]).join(' ')].join(' ').toLowerCase();
+      if(!blob.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function render(){
+  const list = getFiltered();
+  document.getElementById('count').innerHTML = `<strong>${list.length}</strong> ${list.length===1?'scenario':'scenarios'}${searchQuery?` matching "<strong>${escapeHtml(searchQuery)}</strong>"`:''}`;
+  document.getElementById('tb-sub').textContent = `${scenarios.length} scenarios in your knowledge base`;
+
+  const cards = document.getElementById('cards');
+  if(list.length === 0){
+    cards.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <div class="icon">${searchQuery ? '🔍' : '📋'}</div>
+      <h3>${searchQuery ? 'No scenarios found' : 'No scenarios yet'}</h3>
+      <p>${searchQuery ? `No matches for "${escapeHtml(searchQuery)}"` : 'Click "+ Add Scenario" to start building your cheat sheet.'}</p>
+      ${!searchQuery ? '<button class="btn btn-primary" onclick="openAddModal()" style="margin-top:14px">+ Add Scenario</button>' : ''}
+    </div>`;
+    return;
+  }
+
+  cards.innerHTML = list.map(s => {
+    const cat = CATEGORIES[s.category] || CATEGORIES.other;
+    return `<div class="sc-card" onclick="openDetail('${s.id}')" style="--cat-color:${cat.color};--cat-bg:${cat.bg}">
+      <div class="accent"></div>
+      <div class="sc-head">
+        <span class="cat-pill"><span>${cat.icon}</span> ${cat.label}</span>
+        <div class="sc-title">${escapeHtml(s.title)}</div>
+      </div>
+      <div class="sc-quick">${escapeHtml(s.quickAnswer || 'No quick answer added yet.')}</div>
+      <div class="sc-foot">
+        ${(s.tags||[]).slice(0,4).map(t => `<span class="sc-tag">${escapeHtml(t)}</span>`).join('')}
+        ${s.cannedResponse ? `<div class="sc-cr"><span>📨</span><span class="sc-cr-label">Template:</span> ${escapeHtml(s.cannedResponse)}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── DETAIL MODAL ───────────────────────────────────────────
+function openDetail(id){
+  const s = scenarios.find(x => x.id === id);
+  if(!s) return;
+  const cat = CATEGORIES[s.category] || CATEGORIES.other;
+
+  const stepsArray = (s.steps || '').split('\n').map(t => t.trim()).filter(Boolean);
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="m-head">
+      <div class="m-titles">
+        <div class="m-cat"><span class="cat-pill" style="--cat-color:${cat.color};--cat-bg:${cat.bg};background:${cat.bg};color:${cat.color}"><span>${cat.icon}</span> ${cat.label}</span></div>
+        <div class="m-name">${escapeHtml(s.title)}</div>
+      </div>
+      <button class="m-close" onclick="closeModal('detail-modal')">✕</button>
+    </div>
+    <div class="m-body">
+      ${(s.customerSays||'').trim() ? `<div class="detail-section">
+        <div class="detail-label">💬 Customer typically asks</div>
+        <div class="detail-text">${escapeHtml(s.customerSays)}</div>
+      </div>` : ''}
+
+      <div class="detail-section">
+        <div class="detail-label">⚡ Quick Answer</div>
+        <div class="detail-text highlight">${escapeHtml(s.quickAnswer || 'No quick answer added.')}</div>
+      </div>
+
+      ${(s.rules||'').trim() ? `<div class="detail-section">
+        <div class="detail-label">📜 Detailed Rules</div>
+        <div class="detail-text">${escapeHtml(s.rules)}</div>
+      </div>` : ''}
+
+      ${stepsArray.length ? `<div class="detail-section">
+        <div class="detail-label">📋 Steps to Follow</div>
+        <div class="steps-list">
+          ${stepsArray.map((step, i) => `<div class="step-item">
+            <span class="step-num">${i+1}</span>
+            <span>${escapeHtml(step.replace(/^\d+\.\s*/, ''))}</span>
+          </div>`).join('')}
+        </div>
+      </div>` : ''}
+
+      ${(s.cannedResponse||'').trim() ? `<div class="detail-section">
+        <div class="detail-label">📨 Related Canned Response</div>
+        <div class="cr-link-display">
+          <span class="icon">📄</span>
+          <span class="label">Use template:</span>
+          <span>${escapeHtml(s.cannedResponse)}</span>
+        </div>
+      </div>` : ''}
+
+      ${(s.warnings||'').trim() ? `<div class="detail-section">
+        <div class="detail-label">⚠️ Warnings & Edge Cases</div>
+        <div class="warning-box"><span class="icon">⚠️</span><span>${escapeHtml(s.warnings)}</span></div>
+      </div>` : ''}
+
+      ${(s.tags||[]).length ? `<div class="detail-section">
+        <div class="detail-label">🏷️ Tags</div>
+        <div class="tags-display">
+          ${s.tags.map(t => `<span class="sc-tag">${escapeHtml(t)}</span>`).join('')}
+        </div>
+      </div>` : ''}
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-danger btn-sm" onclick="deleteScenario('${s.id}')">🗑 Delete</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('detail-modal')">Close</button>
+      <button class="btn btn-primary btn-sm" onclick="closeModal('detail-modal');openEditModal('${s.id}')">✏️ Edit</button>
+    </div>
+  `;
+  document.getElementById('detail-modal').classList.add('show');
+}
+
+// ── ADD/EDIT FORM ──────────────────────────────────────────
+function openAddModal(){
+  editingId = null;
+  document.getElementById('form-title').textContent = 'Add New Scenario';
+  ['title','customer-says','quick-answer','rules','steps','canned-response','warnings','tags'].forEach(f => document.getElementById('f-'+f).value = '');
+  document.getElementById('f-category').value = activeFilter !== 'all' ? activeFilter : 'refund';
+  document.getElementById('form-modal').classList.add('show');
+  setTimeout(() => document.getElementById('f-title').focus(), 100);
+}
+
+function openEditModal(id){
+  const s = scenarios.find(x => x.id === id);
+  if(!s) return;
+  editingId = id;
+  document.getElementById('form-title').textContent = `Edit: ${s.title}`;
+  document.getElementById('f-category').value = s.category || 'refund';
+  document.getElementById('f-title').value = s.title || '';
+  document.getElementById('f-customer-says').value = s.customerSays || '';
+  document.getElementById('f-quick-answer').value = s.quickAnswer || '';
+  document.getElementById('f-rules').value = s.rules || '';
+  document.getElementById('f-steps').value = s.steps || '';
+  document.getElementById('f-canned-response').value = s.cannedResponse || '';
+  document.getElementById('f-warnings').value = s.warnings || '';
+  document.getElementById('f-tags').value = (s.tags || []).join(', ');
+  document.getElementById('form-modal').classList.add('show');
+}
+
+function saveScenario(){
+  const title = document.getElementById('f-title').value.trim();
+  const quickAnswer = document.getElementById('f-quick-answer').value.trim();
+  if(!title){ toast('Title is required','error'); return; }
+  if(!quickAnswer){ toast('Quick Answer is required — it\'s the key value of the cheat sheet!','error'); return; }
+
+  const tagsRaw = document.getElementById('f-tags').value.trim();
+  const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+  const data = {
+    id: editingId || ('user-' + Date.now().toString(36)),
+    category: document.getElementById('f-category').value,
+    title,
+    customerSays: document.getElementById('f-customer-says').value.trim(),
+    quickAnswer,
+    rules: document.getElementById('f-rules').value.trim(),
+    steps: document.getElementById('f-steps').value.trim(),
+    cannedResponse: document.getElementById('f-canned-response').value.trim(),
+    warnings: document.getElementById('f-warnings').value.trim(),
+    tags,
+  };
+
+  if(editingId){
+    const idx = scenarios.findIndex(s => s.id === editingId);
+    if(idx >= 0) scenarios[idx] = data;
+    toast(`Updated: ${title}`, 'success');
+  } else {
+    scenarios.push(data);
+    toast(`Added: ${title}`, 'success');
+  }
+  save();
+  closeModal('form-modal');
+  renderSidebar();
+  render();
+}
+
+function deleteScenario(id){
+  const s = scenarios.find(x => x.id === id);
+  if(!s) return;
+  if(!confirm(`Delete scenario "${s.title}"?\n\nThis cannot be undone (but you can re-import from a backup).`)) return;
+  scenarios = scenarios.filter(x => x.id !== id);
+  save();
+  closeModal('detail-modal');
+  renderSidebar();
+  render();
+  toast(`Deleted: ${s.title}`, 'success');
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.remove('show');
+}
+
+// ── EXPORT / IMPORT ────────────────────────────────────────
+function exportData(){
+  const blob = new Blob([JSON.stringify(scenarios, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Adel_cheatsheet_backup_${TODAY}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast(`Exported ${scenarios.length} scenarios`, 'success');
+}
+
+function importData(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if(!Array.isArray(imported)) throw new Error('Invalid format');
+      const choice = confirm(`Import ${imported.length} scenarios.\n\nOK = Replace all current data\nCancel = Merge (add new, skip duplicates by title)`);
+      if(choice){
+        scenarios = imported;
+        toast(`Imported ${imported.length} scenarios (replaced)`, 'success');
+      } else {
+        const existingTitles = new Set(scenarios.map(s => s.title.toLowerCase()));
+        const toAdd = imported.filter(s => !existingTitles.has((s.title||'').toLowerCase()));
+        scenarios = [...scenarios, ...toAdd];
+        toast(`Merged ${toAdd.length} new scenarios`, 'success');
+      }
+      save();
+      renderSidebar();
+      render();
+    } catch(err){
+      toast('Import failed: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ── TOAST ──────────────────────────────────────────────────
+function toast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (type||'');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ── HELPERS ────────────────────────────────────────────────
+function escapeHtml(s){
+  if(s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){
+    closeModal('detail-modal');
+    closeModal('form-modal');
+  }
+});
+
+init();
+</script>
+</body>
+</html>

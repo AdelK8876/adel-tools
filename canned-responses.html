@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canned Responses — Travel Agency</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0f2044; --navy2:#162d5c; --blue:#1a56db; --blue2:#1e40af;
+  --teal:#0891b2; --green:#059669; --amber:#d97706; --red:#dc2626;
+  --bg:#f0f4f8; --card:#ffffff; --border:#dde3ec; --text:#1e293b;
+  --muted:#64748b; --light:#f8fafc; --sidebar:#0f2044;
+  --sidebar-w:290px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px}
+
+/* ── SIDEBAR ── */
+#sidebar{width:var(--sidebar-w);background:var(--sidebar);position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;overflow:hidden;z-index:100;box-shadow:4px 0 20px rgba(0,0,0,0.2)}
+#sb-head{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
+#sb-head .logo{color:#fff;font-size:15px;font-weight:700;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
+#sb-head .logo span{background:linear-gradient(135deg,#3b82f6,#06b6d4);padding:5px 9px;border-radius:6px;font-size:12px}
+#sb-head .sub{color:rgba(255,255,255,.4);font-size:10.5px;margin-top:4px;letter-spacing:.05em}
+#sb-nav{flex:1;overflow-y:auto;padding:10px 0}
+#sb-nav::-webkit-scrollbar{width:3px}
+#sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px}
+.nav-section{padding:10px 16px 4px;font-size:9px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em}
+.nav-btn{display:flex;align-items:flex-start;gap:10px;padding:9px 16px;cursor:pointer;border-left:3px solid transparent;transition:all .15s;user-select:none;border-radius:0}
+.nav-btn:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav-btn.active{background:rgba(59,130,246,.2);border-left-color:#3b82f6;color:#fff}
+.nav-btn .nb-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:1px}
+.nav-btn .nb-text{flex:1}
+.nav-btn .nb-title{font-size:12px;font-weight:600;color:rgba(255,255,255,.85);line-height:1.3}
+.nav-btn.active .nb-title{color:#fff}
+.nav-btn .nb-sub{font-size:10px;color:rgba(255,255,255,.35);margin-top:1px;line-height:1.3}
+.nb-badge{font-size:9px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.5);padding:1px 7px;border-radius:10px;white-space:nowrap;margin-top:2px;display:inline-block}
+
+/* ── MAIN ── */
+#main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+#topbar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+#topbar .page-title{font-size:15px;font-weight:700;color:var(--navy)}
+#topbar .page-sub{font-size:12px;color:var(--muted);margin-top:1px}
+.top-contacts{display:flex;gap:16px;align-items:center}
+.top-contact{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.top-contact strong{color:var(--text);font-weight:600}
+
+#content{padding:24px 28px;flex:1}
+
+/* ── TEMPLATE CARD ── */
+.tpl-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;max-width:860px}
+.tpl-card-head{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.tpl-icon{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.tpl-head-text .tpl-title{font-size:14px;font-weight:700;color:var(--navy)}
+.tpl-head-text .tpl-desc{font-size:11.5px;color:var(--muted);margin-top:2px}
+.lang-tabs{display:flex;gap:6px;margin-left:auto}
+.lang-tab{padding:5px 14px;border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--light);color:var(--muted);transition:all .15s}
+.lang-tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
+
+/* ── FIELDS ── */
+.fields-area{padding:18px 22px;border-bottom:1px solid var(--border);background:#fafbfc}
+.fields-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field-group{display:flex;flex-direction:column;gap:5px}
+.field-group.full{grid-column:1/-1}
+.field-group label{font-size:11.5px;font-weight:600;color:var(--text)}
+.field-group label .req{color:var(--red)}
+.field-group input,.field-group select{padding:8px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;outline:none;transition:border-color .15s;background:#fff;color:var(--text)}
+.field-group input:focus,.field-group select:focus{border-color:var(--blue)}
+.field-group .hint{font-size:10.5px;color:var(--muted)}
+.gen-btn{margin-top:14px;padding:10px 22px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:7px;font-family:'Plus Jakarta Sans',sans-serif}
+.gen-btn:hover{background:var(--blue2);transform:translateY(-1px)}
+
+/* ── PREVIEW ── */
+.preview-area{padding:18px 22px}
+.preview-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.preview-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.copy-btn{display:flex;align-items:center;gap:6px;padding:7px 16px;background:var(--green);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif}
+.copy-btn:hover{background:#047857;transform:translateY(-1px)}
+.copy-btn.copied{background:#047857}
+.preview-box{background:#f8fafc;border:1.5px solid var(--border);border-radius:8px;padding:16px 18px;font-size:13px;line-height:1.85;color:var(--text);white-space:pre-wrap;word-break:break-word;min-height:100px;max-height:420px;overflow-y:auto;font-family:'Plus Jakarta Sans',sans-serif}
+.preview-box[dir="rtl"]{text-align:right;font-size:14px}
+.preview-placeholder{color:var(--muted);font-style:italic;font-size:12.5px}
+
+/* ── SUB SELECTOR ── */
+.sub-selector{padding:14px 22px;border-bottom:1px solid var(--border);background:var(--light);display:flex;gap:8px;flex-wrap:wrap}
+.sub-btn{padding:7px 16px;border-radius:7px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif}
+.sub-btn:hover{border-color:var(--blue);color:var(--blue)}
+.sub-btn.active{background:var(--navy);border-color:var(--navy);color:#fff}
+
+/* ── WELCOME ── */
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;gap:12px}
+.welcome .w-icon{font-size:52px;margin-bottom:8px}
+.welcome h2{font-size:20px;font-weight:700;color:var(--navy)}
+.welcome p{color:var(--muted);font-size:13.5px;max-width:400px;line-height:1.7}
+.welcome .w-hint{font-size:12px;color:var(--muted);margin-top:8px;background:var(--light);border:1px solid var(--border);border-radius:8px;padding:10px 18px}
+
+/* ── STATUS BADGE ── */
+.status-bar{display:flex;gap:8px;padding:10px 22px;background:linear-gradient(to right,#eff6ff,#f0fdf4);border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center}
+.status-item{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.status-item strong{color:var(--text);font-weight:600}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot.blue{background:var(--blue)}.dot.green{background:var(--green)}.dot.amber{background:var(--amber)}
+/* ── CURRENCY SPLIT FIELD ── */
+.currency-split{display:flex;gap:0;border:1.5px solid var(--border);border-radius:7px;overflow:hidden;transition:border-color .15s;background:#fff}
+.currency-split:focus-within{border-color:var(--blue)}
+.cur-num{flex:1;padding:8px 12px;border:none;outline:none;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:transparent;min-width:0}
+.cur-divider{width:1px;background:var(--border);flex-shrink:0;align-self:stretch}
+.cur-select{padding:8px 10px 8px 6px;border:none;outline:none;font-size:12.5px;font-family:'Segoe UI','Arial',sans-serif;color:var(--text);background:#f8fafc;cursor:pointer;direction:rtl;min-width:150px;max-width:180px;overflow-y:auto}
+.cur-select:hover{background:#f0f4f8}
+.cur-preview{margin-top:6px;font-size:11px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.prev-en{color:var(--blue);font-weight:600;background:#eff6ff;padding:2px 9px;border-radius:5px}
+.prev-ar{color:#059669;font-weight:600;background:#f0fdf4;padding:2px 9px;border-radius:5px;font-family:'Segoe UI',sans-serif;direction:rtl;unicode-bidi:embed}
+.cur-preview-label{font-size:10px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div id="sb-head">
+    <div class="logo"><span>✈</span> Canned Responses</div>
+    <div class="sub">Travel Agency · Customer Service</div>
+  </div>
+  <nav id="sb-nav">
+    <div class="nav-section">One Way Bookings</div>
+    <div class="nav-btn" onclick="showTemplate('ow-normal')" id="nav-ow-normal">
+      <div class="nb-icon" style="background:#fef3c7">✈️</div>
+      <div class="nb-text">
+        <div class="nb-title">Booking Failed — One Way</div>
+        <div class="nb-sub">Normal Payment</div>
+        <span class="nb-badge">EN + AR</span>
+      </div>
+    </div>
+    <div class="nav-btn" onclick="showTemplate('ow-tabby')" id="nav-ow-tabby">
+      <div class="nb-icon" style="background:#fce7f3">💳</div>
+      <div class="nb-text">
+        <div class="nb-title">Booking Failed — One Way</div>
+        <div class="nb-sub">Tabby Payment</div>
+        <span class="nb-badge">EN + AR</span>
+      </div>
+    </div>
+
+    <div class="nav-section">SOOW — Split One Way</div>
+    <div class="nav-btn" onclick="showTemplate('soow-normal')" id="nav-soow-normal">
+      <div class="nb-icon" style="background:#dbeafe">🔀</div>
+      <div class="nb-text">
+        <div class="nb-title">Booking Failed — SOOW</div>
+        <div class="nb-sub">Normal Payment</div>
+        <span class="nb-badge">DEP + RET · EN + AR</span>
+      </div>
+    </div>
+    <div class="nav-btn" onclick="showTemplate('soow-tabby')" id="nav-soow-tabby">
+      <div class="nb-icon" style="background:#f3e8ff">💳</div>
+      <div class="nb-text">
+        <div class="nb-title">Booking Failed — SOOW</div>
+        <div class="nb-sub">Tabby Payment</div>
+        <span class="nb-badge">DEP + RET · EN + AR</span>
+      </div>
+    </div>
+
+    <div class="nav-section">SOOW — LCC Non-Refundable</div>
+    <div class="nav-btn" onclick="showTemplate('lcc-no-refund')" id="nav-lcc-no-refund">
+      <div class="nb-icon" style="background:#fee2e2">🚫</div>
+      <div class="nb-text">
+        <div class="nb-title">LCC Cancellation Refusal</div>
+        <div class="nb-sub">Confirmed LCC segment cannot be refunded</div>
+        <span class="nb-badge">DEP ↔ RET · EN + AR</span>
+      </div>
+    </div>
+
+    <div class="nav-section">Extra Baggage</div>
+    <div class="nav-btn" onclick="showTemplate('bag-normal')" id="nav-bag-normal">
+      <div class="nb-icon" style="background:#dcfce7">🧳</div>
+      <div class="nb-text">
+        <div class="nb-title">Extra Baggage Failed</div>
+        <div class="nb-sub">Normal Payment</div>
+        <span class="nb-badge">EN + AR</span>
+      </div>
+    </div>
+    <div class="nav-btn" onclick="showTemplate('bag-tabby')" id="nav-bag-tabby">
+      <div class="nb-icon" style="background:#fef9c3">💳</div>
+      <div class="nb-text">
+        <div class="nb-title">Extra Baggage Failed</div>
+        <div class="nb-sub">Tabby Payment</div>
+        <span class="nb-badge">EN + AR</span>
+      </div>
+    </div>
+
+    <div class="nav-section">Payment Links</div>
+    <div class="nav-btn" onclick="showTemplate('paylink')" id="nav-paylink">
+      <div class="nb-icon" style="background:#e0f2fe">🔗</div>
+      <div class="nb-text">
+        <div class="nb-title">Payment Link</div>
+        <div class="nb-sub">English &amp; Arabic</div>
+        <span class="nb-badge">EN + AR</span>
+      </div>
+    </div>
+
+    <div class="nav-section">Voucher Compensation</div>
+    <div class="nav-btn" onclick="showTemplate('ow-voucher')" id="nav-ow-voucher">
+      <div class="nb-icon" style="background:#d1fae5">🎟️</div>
+      <div class="nb-text">
+        <div class="nb-title">Booking Failed — Voucher</div>
+        <div class="nb-sub">Voucher Compensation</div>
+        <span class="nb-badge">EN + AR</span>
+      </div>
+    </div>
+
+    <div class="nav-section">Booking Confirmation</div>
+    <div class="nav-btn" onclick="showTemplate('booking-confirmed')" id="nav-booking-confirmed">
+      <div class="nb-icon" style="background:#dcfce7">✅</div>
+      <div class="nb-text">
+        <div class="nb-title">Booking Confirmed</div>
+        <div class="nb-sub">Send confirmation with PNR & ticket</div>
+        <span class="nb-badge">EN + AR</span>
+      </div>
+    </div>
+
+    <div class="nav-section">Change & Cancel</div>
+    <div class="nav-btn" onclick="showTemplate('change-cancel')" id="nav-change-cancel">
+      <div class="nb-icon" style="background:#fce7f3">🔄</div>
+      <div class="nb-text">
+        <div class="nb-title">Change or Cancel Request</div>
+        <div class="nb-sub">Customer must contact us</div>
+        <span class="nb-badge">EN + AR</span>
+      </div>
+    </div>
+
+    <div class="nav-section">Aggregator Emails</div>
+    <div class="nav-btn" onclick="showTemplate('aggregator-pending')" id="nav-aggregator-pending">
+      <div class="nb-icon" style="background:#fef9c3">⏳</div>
+      <div class="nb-text">
+        <div class="nb-title">Case Pending Issuance</div>
+        <div class="nb-sub">Bingtrip · Over 2 Hours</div>
+        <span class="nb-badge">EN Only</span>
+      </div>
+    </div>
+
+    <div class="nav-section">Schedule Changes</div>
+    <div class="nav-btn" onclick="showTemplate('schedule-change')" id="nav-schedule-change">
+      <div class="nb-icon" style="background:#ede9fe">🔔</div>
+      <div class="nb-text">
+        <div class="nb-title">Involuntary Schedule Change</div>
+        <div class="nb-sub">Airline Change or Cancellation</div>
+        <span class="nb-badge">Warm · Direct · Formal · EN + AR</span>
+      </div>
+    </div>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <div>
+      <div class="page-title" id="page-title">Select a Template</div>
+      <div class="page-sub" id="page-sub">Choose from the sidebar to get started</div>
+    </div>
+    <div class="top-contacts">
+      <div class="top-contact">📞 <strong>EG:</strong> 0020221279930</div>
+      <div class="top-contact">📞 <strong>UAE:</strong> 0097145810300</div>
+      <div class="top-contact">💬 <strong>WA:</strong> 00971588250786</div>
+    </div>
+  </div>
+  <div id="content">
+    <div class="welcome" id="welcome">
+      <div class="w-icon">📋</div>
+      <h2>Canned Responses Tool</h2>
+      <p>Select a template from the sidebar, fill in the details, and copy the ready-to-send message in seconds.</p>
+      <div class="w-hint">💡 All messages are bilingual — English &amp; Arabic — with one click copy.</div>
+    </div>
+    <div id="template-area" style="display:none"></div>
+  </div>
+</div>
+
+<script>
+const CONTACTS = `📞 Egypt    : 0020221279930\n📞 UAE      : 0097145810300\n💬 WhatsApp : 00971588250786\n📧 Email    : CustomerSupport@wego.com`;
+const CONTACTS_AR = `📞 مصر         : 0020221279930\n📞 الإمارات      : 0097145810300\n💬 واتساب       : 00971588250786\n📧 البريد الإلكتروني : CustomerSupport@wego.com`;
+
+// ── TEMPLATES ────────────────────────────────────────────────────────────────
+const TEMPLATES = {
+
+  'ow-normal': {
+    title: 'Booking Failed — One Way',
+    desc: 'Normal Payment · Automatic Refund',
+    icon: '✈️',
+    iconBg: '#fef3c7',
+    fields: [
+      {id:'amount', label:'Refund Amount', type:'currency', req:true},
+    ],
+    en(v){ return `Dear Valued Customer,
+
+We regret to inform you that we were unable to successfully confirm your booking.
+Please accept our sincere apologies for any inconvenience this may have caused.
+Kindly note that if any amount has been debited from your account, it will be automatically refunded.
+
+The refunded amount is ${v.amount}.
+
+Depending on your bank's processing time, it may take approximately 7–10 business days for the amount to reflect in your account.
+Should you require any further assistance or wish to proceed with an alternative booking, please feel free to contact us through the following channels:
+${CONTACTS}
+
+We remain at your service and look forward to assisting you.`; },
+    ar(v){ return `عزيزي العميل،
+
+نأسف لإبلاغك بأننا لم نتمكن من تأكيد حجزك بنجاح.
+يرجى قبول اعتذارنا الصادق عن أي إزعاج قد يسببه هذا الموقف.
+يرجى ملاحظة أنه إذا تم خصم أي مبلغ من حسابك، فسيتم رده تلقائيًا.
+
+المبلغ المسترد هو ${v.amount_ar}.
+
+اعتمادًا على وقت معالجة البنك الذي تتعامل معه، قد يستغرق الأمر ما يقرب من 7-10 أيام عمل حتى ينعكس المبلغ في حسابك.
+إذا كنت بحاجة إلى أي مساعدة إضافية أو ترغب في المضي قدمًا في حجز بديل، فلا تتردد في الاتصال بنا من خلال القنوات التالية:
+${CONTACTS_AR}
+
+نحن في خدمتكم دائمًا.`; }
+  },
+
+  'ow-tabby': {
+    title: 'Booking Failed — One Way',
+    desc: 'Tabby Payment · Contact Tabby for Refund',
+    icon: '💳',
+    iconBg: '#fce7f3',
+    fields: [
+      {id:'amount', label:'Refund Amount', type:'currency', req:true},
+    ],
+    en(v){ return `Dear Valued Customer,
+
+We regret to inform you that we were unable to successfully confirm your booking.
+Please accept our sincere apologies for any inconvenience this may have caused.
+Since the payment was made through Tabby, kindly contact Tabby directly, as they will inform you about the refund process and the expected timeframe.
+
+The refunded amount is ${v.amount}.
+
+Should you require any further assistance or wish to proceed with an alternative booking, please feel free to contact us through the following channels:
+${CONTACTS}
+
+We remain at your service and look forward to assisting you.`; },
+    ar(v){ return `عزيزي العميل،
+
+نأسف لإبلاغك بأننا لم نتمكن من تأكيد حجزك بنجاح.
+يرجى قبول اعتذارنا الصادق عن أي إزعاج قد يسببه هذا الموقف.
+بما أن الدفع تم عن طريق تابي Tabby، برجاء التواصل مع تابي Tabby مباشرةً، وذلك لإبلاغ حضرتك بإجراءات الاسترداد والمدة الزمنية المتوقعة.
+
+المبلغ المسترد هو ${v.amount_ar}.
+
+إذا كنت بحاجة إلى أي مساعدة إضافية أو ترغب في المضي قدمًا في حجز بديل، فلا تتردد في الاتصال بنا من خلال القنوات التالية:
+${CONTACTS_AR}
+
+نحن في خدمتكم دائمًا.`; }
+  },
+
+  'soow-normal': {
+    title: 'Booking Failed — SOOW',
+    desc: 'Normal Payment · Departure or Return leg failed',
+    icon: '🔀',
+    iconBg: '#dbeafe',
+    hasSub: true,
+    subs: ['Departure Booking Failed', 'Return Booking Failed'],
+    fields: [
+      {id:'amount', label:'Refund Amount', type:'currency', req:true},
+    ],
+    en(v, sub){ 
+      const isDep = sub === 0;
+      return `Dear Valued Customer,
+
+We regret to inform you that we were unable to successfully confirm your ${isDep ? 'Departure' : 'Return'} Booking.
+However, the ${isDep ? 'Return' : 'Departure'} Booking is already confirmed.
+
+Please accept our sincere apologies for any inconvenience this may have caused.
+Kindly note that if any amount has been debited from your account, it will be automatically refunded.
+
+The refunded amount is ${v.amount}.
+
+Depending on your bank's processing time, it may take approximately 7–10 business days for the amount to reflect in your account.
+Should you require any further assistance or wish to proceed with an alternative booking, please feel free to contact us through the following channels:
+${CONTACTS}
+
+We remain at your service and look forward to assisting you.`; },
+    ar(v, sub){ 
+      const isDep = sub === 0;
+      return `عزيزي العميل،
+
+نأسف لإبلاغك بأننا لم نتمكن من تأكيد حجز ${isDep ? 'الذهاب' : 'العودة'} بنجاح.
+ومع ذلك، تم تأكيد حجز ${isDep ? 'العودة' : 'الذهاب'} بالفعل ( PNR Confirmed ).
+
+يرجى قبول اعتذارنا الصادق عن أي إزعاج قد يسببه هذا الموقف.
+يرجى ملاحظة أنه إذا تم خصم أي مبلغ من حسابك، فسيتم رده تلقائيًا.
+
+المبلغ المسترد هو ${v.amount_ar}.
+
+اعتمادًا على وقت معالجة البنك الذي تتعامل معه، قد يستغرق الأمر ما يقرب من 7-10 أيام عمل حتى ينعكس المبلغ في حسابك.
+إذا كنت بحاجة إلى أي مساعدة إضافية أو ترغب في المضي قدمًا في حجز بديل، فلا تتردد في الاتصال بنا من خلال القنوات التالية:
+${CONTACTS_AR}
+
+نحن في خدمتكم دائمًا.`; }
+  },
+
+  'soow-tabby': {
+    title: 'Booking Failed — SOOW',
+    desc: 'Tabby Payment · Contact Tabby for Refund',
+    icon: '💳',
+    iconBg: '#f3e8ff',
+    hasSub: true,
+    subs: ['Departure Booking Failed', 'Return Booking Failed'],
+    fields: [
+      {id:'amount', label:'Refund Amount', type:'currency', req:true},
+    ],
+    en(v, sub){ 
+      const isDep = sub === 0;
+      return `Dear Valued Customer,
+
+We regret to inform you that we were unable to successfully confirm your ${isDep ? 'Departure' : 'Return'} Booking.
+However, the ${isDep ? 'Return' : 'Departure'} Booking is already confirmed ( PNR Confirmed ).
+
+Please accept our sincere apologies for any inconvenience this may have caused.
+Since the payment was made through Tabby, kindly contact Tabby directly, as they will inform you about the refund process and the expected timeframe.
+
+The refunded amount is ${v.amount}.
+
+Should you require any further assistance or wish to proceed with an alternative booking, please feel free to contact us through the following channels:
+${CONTACTS}
+
+We remain at your service and look forward to assisting you.`; },
+    ar(v, sub){ 
+      const isDep = sub === 0;
+      return `عزيزي العميل،
+
+نأسف لإبلاغك بأننا لم نتمكن من تأكيد حجز ${isDep ? 'الذهاب' : 'العودة'} بنجاح.
+ومع ذلك، تم تأكيد حجز ${isDep ? 'العودة' : 'الذهاب'} بالفعل ( PNR Confirmed ).
+
+يرجى قبول اعتذارنا الصادق عن أي إزعاج قد يسببه هذا الموقف.
+بما أن الدفع تم عن طريق تابي Tabby، برجاء التواصل مع تابي Tabby مباشرةً، وذلك لإبلاغ حضرتك بإجراءات الاسترداد والمدة الزمنية المتوقعة.
+
+المبلغ المسترد هو ${v.amount_ar}.
+
+إذا كنت بحاجة إلى أي مساعدة إضافية أو ترغب في المضي قدمًا في حجز بديل، فلا تتردد في الاتصال بنا من خلال القنوات التالية:
+${CONTACTS_AR}
+
+نحن في خدمتكم دائمًا.`; }
+  },
+
+  'bag-normal': {
+    title: 'Extra Baggage Failed',
+    desc: 'Normal Payment · Automatic Refund',
+    icon: '🧳',
+    iconBg: '#dcfce7',
+    fields: [
+      {id:'ref', label:'Booking Reference', ph:'WF5V3F4JE7J26', req:true, hint:'e.g. WF5V3F4JE7J26'},
+      {id:'amount', label:'Refund Amount', type:'currency', req:true},
+    ],
+    en(v){ return `Subject: Regarding Your Extra Baggage — ${v.ref}
+
+Dear Valued Customer,
+
+We would like to inform you that, unfortunately, we were unable to add the additional baggage you selected and paid for in your booking.
+Please be advised that a refund has been successfully processed for the unused baggage service.
+
+The refunded amount is ${v.amount}.
+
+Kindly note that, depending on your bank's processing time, it may take approximately 7–10 business days for the amount to reflect in your account.
+Should you require any further assistance or wish to proceed with an alternative booking, please feel free to contact us through the following channels:
+${CONTACTS}
+
+We remain at your service and look forward to assisting you.`; },
+    ar(v){ return `الموضوع: بخصوص طلب إضافة الأمتعة — ${v.ref}
+
+عزيزي العميل،
+
+نود إفادتكم بأنه للأسف لم نتمكن من إضافة قطعة الأمتعة الإضافية التي تم اختيارها وسداد قيمتها ضمن الحجز.
+يرجى العلم بأنه قد تم إصدار استرداد للمبلغ الخاص بخدمة الأمتعة غير المستخدمة بنجاح.
+
+قيمة المبلغ المسترد هي ${v.amount_ar}.
+
+يرجى ملاحظة أنه وفقًا لإجراءات البنك الخاص بكم، قد يستغرق ظهور المبلغ في حسابكم مدة تتراوح من 7 إلى 10 أيام عمل.
+في حال احتجتم إلى أي مساعدة إضافية أو رغبتم في المتابعة بحجز بديل، يرجى التواصل معنا من خلال القنوات التالية:
+${CONTACTS_AR}
+
+نحن في خدمتكم دائمًا.`; }
+  },
+
+  'bag-tabby': {
+    title: 'Extra Baggage Failed',
+    desc: 'Tabby Payment · Contact Tabby for Refund',
+    icon: '🧳',
+    iconBg: '#fef9c3',
+    fields: [
+      {id:'ref', label:'Booking Reference', ph:'WF5V3F4JE7J26', req:true, hint:'e.g. WF5V3F4JE7J26'},
+      {id:'amount', label:'Refund Amount', type:'currency', req:true},
+    ],
+    en(v){ return `Subject: Regarding Your Extra Baggage — ${v.ref}
+
+Dear Valued Customer,
+
+We would like to inform you that, unfortunately, we were unable to add the additional baggage you selected and paid for in your booking.
+Since the payment was made through Tabby, kindly contact Tabby directly, as they will inform you about the refund process and the expected timeframe.
+
+The refunded amount is ${v.amount}.
+
+Should you require any further assistance or wish to proceed with an alternative booking, please feel free to contact us through the following channels:
+${CONTACTS}
+
+We remain at your service and look forward to assisting you.`; },
+    ar(v){ return `الموضوع: بخصوص طلب إضافة الأمتعة — ${v.ref}
+
+عزيزي العميل،
+
+نود إفادتكم بأنه للأسف لم نتمكن من إضافة قطعة الأمتعة الإضافية التي تم اختيارها وسداد قيمتها ضمن الحجز.
+بما أن الدفع تم عن طريق تابي Tabby، برجاء التواصل مع تابي Tabby مباشرةً، وذلك لإبلاغ حضرتك بإجراءات الاسترداد والمدة الزمنية المتوقعة.
+
+المبلغ المسترد هو ${v.amount_ar}.
+
+إذا كنت بحاجة إلى أي مساعدة إضافية أو ترغب في المضي قدمًا في حجز بديل، فلا تتردد في الاتصال بنا من خلال القنوات التالية:
+${CONTACTS_AR}
+
+نحن في خدمتكم دائمًا.`; }
+  },
+
+  'paylink': {
+    title: 'Payment Link',
+    desc: 'English & Arabic · 10-minute validity',
+    icon: '🔗',
+    iconBg: '#e0f2fe',
+    fields: [
+      {id:'ref',  label:'Booking Reference (WF...)', ph:'WF5V3F4JE7J26', req:true},
+      {id:'link', label:'Payment Link URL', ph:'https://pay.example.com/...', req:true, hint:'The secure payment URL to send'},
+    ],
+    en(v){ return `Subject: Secure Payment Link ( Ref: ${v.ref} ) — Action Required
+
+Dear Valued Customer,
+
+Thank you for choosing our services.
+
+Please find below the secure payment link to proceed with your booking:
+
+Payment Link: ${v.link}
+
+Kindly note that the payment link is valid for 10 minutes only.
+We recommend completing the payment within this timeframe so we can finalize and confirm your reservation at the quoted fare.
+Once the payment has been successfully processed, the booking confirmation details will be sent to you promptly.
+Should you require any further assistance, please feel free to contact us through the following channels:
+${CONTACTS}
+
+We remain at your service and look forward to assisting you.`; },
+    ar(v){ return `الموضوع: رابط الدفع الآمن ( المرجع: ${v.ref} ) — لإتمام الحجز
+
+عزيزي العميل،
+
+نشكر لكم اختياركم لخدماتنا.
+يرجى التكرم بالعثور أدناه على رابط الدفع الآمن لإتمام إجراءات الحجز:
+
+رابط الدفع: ${v.link}
+
+يرجى العلم أن صلاحية رابط الدفع هي 10 دقائق فقط.
+لذا نوصي بإتمام عملية الدفع خلال هذه المدة حتى نتمكن من تثبيت السعر المعروض وتأكيد الحجز.
+بمجرد إتمام عملية الدفع بنجاح، سيتم إرسال تفاصيل تأكيد الحجز إليكم في أقرب وقت ممكن.
+إذا كنت بحاجة إلى أي مساعدة إضافية، فلا تتردد في الاتصال بنا من خلال القنوات التالية:
+${CONTACTS_AR}
+
+نقدّر ثقتكم.
+نحن في خدمتكم دائمًا.`; }
+  },
+  'ow-voucher': {
+    title: 'Booking Failed — Voucher Compensation',
+    desc: 'Voucher issued instead of refund',
+    icon: '🎟️',
+    iconBg: '#d1fae5',
+    fields: [
+      {id:'voucher', label:'Voucher Number', ph:'VOUCHER-XXXXXXXX', req:true, hint:'e.g. VOUCHER-12345678'},
+      {id:'vamount', label:'Voucher Value', type:'currency', req:true},
+      {id:'expiry',  label:'Valid Until (Expiry Date)', ph:'31 Dec 2025', req:true},
+    ],
+    en(v){ return `Dear Valued Customer,
+
+We sincerely apologize for the inconvenience, as we were unable to successfully confirm your booking.
+Please accept our heartfelt apologies for any disruption this may have caused to your travel plans.
+
+As a gesture of goodwill and to ensure your experience with us remains a positive one, we are pleased to offer you a Voucher that can be used toward your next booking with us.
+
+🎟️ Voucher Number : ${v.voucher}
+💰 Voucher Value   : ${v.vamount}
+📅 Valid Until      : ${v.expiry}
+
+You can apply this voucher directly at checkout on your next booking through Wego.
+
+Should you require any further assistance or wish to proceed with an alternative booking, please feel free to contact us through the following channels:
+${CONTACTS}
+
+We remain at your service and look forward to assisting you.`; },
+    ar(v){ return `عزيزي العميل،
+
+نأسف بشدة لإبلاغك بأننا لم نتمكن من تأكيد حجزك بنجاح.
+يرجى قبول اعتذارنا الصادق عن أي إزعاج أو تأثير قد يكون لهذا الأمر على خططك.
+
+حرصًا منا على تقديم أفضل تجربة ممكنة لك، يسعدنا تزويدك بقسيمة (Voucher) يمكنك استخدامها في حجزك القادم معنا.
+
+🎟️ رقم القسيمة  : ${v.voucher}
+💰 قيمة القسيمة  : ${v.vamount_ar}
+📅 صالحة حتى    : ${v.expiry}
+
+يمكنك تطبيق هذه القسيمة مباشرةً عند إتمام حجزك القادم عبر Wego.
+
+إذا كنت بحاجة إلى أي مساعدة إضافية أو ترغب في المضي قدمًا في حجز بديل، فلا تتردد في الاتصال بنا من خلال القنوات التالية:
+${CONTACTS_AR}
+
+نحن في خدمتكم دائمًا.`; }
+  },
+
+  'booking-confirmed': {
+    title: 'Booking Confirmed',
+    desc: 'Confirmation email with Wego PNR, Airline PNR, ticket number(s) & up to 3 passengers',
+    icon: '✅',
+    iconBg: '#dcfce7',
+    fields: [
+      {id:'ref',     label:'Wego Booking Reference', ph:'WFSS2FPN9CY26', req:true, hint:'e.g. WFSS2FPN9CY26'},
+      {id:'wpnr',    label:'Wego PNR', ph:'GHGTR5', req:true, hint:'Wego internal record locator (the one used in the GDS)'},
+      {id:'pnr',     label:'Airline PNR', ph:'DH3XJR', req:true, hint:'Airline record locator (the one customer uses on the airline website)'},
+      {id:'ticket',  label:'Ticket Number 1', ph:'XXX-XXXXXXXXXX', req:true, hint:'e.g. 065-5805289241'},
+      {id:'name',    label:'Passenger Name 1', ph:'MR. JOHN DOE', req:true, hint:'Full name as on ticket'},
+      {id:'ticket2', label:'Ticket Number 2 (optional)', ph:'XXX-XXXXXXXXXX', req:false, hint:'For multi-passenger booking'},
+      {id:'name2',   label:'Passenger Name 2 (optional)', ph:'MRS. JANE DOE', req:false, hint:'Leave blank if single passenger'},
+      {id:'ticket3', label:'Ticket Number 3 (optional)', ph:'XXX-XXXXXXXXXX', req:false, hint:'For multi-passenger booking'},
+      {id:'name3',   label:'Passenger Name 3 (optional)', ph:'MASTER. JOHN DOE JR', req:false, hint:'Leave blank if not needed'},
+    ],
+    en(v){
+      const hasP2 = !v.ticket2.startsWith('[') && !v.name2.startsWith('[');
+      const hasP3 = !v.ticket3.startsWith('[') && !v.name3.startsWith('[');
+      let ticketLines = `• Ticket Number : ${v.ticket} - ${v.name}`;
+      if (hasP2) ticketLines += `\n• Ticket Number : ${v.ticket2} - ${v.name2}`;
+      if (hasP3) ticketLines += `\n• Ticket Number : ${v.ticket3} - ${v.name3}`;
+      return `Subject: Booking Confirmation – Wego Ref: ${v.ref}
+
+Dear Valued Customer,
+
+Thank you for contacting Wego.
+
+We are pleased to inform you that your booking has been successfully confirmed. Please find your reservation details below:
+
+• Wego Booking Reference : ${v.ref}
+• Wego PNR : ${v.wpnr}
+• Airline PNR : ${v.pnr}
+${ticketLines}
+
+For your convenience, your e-ticket has been attached to this email and has also been sent directly to your registered email address.
+
+Should you require any further assistance or have any inquiries regarding your booking, please do not hesitate to reach out to us through any of our support channels:
+
+${CONTACTS}
+
+We remain at your service and look forward to assisting you.
+
+Best regards,
+Wego Customer Support Team`;
+    },
+    ar(v){
+      const hasP2 = !v.ticket2.startsWith('[') && !v.name2.startsWith('[');
+      const hasP3 = !v.ticket3.startsWith('[') && !v.name3.startsWith('[');
+      let ticketLines = `• رقم التذكرة : ${v.ticket} - ${v.name}`;
+      if (hasP2) ticketLines += `\n• رقم التذكرة : ${v.ticket2} - ${v.name2}`;
+      if (hasP3) ticketLines += `\n• رقم التذكرة : ${v.ticket3} - ${v.name3}`;
+      return `الموضوع: تأكيد الحجز – رقم الحجز لدى Wego: ${v.ref}
+
+عزيزي العميل،
+
+شكرًا لتواصلك مع Wego.
+
+يسرّنا إبلاغك بأنه قد تم تأكيد حجزك بنجاح. تجد تفاصيل حجزك فيما يلي:
+
+• رقم الحجز لدى Wego : ${v.ref}
+• رقم حجز التذكرة لدى Wego : ${v.wpnr}
+• رقم حجز التذكرة لدى شركة الطيران : ${v.pnr}
+${ticketLines}
+
+لمزيد من اليُسر، تم إرفاق تذكرتك الإلكترونية بهذه الرسالة، كما تم إرسالها مباشرةً إلى بريدك الإلكتروني المسجّل.
+
+إذا كنت بحاجة إلى أي مساعدة إضافية أو لديك أي استفسارات بخصوص حجزك، فلا تتردد في التواصل معنا عبر أي من قنوات الدعم التالية:
+
+${CONTACTS_AR}
+
+نحن في خدمتكم دائمًا.
+
+مع أطيب التحيات،
+فريق دعم العملاء لدى Wego`;
+    }
+  },
+
+  'change-cancel': {
+    title: 'Change or Cancel Request',
+    desc: 'Inform customer to contact us for change or cancellation',
+    icon: '🔄',
+    iconBg: '#fce7f3',
+    hasSub: true,
+    subs: ['Flight Change', 'Cancellation'],
+    fields: [
+      {id:'ref', label:'Booking Reference', ph:'WF5V3F4JE7J26', req:true, hint:'e.g. WF5V3F4JE7J26'},
+    ],
+    en(v, sub){
+      return `Dear Customer,
+
+Thank you for contacting Wego.
+
+Please contact our customer care in order to assist you regarding your request, for security purposes amendment and cancellation requests can only be processed by contacting our contact center.
+
+${CONTACTS}
+
+International charges may apply.
+
+Our support team is available 24/7. Please note that call and chat wait times may be longer than usual due to high demand.
+
+If your departure is within the next 24 hours, contacting your airline directly may provide the fastest resolution.
+
+We remain at your service and look forward to assisting you.`;
+    },
+    ar(v, sub){
+      return `عزيزي العميل،
+
+شكرًا لتواصلك مع Wego.
+
+يرجى التواصل مع خدمة العملاء لمساعدتك بشأن طلبك، حيث إنه لأسباب أمنية لا يمكن معالجة طلبات التعديل والإلغاء إلا من خلال التواصل مع مركز الاتصال الخاص بنا.
+
+${CONTACTS_AR}
+
+قد يتم تطبيق رسوم الاتصال الدولية.
+
+فريق الدعم لدينا متاح على مدار الساعة طوال أيام الأسبوع. يرجى العلم بأن أوقات انتظار المكالمات والدردشة قد تكون أطول من المعتاد نظرًا لارتفاع الطلب.
+
+إذا كان موعد سفرك خلال الـ 24 ساعة القادمة، فقد يوفر التواصل مع شركة الطيران مباشرةً أسرع حل ممكن.
+
+نحن في خدمتكم دائمًا.`;
+    }
+  },
+
+  'aggregator-pending': {
+    title: 'Case Pending Issuance — Bingtrip',
+    desc: 'English Only · Polite follow-up for cases pending over 2 hours',
+    icon: '⏳',
+    iconBg: '#fef9c3',
+    fields: [
+      {id:'ref', label:'Case / Booking Reference', ph:'e.g. BT-20250425-001', req:true, hint:'The case or booking reference number from Bingtrip'},
+    ],
+    en(v){ return `Subject: Urgent Follow-Up: Case Pending Issuance for Over 2 Hours (Ref: ${v.ref})
+
+Dear Support Team,
+
+I hope this message finds you well.
+
+I am writing to follow up on Case Reference: ${v.ref}, which has been pending issuance for more than 2 hours — beyond the standard expected processing time.
+
+Could you kindly look into this matter and provide us with an update on the following:
+
+- Current status of the case
+- Expected time of issuance
+- Any issues or blockers that may be causing the delay
+
+Your prompt response is highly appreciated.
+
+Best regards`; },
+    ar(v){ return `Subject: Urgent Follow-Up: Case Pending Issuance for Over 2 Hours (Ref: ${v.ref})
+
+Dear Support Team,
+
+I hope this message finds you well.
+
+I am writing to follow up on Case Reference: ${v.ref}, which has been pending issuance for more than 2 hours — beyond the standard expected processing time.
+
+Could you kindly look into this matter and provide us with an update on the following:
+
+- Current status of the case
+- Expected time of issuance
+- Any issues or blockers that may be causing the delay
+
+Your prompt response is highly appreciated.
+
+Best regards`; }
+  },
+
+  'schedule-change': {
+    title: 'Involuntary Schedule Change',
+    desc: 'Airline-initiated change or cancellation · Warm / Direct / Formal',
+    icon: '🔔',
+    iconBg: '#ede9fe',
+    hasSub: true,
+    subs: ['Warm & Reassuring', 'Clear & Direct', 'Formal & Professional'],
+    fields: [
+      {id:'ref',      label:'Booking Reference', ph:'WF5V3F4JE7J26', req:true},
+      {id:'route',    label:'Route (Origin → Destination)', ph:'Cairo → Dubai', req:false},
+      {id:'orig_dt',  label:'Original Date & Time', ph:'10 Jan 2025 · 08:00', req:true},
+      {id:'new_dt',   label:"New Date & Time (or 'Cancelled')", ph:'10 Jan 2025 · 14:30', req:true},
+    ],
+    en(v, sub){
+      const c = CONTACTS;
+      if (sub === 0) return `Dear Valued Customer,
+
+We hope this message finds you well.
+
+We're reaching out to let you know that your airline has made an involuntary change to your flight schedule. This change was initiated directly by the airline and is outside of our control.
+
+✈️ Booking Reference : ${v.ref}${v.route ? '\n📍 Route              : ' + v.route : ''}
+📅 Original Flight    : ${v.orig_dt}
+🔄 Updated Flight     : ${v.new_dt}
+
+We completely understand this may affect your travel plans, and we're here to help you through the next steps.
+
+Please don't hesitate to reach out to our support team — we're available to assist you right away:
+${c}
+
+Our team will do their best to find the most suitable solution for you as quickly as possible.
+Thank you for your patience and for choosing Wego.
+
+We remain at your service and look forward to assisting you.`;
+
+      if (sub === 1) return `Dear Valued Customer,
+
+We're writing to inform you of an important update regarding your upcoming flight.
+Your airline has issued an involuntary schedule change on your booking. Please review the details below:
+
+─────────────────────────────────
+🔖 Booking Reference : ${v.ref}${v.route ? '\n📍 Route              : ' + v.route : ''}
+📅 Original Departure : ${v.orig_dt}
+🔄 New Departure      : ${v.new_dt}
+─────────────────────────────────
+
+To confirm your acceptance, request a rebooking, or discuss your options — please contact us directly:
+${c}
+
+Please contact us at your earliest convenience so we can secure the best available option for you.
+
+We remain at your service and look forward to assisting you.`;
+
+      return `Dear Valued Customer,
+
+We are writing to formally notify you that the airline operating your flight has applied an involuntary schedule change to your reservation. This amendment was made at the airline's discretion and was not initiated by Wego.
+
+Booking Details:
+──────────────────────────────────
+Booking Reference : ${v.ref}${v.route ? '\nAffected Route    : ' + v.route : ''}
+Original Schedule : ${v.orig_dt}
+Revised Schedule  : ${v.new_dt}
+──────────────────────────────────
+
+Wego remains committed to supporting you throughout this process. Our customer support team is readily available to discuss your available options, including rebooking or any applicable entitlements.
+
+Please contact us at your earliest convenience through the following channels:
+${c}
+
+We apologize for any inconvenience this may cause and appreciate your understanding.
+
+We remain at your service and look forward to assisting you.`;
+    },
+    ar(v, sub){
+      const c = CONTACTS_AR;
+      if (sub === 0) return `عزيزي العميل،
+
+نأمل أن تكون بخير.
+
+نتواصل معك لإعلامك بأن شركة الطيران قامت بتغيير غير طوعي في جدول رحلتك. هذا التغيير صادر مباشرةً من شركة الطيران وخارج عن إرادتنا.
+
+✈️ رقم الحجز      : ${v.ref}${v.route ? '\n📍 المسار           : ' + v.route : ''}
+📅 الرحلة الأصلية  : ${v.orig_dt}
+🔄 الرحلة المحدّثة : ${v.new_dt}
+
+ندرك تمامًا أن هذا قد يؤثر على خططك، ونحن هنا لمساعدتك في اتخاذ الخطوات التالية.
+
+لا تتردد في التواصل مع فريق الدعم لدينا:
+${c}
+
+سيبذل فريقنا قصارى جهده لإيجاد الحل الأنسب لك في أقرب وقت.
+شكرًا لصبرك ولاختيارك Wego.
+
+نحن في خدمتكم دائمًا.`;
+
+      if (sub === 1) return `عزيزي العميل،
+
+نكتب إليك لإطلاعك على تحديث مهم بشأن رحلتك القادمة.
+أصدرت شركة الطيران تغييرًا غير طوعي في جدول حجزك. يرجى مراجعة التفاصيل أدناه:
+
+──────────────────────────────
+🔖 رقم الحجز      : ${v.ref}${v.route ? '\n📍 المسار           : ' + v.route : ''}
+📅 الموعد الأصلي  : ${v.orig_dt}
+🔄 الموعد الجديد  : ${v.new_dt}
+──────────────────────────────
+
+لتأكيد موافقتك أو طلب إعادة الحجز أو مناقشة خياراتك، يرجى التواصل معنا مباشرةً:
+${c}
+
+يرجى التواصل معنا في أقرب وقت ممكن لنتمكن من تأمين أفضل خيار متاح لك.
+
+نحن في خدمتكم دائمًا.`;
+
+      return `عزيزي العميل،
+
+نكتب إليك لإعلامك رسميًا بأن شركة الطيران المشغّلة لرحلتك قد أجرت تغييرًا غير طوعي على حجزك. وقد جاء هذا التعديل وفقًا لتقدير شركة الطيران ولم يصدر عن Wego.
+
+تفاصيل الحجز:
+──────────────────────────────
+رقم الحجز       : ${v.ref}${v.route ? '\nالمسار المتأثر  : ' + v.route : ''}
+الجدول الأصلي  : ${v.orig_dt}
+الجدول المعدّل : ${v.new_dt}
+──────────────────────────────
+
+تظل Wego ملتزمة بدعمك طوال هذه العملية. فريق خدمة العملاء لدينا متاح للتباحث معك بشأن الخيارات المتاحة، بما في ذلك إعادة الحجز أو أي استحقاقات معمول بها.
+
+يرجى التواصل معنا في أقرب وقت ممكن عبر أي من القنوات التالية:
+${c}
+
+نعتذر عن أي إزعاج قد يسببه هذا الأمر ونقدّر تفهمكم.
+
+نحن في خدمتكم دائمًا.`;
+    }
+  },
+
+  'lcc-no-refund': {
+    title: 'LCC Cancellation Refusal — SOOW',
+    desc: 'One segment confirmed on LCC · confirmed ticket cannot be cancelled or refunded',
+    icon: '🚫',
+    iconBg: '#fee2e2',
+    hasSub: true,
+    subs: ['Dep Failed / Ret Confirmed (LCC)', 'Dep Confirmed (LCC) / Ret Failed'],
+    fields: [
+      {id:'ref', label:'Booking Reference', ph:'WF5V3F4JE7J26', req:true, hint:'e.g. WF5V3F4JE7J26'},
+      {id:'airline', label:'LCC Airline Name', ph:'Flyadeal', req:true, hint:'e.g. Flyadeal, flynas, Jazeera, AirArabia'},
+      {id:'flight_date', label:'Confirmed Segment Date', ph:'15 Jan 2025', req:true, hint:'Date of the ticketed LCC flight'},
+    ],
+    en(v, sub){
+      const depFailed = sub === 0;
+      const depText = depFailed
+        ? `• Departure flight: Failed at the time of booking, and the corresponding amount has already been refunded to your original method of payment.`
+        : `• Departure flight (operated by ${v.airline} on ${v.flight_date}): Successfully confirmed and ticketed. As ${v.airline} is a low-cost carrier (LCC), its fare rules strictly do not permit any cancellation, change, or refund — whether the ticket is used or unused. This restriction is set directly by the airline and is not within our authority as the booking agent to override.`;
+      const retText = depFailed
+        ? `• Return flight (operated by ${v.airline} on ${v.flight_date}): Successfully confirmed and ticketed. As ${v.airline} is a low-cost carrier (LCC), its fare rules strictly do not permit any cancellation, change, or refund — whether the ticket is used or unused. This restriction is set directly by the airline and is not within our authority as the booking agent to override.`
+        : `• Return flight: Failed at the time of booking, and the corresponding amount has already been refunded to your original method of payment.`;
+      const refundedLeg = depFailed ? 'departure' : 'return';
+      return `Subject: Regarding your booking — ${v.ref}
+
+Dear Valued Customer,
+
+Thank you for reaching out to us regarding your booking. Please allow me to clarify the status of each segment of your reservation so the situation is fully transparent:
+
+${depText}
+
+${retText}
+
+Kindly note that since the refund on the ${refundedLeg} segment has already been processed and returned to your account, we no longer hold those funds on our side and are therefore unable to issue a new booking on your behalf. Should you wish to make a new reservation, you are most welcome to do so directly through our website.
+
+We sincerely apologize for the inconvenience and appreciate your kind understanding.
+Should you require any further assistance, please feel free to contact us through the following channels:
+${CONTACTS}
+
+We remain at your service and look forward to assisting you.`;
+    },
+    ar(v, sub){
+      const depFailed = sub === 0;
+      const depTextAr = depFailed
+        ? `• رحلة الذهاب: فشلت وقت الحجز، وقد تم بالفعل استرداد المبلغ المقابل إلى وسيلة الدفع الأصلية الخاصة بكم.`
+        : `• رحلة الذهاب (المُشغَّلة من قِبَل ${v.airline} بتاريخ ${v.flight_date}): مؤكدة ومُصدَرة التذكرة بنجاح. ونظراً لأن ${v.airline} تُعدّ من شركات الطيران الاقتصادي (LCC)، فإن شروط التذكرة الخاصة بها لا تسمح بأي إلغاء أو تعديل أو استرداد — سواء استُخدمت التذكرة أم لم تُستخدم. هذا القيد مفروض مباشرةً من قِبَل شركة الطيران، ولا يمكننا تجاوزه بصفتنا وكيل الحجز.`;
+      const retTextAr = depFailed
+        ? `• رحلة العودة (المُشغَّلة من قِبَل ${v.airline} بتاريخ ${v.flight_date}): مؤكدة ومُصدَرة التذكرة بنجاح. ونظراً لأن ${v.airline} تُعدّ من شركات الطيران الاقتصادي (LCC)، فإن شروط التذكرة الخاصة بها لا تسمح بأي إلغاء أو تعديل أو استرداد — سواء استُخدمت التذكرة أم لم تُستخدم. هذا القيد مفروض مباشرةً من قِبَل شركة الطيران، ولا يمكننا تجاوزه بصفتنا وكيل الحجز.`
+        : `• رحلة العودة: فشلت وقت الحجز، وقد تم بالفعل استرداد المبلغ المقابل إلى وسيلة الدفع الأصلية الخاصة بكم.`;
+      const refundedLegAr = depFailed ? 'الذهاب' : 'العودة';
+      return `الموضوع: بخصوص حجزكم — ${v.ref}
+
+عزيزي العميل،
+
+نشكركم على تواصلكم معنا بخصوص حجزكم. نودّ توضيح حالة كل جزء من حجزكم على النحو التالي:
+
+${depTextAr}
+
+${retTextAr}
+
+نحيطكم علماً أنه نظراً لاسترداد مبلغ رحلة ${refundedLegAr} بالفعل وإعادته إلى حسابكم، فإننا لم نعد نحتفظ بذلك المبلغ من جانبنا، وبالتالي لا يمكننا إصدار حجز جديد نيابةً عنكم. وفي حال رغبتكم بإجراء حجز جديد، يسعدنا دعوتكم للقيام بذلك مباشرةً عبر موقعنا الإلكتروني.
+
+نعتذر بصدق عن أي إزعاج، ونشكر لكم حسن تفهمكم.
+إذا كنت بحاجة إلى أي مساعدة إضافية، فلا تتردد في الاتصال بنا من خلال القنوات التالية:
+${CONTACTS_AR}
+
+نحن في خدمتكم دائمًا.`;
+    }
+  },
+
+};
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let currentTpl = null;
+let currentSub = 0;
+let currentLang = 'en';
+let lastGeneratedMsg = '';
+const selectedCurrencies = {}; // stores { fieldId: "CODE|arName" } — reliable fix for RTL select quirks
+
+function showTemplate(id) {
+  const tpl = TEMPLATES[id];
+  if (!tpl) return;
+  currentTpl = id;
+  currentSub = 0;
+  currentLang = 'en';
+
+  // Update sidebar active
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('nav-' + id)?.classList.add('active');
+
+  // Update topbar
+  document.getElementById('page-title').textContent = tpl.title;
+  document.getElementById('page-sub').textContent = tpl.desc;
+
+  // Hide welcome
+  document.getElementById('welcome').style.display = 'none';
+  document.getElementById('template-area').style.display = 'block';
+
+  // Build template UI
+  let html = `<div class="tpl-card">`;
+
+  // Head
+  html += `<div class="tpl-card-head">
+    <div class="tpl-icon" style="background:${tpl.iconBg}">${tpl.icon}</div>
+    <div class="tpl-head-text">
+      <div class="tpl-title">${tpl.title}</div>
+      <div class="tpl-desc">${tpl.desc}</div>
+    </div>
+    <div class="lang-tabs">
+      <div class="lang-tab active" id="tab-en" onclick="switchLang('en')">🇬🇧 English</div>
+      <div class="lang-tab" id="tab-ar" onclick="switchLang('ar')">🇪🇬 Arabic</div>
+    </div>
+  </div>`;
+
+  // Sub-selector (SOOW)
+  if (tpl.hasSub) {
+    html += `<div class="sub-selector" id="sub-selector">`;
+    tpl.subs.forEach((s, i) => {
+      html += `<button class="sub-btn${i===0?' active':''}" onclick="switchSub(${i})" id="sub-btn-${i}">${s}</button>`;
+    });
+    html += `</div>`;
+  }
+
+  // Status bar
+  html += `<div class="status-bar">
+    <div class="status-item"><span class="dot blue"></span> Fill in the fields below</div>
+    <div class="status-item"><span class="dot green"></span> Click Generate</div>
+    <div class="status-item"><span class="dot amber"></span> Copy &amp; Send</div>
+  </div>`;
+
+  // Fields
+  html += `<div class="fields-area"><div class="fields-title">📝 Fill In Details</div><div class="fields-grid">`;
+  tpl.fields.forEach(f => {
+    const cls = tpl.fields.length === 1 || f.full ? 'field-group full' : 'field-group';
+    if (f.type === 'currency') {
+      html += `<div class="${cls} full">
+        <label>${f.label} <span class="req">*</span></label>
+        <div class="currency-split">
+          <input id="field-${f.id}-num" class="cur-num" type="number" placeholder="1000" min="0" step="0.01" autocomplete="off" oninput="updateCurPreview('${f.id}')" onkeydown="if(event.key==='Enter')generateMsg()">
+          <div class="cur-divider"></div>
+          <select id="field-${f.id}-cur" class="cur-select" onchange="updateCurPreview('${f.id}')">
+            <optgroup label="── Middle East ──">
+            <option value="AED|درهم إماراتي" selected>🇦🇪 درهم إماراتي</option>
+            <option value="SAR|ريال سعودي">🇸🇦 ريال سعودي</option>
+            <option value="QAR|ريال قطري">🇶🇦 ريال قطري</option>
+            <option value="KWD|دينار كويتي">🇰🇼 دينار كويتي</option>
+            <option value="BHD|دينار بحريني">🇧🇭 دينار بحريني</option>
+            <option value="OMR|ريال عُماني">🇴🇲 ريال عُماني</option>
+            <option value="JOD|دينار أردني">🇯🇴 دينار أردني</option>
+            <option value="IQD|دينار عراقي">🇮🇶 دينار عراقي</option>
+            </optgroup>
+            <optgroup label="── Africa ──">
+            <option value="EGP|جنيه مصري">🇪🇬 جنيه مصري</option>
+            <option value="MAD|درهم مغربي">🇲🇦 درهم مغربي</option>
+            <option value="TND|دينار تونسي">🇹🇳 دينار تونسي</option>
+            <option value="DZD|دينار جزائري">🇩🇿 دينار جزائري</option>
+            </optgroup>
+            <optgroup label="── Asia ──">
+            <option value="INR|روبية هندية">🇮🇳 روبية هندية</option>
+            <option value="PKR|روبية باكستانية">🇵🇰 روبية باكستانية</option>
+            <option value="SGD|دولار سنغافوري">🇸🇬 دولار سنغافوري</option>
+            <option value="MYR|رينغيت ماليزي">🇲🇾 رينغيت ماليزي</option>
+            <option value="THB|بات تايلاندي">🇹🇭 بات تايلاندي</option>
+            <option value="TRY|ليرة تركية">🇹🇷 ليرة تركية</option>
+            <option value="CNY|يوان صيني">🇨🇳 يوان صيني</option>
+            </optgroup>
+            <optgroup label="── International ──">
+            <option value="USD|دولار أمريكي">🇺🇸 دولار أمريكي</option>
+            <option value="EUR|يورو">🇪🇺 يورو</option>
+            <option value="GBP|جنيه إسترليني">🇬🇧 جنيه إسترليني</option>
+            <option value="AUD|دولار أسترالي">🇦🇺 دولار أسترالي</option>
+            <option value="CAD|دولار كندي">🇨🇦 دولار كندي</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="cur-preview">
+          <span class="cur-preview-label">Preview:</span>
+          <span class="prev-en" id="prev-en-${f.id}">EN: —</span>
+          <span class="prev-ar" id="prev-ar-${f.id}">AR: —</span>
+        </div>
+      </div>`;
+    } else {
+      html += `<div class="${cls}">
+        <label>${f.label}${f.req ? ' <span class="req">*</span>' : ''}</label>
+        <input id="field-${f.id}" type="text" placeholder="${f.ph || ''}" autocomplete="off" onkeydown="if(event.key==='Enter')generateMsg()">
+        ${f.hint ? `<span class="hint">${f.hint}</span>` : ''}
+      </div>`;
+    }
+  });
+  html += `</div>
+    <button class="gen-btn" onclick="generateMsg()">⚡ Generate Message</button>
+  </div>`;
+
+  // Preview
+  html += `<div class="preview-area">
+    <div class="preview-header">
+      <div class="preview-label">📄 Preview</div>
+      <button class="copy-btn" id="copy-btn" onclick="copyMessage()">📋 Copy Message</button>
+    </div>
+    <div class="preview-box" id="preview-box"><span class="preview-placeholder">Fill in the fields above and click Generate to see your message here...</span></div>
+  </div>`;
+
+  html += `</div>`;
+  document.getElementById('template-area').innerHTML = html;
+
+  // Auto-focus first field
+  setTimeout(() => {
+    document.getElementById(`field-${tpl.fields[0].id}`)?.focus();
+    // Initialise currency cache for all currency fields so Generate works even without touching the dropdown
+    tpl.fields.forEach(f => {
+      if (f.type === 'currency') {
+        const curEl = document.getElementById('field-' + f.id + '-cur');
+        if (curEl) selectedCurrencies[f.id] = curEl.options[curEl.selectedIndex]?.value || 'AED|درهم إماراتي';
+      }
+    });
+  }, 100);
+}
+
+function switchLang(lang) {
+  currentLang = lang;
+  document.getElementById('tab-en').classList.toggle('active', lang === 'en');
+  document.getElementById('tab-ar').classList.toggle('active', lang === 'ar');
+  const pb = document.getElementById('preview-box');
+  if (pb) {
+    pb.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    pb.style.fontFamily = lang === 'ar' ? "'Segoe UI', 'Arial', sans-serif" : "'Plus Jakarta Sans', sans-serif";
+    pb.style.fontSize = lang === 'ar' ? '14px' : '13px';
+  }
+  generateMsg();
+}
+
+function switchSub(idx) {
+  currentSub = idx;
+  document.querySelectorAll('.sub-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+  generateMsg();
+}
+
+function updateCurPreview(fid) {
+  const num = parseFloat(document.getElementById('field-'+fid+'-num')?.value) || 0;
+  const curEl = document.getElementById('field-'+fid+'-cur');
+  // Use selectedIndex for reliability — avoids RTL select .value browser quirks
+  const sel = curEl ? curEl.options[curEl.selectedIndex]?.value || 'AED|درهم إماراتي' : 'AED|درهم إماراتي';
+  selectedCurrencies[fid] = sel; // cache it so generateMsg reads the same value
+  const [code, arName] = sel.split('|');
+  const formatted = num.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  document.getElementById('prev-en-'+fid).textContent = 'EN: ' + code + ' ' + formatted;
+  document.getElementById('prev-ar-'+fid).textContent = 'AR: ' + formatted + ' ' + arName;
+}
+
+function generateMsg() {
+  const tpl = TEMPLATES[currentTpl];
+  if (!tpl) return;
+  const vals = {};
+  let allFilled = true;
+  tpl.fields.forEach(f => {
+    if (f.type === 'currency') {
+      const numEl = document.getElementById('field-' + f.id + '-num');
+      const curEl = document.getElementById('field-' + f.id + '-cur');
+      const num = parseFloat(numEl?.value) || 0;
+      // Read from cache first (most reliable), fallback to selectedIndex, then .value
+      const sel = selectedCurrencies[f.id]
+        || (curEl ? curEl.options[curEl.selectedIndex]?.value : null)
+        || curEl?.value
+        || 'AED|درهم إماراتي';
+      const [code, arName] = sel.split('|');
+      if (!num) allFilled = false;
+      const formatted = num.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+      vals[f.id] = code + ' ' + formatted;           // English version
+      vals[f.id + '_ar'] = formatted + ' ' + arName; // Arabic version
+    } else {
+      const el = document.getElementById('field-' + f.id);
+      const v = el?.value.trim() || '';
+      if (f.req && !v) allFilled = false;
+      vals[f.id] = v || `[${f.label}]`;
+    }
+  });
+  const msg = currentLang === 'en' ? tpl.en(vals, currentSub) : tpl.ar(vals, currentSub);
+  lastGeneratedMsg = msg;
+  const pb = document.getElementById('preview-box');
+  if (pb) {
+    pb.textContent = msg;
+    pb.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+    pb.style.fontFamily = currentLang === 'ar' ? "'Segoe UI', 'Arial', sans-serif" : "'Plus Jakarta Sans', sans-serif";
+    pb.style.fontSize = currentLang === 'ar' ? '14px' : '13px';
+  }
+}
+
+function copyMessage() {
+  const pb = document.getElementById('preview-box');
+  if (!pb || pb.querySelector('.preview-placeholder') || !lastGeneratedMsg) return;
+  navigator.clipboard.writeText(lastGeneratedMsg).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '✅ Copied!';
+    btn.style.background = '#047857';
+    setTimeout(() => {
+      btn.textContent = '📋 Copy Message';
+      btn.style.background = '';
+    }, 2000);
+  });
+}
+</script>
+</body>
+</html>
