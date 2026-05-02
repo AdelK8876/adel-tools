@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sabre GDS — Quick Reference</title>
+<style>
+:root{--sb:230px;--navy:#0d1b3e;--red:#cc0000;--amber:#e8940a;--blue:#1d4ed8;--bg:#f5f4f0;--card:#fff;--border:#e0dcd4;--cmd:#12122a;--cmd-t:#e8e6f8;--text:#1a1a1a;--muted:#777;--green:#1e8a4c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+#sb{position:fixed;top:0;left:0;width:var(--sb);height:100vh;background:var(--navy);display:flex;flex-direction:column;overflow:hidden;z-index:100}
+#sb-logo{background:var(--red);padding:14px 16px;flex-shrink:0}
+#sb-logo .brand{color:#fff;font-size:18px;font-weight:800;letter-spacing:1px}
+#sb-logo .sub{color:rgba(255,255,255,.75);font-size:10px;margin-top:2px;letter-spacing:.5px}
+#sb-search{padding:10px 12px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.08)}
+#sb-search input{width:100%;padding:7px 10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:6px;color:#fff;font-size:12px;outline:none}
+#sb-search input::placeholder{color:rgba(255,255,255,.45)}
+#sb-search input:focus{border-color:var(--amber)}
+#sb-nav{flex:1;overflow-y:auto;padding:6px 0}
+#sb-nav::-webkit-scrollbar{width:4px}
+#sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:2px}
+.nav-grp{padding:8px 14px 3px;font-size:9.5px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em}
+.nav-item{display:flex;align-items:center;padding:7px 14px;color:rgba(255,255,255,.72);font-size:12.5px;cursor:pointer;border-left:3px solid transparent;gap:8px;transition:all .15s;user-select:none}
+.nav-item:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-item.on{background:rgba(255,255,255,.12);color:#fff;border-left-color:var(--amber)}
+.nav-item .ic{width:18px;text-align:center;font-size:14px}
+.nav-item .nc{margin-left:auto;font-size:10px;background:rgba(255,255,255,.12);padding:1px 6px;border-radius:10px;color:rgba(255,255,255,.5)}
+#sb-note{padding:10px 14px;font-size:10px;color:rgba(255,255,255,.35);border-top:1px solid rgba(255,255,255,.08);flex-shrink:0;line-height:1.6}
+#main{margin-left:var(--sb);flex:1;display:flex;flex-direction:column;min-height:100vh}
+#topbar{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:12px}
+#topbar .logo-text{font-size:13px;font-weight:700;color:var(--red);white-space:nowrap}
+#main-search{flex:1;padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none;transition:border-color .15s;background:var(--bg)}
+#main-search:focus{border-color:var(--red)}
+#res-count{font-size:12px;color:var(--muted);white-space:nowrap;min-width:90px;text-align:right}
+#content{padding:20px 24px;flex:1}
+.section{margin-bottom:28px;scroll-margin-top:60px}
+.sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--border)}
+.sec-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.sec-title{font-size:15px;font-weight:700}
+.sec-badge{font-size:10px;background:var(--bg);border:1px solid var(--border);padding:2px 8px;border-radius:10px;color:var(--muted);margin-left:auto}
+.ctable{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;table-layout:fixed}
+.ctable colgroup .c1{width:36%}.ctable colgroup .c2{width:47%}.ctable colgroup .c3{width:17%}
+.ctable tr.header-row td{background:#f0ede5;font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.06em;padding:7px 14px;border-top:1px solid var(--border)}
+.ctable tr.header-row td:first-child{border-left:4px solid var(--amber)}
+.ctable tr.cmd-row td{padding:7px 10px;vertical-align:middle;border-bottom:1px solid #f0ede8}
+.ctable tr.cmd-row:last-child td{border-bottom:none}
+.ctable tr.cmd-row:nth-child(even) td{background:#fafaf8}
+.ctable tr.cmd-row:hover td{background:#f0ede4}
+.ctable tr.cmd-row.hide{display:none}
+.cmd-box{font-family:'Courier New',monospace;font-size:12.5px;background:var(--cmd);color:var(--cmd-t);padding:4px 9px;border-radius:5px;display:inline-block;cursor:pointer;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:background .12s;vertical-align:middle}
+.cmd-box:hover{background:#1f1f40}
+.cmd-box.ok{background:#0f3323;color:#7de09e}
+.desc{font-size:12.5px;color:var(--text);line-height:1.4}
+.btn-wrap{display:flex;flex-direction:column;gap:4px}
+.cpbtn{font-size:10.5px;border:1px solid var(--border);background:var(--card);padding:3px 8px;border-radius:5px;cursor:pointer;white-space:nowrap;transition:all .12s;width:100%;color:var(--muted)}
+.cpbtn:hover{background:var(--amber);color:#fff;border-color:var(--amber)}
+.fillbtn{font-size:10.5px;border:1px solid #3b82f6;background:#eff6ff;padding:3px 8px;border-radius:5px;cursor:pointer;white-space:nowrap;transition:all .12s;width:100%;color:#1d4ed8;font-weight:600}
+.fillbtn:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.tool-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px}
+.tool-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px}
+.tool-hdr{font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #f0a500}
+.tool-label{font-size:11.5px;color:var(--muted);margin-bottom:4px;font-weight:600}
+.tool-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.tinput{padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-family:'Courier New',monospace;outline:none;transition:border-color .15s;text-transform:uppercase}
+.tinput:focus{border-color:var(--amber)}
+.tinput.sm{width:80px}.tinput.md{width:110px}.tinput.lg{flex:1;min-width:80px}
+.tbtn{padding:8px 16px;background:var(--amber);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;white-space:nowrap}
+.tbtn:hover{opacity:.88}
+.tout{background:#f5f4f0;border:1.5px dashed #c8c4bc;border-radius:6px;padding:9px 12px;font-size:13px;font-family:'Courier New',monospace;color:var(--cmd);min-height:36px;margin-top:4px;word-break:break-all;cursor:pointer}
+.tout.result{border-color:var(--green);background:#f0faf4;color:var(--green)}
+.tout.err{border-color:#dc3545;background:#fff5f5;color:#dc3545}
+.note{background:#fffbe6;border:1px solid #f5c518;border-radius:6px;padding:8px 12px;font-size:11.5px;color:#7a5c00;margin-bottom:10px}
+/* MODAL */
+#mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:center;justify-content:center}
+#mo.show{display:flex}
+#mb{background:#fff;border-radius:14px;width:500px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+#mhead{background:#0d1b3e;padding:18px 22px;border-radius:14px 14px 0 0;display:flex;justify-content:space-between;align-items:flex-start}
+#mhead h2{color:#fff;font-size:16px;font-weight:700;margin:0}
+#mhead .msub{color:rgba(255,255,255,.6);font-size:11px;margin-top:3px}
+#mclose{background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:12px;transition:background .15s;line-height:1}
+#mclose:hover{background:rgba(255,255,255,.3)}
+#mbody{padding:20px 22px}
+#mnote{background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:8px 12px;font-size:11.5px;color:#1e40af;margin-bottom:16px;font-family:'Courier New',monospace;line-height:1.5}
+.mf{margin-bottom:14px}
+.mf label{display:block;font-size:12px;font-weight:600;color:#444;margin-bottom:5px}
+.mf input,.mf select{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-family:'Courier New',monospace;outline:none;transition:border-color .15s;background:#fff}
+.mf select{text-transform:none}
+.mf input:focus,.mf select:focus{border-color:var(--blue)}
+.mf .hint{font-size:11px;color:var(--muted);margin-top:3px}
+#mres{background:#1a1a2e;border-radius:8px;padding:14px 16px;margin:16px 0 0;font-family:'Courier New',monospace;font-size:15px;color:#e8e6f8;min-height:48px;word-break:break-all;display:flex;align-items:center;gap:10px;cursor:pointer}
+#mres .rlabel{font-size:10px;color:rgba(255,255,255,.4);flex-shrink:0}
+#mres-text{flex:1}
+#mfooter{display:flex;gap:10px;padding:0 22px 20px}
+#gbtn{flex:1;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s}
+#gbtn:hover{background:#1e40af}
+#cbtn{padding:11px 20px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer;transition:all .15s;color:var(--text)}
+#cbtn:hover{background:#e8e4da}
+@media print{#sb,#topbar{display:none}#main{margin-left:0}.cpbtn,.fillbtn{display:none}.cmd-box{background:#eee;color:#000}}
+</style>
+</head>
+<body>
+
+<aside id="sb">
+  <div id="sb-logo"><div class="brand">SABRE</div><div class="sub">GDS QUICK REFERENCE GUIDE</div></div>
+  <div id="sb-search"><input id="sbq" placeholder="Jump to section..." oninput="filterNav(this.value)"></div>
+  <nav id="sb-nav"></nav>
+  <div id="sb-note">‡ = Sabre modifier key (¥ on some keyboards)<br>¤ = Sabre change/modify key<br>✏️ Fill = generate with your real data<br>Click any command to copy it</div>
+</aside>
+
+<div id="main">
+  <div id="topbar">
+    <span class="logo-text">✈ SABRE QUICK REF</span>
+    <input id="main-search" placeholder="Search all commands and descriptions..." oninput="doSearch(this.value)" autocomplete="off">
+    <span id="res-count"></span>
+  </div>
+  <div id="content"></div>
+</div>
+
+<div id="mo" onclick="if(event.target===this)closeModal()">
+  <div id="mb">
+    <div id="mhead">
+      <div><h2 id="mtitle">Form</h2><div class="msub" id="msub"></div></div>
+      <button id="mclose" onclick="closeModal()">✕</button>
+    </div>
+    <div id="mbody">
+      <div id="mnote"></div>
+      <div id="mfields"></div>
+      <div id="mres" onclick="copyResult()"><span class="rlabel">CODE:</span><span id="mres-text">Fill in the fields above and click Generate</span></div>
+    </div>
+    <div id="mfooter">
+      <button id="gbtn" onclick="genAndCopy()">⚡ Generate &amp; Copy</button>
+      <button id="cbtn" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const FD={
+  'adult-name':{
+    t:'Adult Name Entry',s:'Format: -LASTNAME/FIRSTNAME TITLE',
+    n:'-KADDOUR/ADEL MR   or   -SMITH/MARY MRS',
+    f:[{id:'first',l:'First Name',p:'ADEL',u:1,r:1},{id:'last',l:'Last Name',p:'KADDOUR',u:1,r:1},
+       {id:'title',l:'Title',sel:['MR','MRS','MS','DR','PROF','REV','SIR','HH','CAPT']}],
+    b(v){return `-${v.last}/${v.first} ${v.title}`}
+  },
+  'child-name':{
+    t:'Child (CNN) Name Entry',s:'Format: -LASTNAME/FIRSTNAME MSTR|MISS',
+    n:'-KADDOUR/ADAM MSTR   or   -SMITH/EMMA MISS',
+    f:[{id:'first',l:'First Name',p:'ADAM',u:1,r:1},{id:'last',l:'Last Name',p:'KADDOUR',u:1,r:1},
+       {id:'gender',l:'Gender',sel:['MSTR  (Male / Boy)','MISS  (Female / Girl)']}],
+    b(v){return `-${v.last}/${v.first} ${v.gender.split(' ')[0]}`}
+  },
+  'infant-name':{
+    t:'Infant (INF) Name Entry',s:'Format: -I/LASTNAME/FIRSTNAME MSTR|MISS',
+    n:'-I/KADDOUR/ADAM MSTR',
+    f:[{id:'first',l:'First Name',p:'ADAM',u:1,r:1},{id:'last',l:'Last Name',p:'KADDOUR',u:1,r:1},
+       {id:'gender',l:'Gender',sel:['MSTR  (Male / Boy)','MISS  (Female / Girl)']}],
+    b(v){return `-I/${v.last}/${v.first} ${v.gender.split(' ')[0]}`}
+  },
+  'infant-ssr':{
+    t:'Infant SSR with Date of Birth',s:'3INFT/LASTNAME/FIRSTNAME/DOB-AdultPaxNumber',
+    n:'3INFT/KADDOUR/ADAM/15MAR23-1.1',
+    f:[{id:'first',l:'First Name',p:'ADAM',u:1,r:1},{id:'last',l:'Last Name',p:'KADDOUR',u:1,r:1},
+       {id:'dob',l:'Date of Birth (DDMMMYY)',p:'15MAR23',u:1,r:1,h:'Example: 15MAR23  or  20NOV24'},
+       {id:'adult',l:'Adult Pax Number',p:'1.1',r:1,h:'The adult this infant travels with'}],
+    b(v){return `3INFT/${v.last}/${v.first}/${v.dob}-${v.adult}`}
+  },
+  'pdt-cnn':{t:'Add Child Passenger Type',s:'PDTCNN-PaxNumber',n:'PDTCNN-2',
+    f:[{id:'pax',l:'Passenger Number',p:'2',r:1,h:'Line number of the child in the PNR'}],b(v){return `PDTCNN-${v.pax}`}},
+  'pdt-inf':{t:'Add Infant Passenger Type',s:'PDTINF-PaxNumber',n:'PDTINF-3',
+    f:[{id:'pax',l:'Passenger Number',p:'3',r:1}],b(v){return `PDTINF-${v.pax}`}},
+  'docs':{
+    t:'Passport / ID DOCS SSR',s:'3DOCS/DocType/Issuer/DocNumber/Nationality/DOB/Gender/Expiry/Name-Pax',
+    n:'3DOCS/P/EG/A12345678/EG/05JUN90/M/12AUG31/KADDOUR/ADEL-1.1',
+    f:[{id:'dtype',l:'Document Type',sel:['P  (Passport)','I  (National ID / Resident Card)','A  (Alien Resident Card)','C  (Crew Member)']},
+       {id:'issuer',l:'Issuer Country (2-letter ISO)',p:'EG',u:1,r:1,h:'EG=Egypt  SA=Saudi Arabia  GB=UK  AE=UAE  US=USA'},
+       {id:'docno',l:'Document Number',p:'A12345678',u:1,r:1},
+       {id:'nat',l:'Nationality (2-letter ISO)',p:'EG',u:1,r:1,h:'Same codes as issuer — EG SA GB AE US etc.'},
+       {id:'dob',l:'Date of Birth (DDMMMYY)',p:'05JUN90',u:1,r:1,h:'Example: 05JUN90  or  15MAR00  or  20NOV04'},
+       {id:'gender',l:'Gender',sel:['M  (Male)','F  (Female)']},
+       {id:'exp',l:'Expiry Date (DDMMMYY)',p:'12AUG31',u:1,r:1,h:'Example: 12AUG31  or  01JAN35'},
+       {id:'last',l:'Last Name',p:'KADDOUR',u:1,r:1},
+       {id:'first',l:'First Name',p:'ADEL',u:1,r:1},
+       {id:'pax',l:'Pax Number (e.g. 1.1)',p:'1.1',r:1}],
+    b(v){return `3DOCS/${v.dtype.charAt(0)}/${v.issuer}/${v.docno}/${v.nat}/${v.dob}/${v.gender.charAt(0)}/${v.exp}/${v.last}/${v.first}-${v.pax}`}
+  },
+  'phone':{
+    t:'Phone Field Entry',s:'Format: 9{number} {name}-{type}',n:'9201234567890 AHMED-H',
+    f:[{id:'num',l:'Phone Number (include country code — no + sign)',p:'201234567890',r:1,h:'e.g. 201234567890 = Egypt mobile'},
+       {id:'name',l:'Contact Name (optional)',p:'AHMED'},
+       {id:'type',l:'Line Type',sel:['-H  Home / Hotel','-B  Business','-M  Mobile','-A  Agent']}],
+    b(v){const t=v.type.split(' ')[0];return `9${v.num}${v.name?' '+v.name:''}${t}`}
+  },
+  'ctcm':{
+    t:'SR CTCM — Mobile Phone',s:'3CTCM/CountryCode+Number-PaxNumber',
+    n:'3CTCM/201234567890-1.1  (no + sign, country code + number together)',
+    f:[{id:'cc',l:'Country Code (digits only)',p:'20',r:1,h:'20=Egypt  971=UAE  966=Saudi  44=UK  1=USA'},
+       {id:'num',l:'Mobile Number (no spaces or dashes)',p:'1234567890',r:1},
+       {id:'pax',l:'Pax Number',p:'1.1',r:1}],
+    b(v){return `3CTCM/${v.cc}${v.num}-${v.pax}`}
+  },
+  'email-pe':{
+    t:'Add Email Address to PNR',s:'PE‡email@domain.com‡',n:'PE‡adel.kaddour@gmail.com‡',
+    f:[{id:'email',l:'Email Address',p:'adel.kaddour@gmail.com',u:0,r:1}],
+    b(v){return `PE‡${v.email}‡`}
+  },
+  'ctce':{
+    t:'SR CTCE — Email Address',s:'3CTCE/username//domain-PaxNumber',
+    n:'3CTCE/ADEL.KADDOUR//GMAIL.COM-1.1  (note double //)',
+    f:[{id:'local',l:'Email username (part before @)',p:'ADEL.KADDOUR',u:1,r:1},
+       {id:'domain',l:'Email domain (part after @)',p:'GMAIL.COM',u:1,r:1,h:'e.g. GMAIL.COM  YAHOO.COM  OUTLOOK.COM'},
+       {id:'pax',l:'Pax Number',p:'1.1',r:1}],
+    b(v){return `3CTCE/${v.local}//${v.domain}-${v.pax}`}
+  },
+  'ttl':{
+    t:'Ticket Time Limit',s:'7TAW{date}/  —  PNR placed on Q9',n:'7TAW14SEP/',
+    f:[{id:'date',l:'Date (DDMTH)',p:'14SEP',u:1,r:1,h:'Example: 14SEP  or  01NOV  or  20DEC'}],
+    b(v){return `7TAW${v.date}/`}
+  },
+  'ttl-q':{
+    t:'Ticket Time Limit — Personal Queue',s:'7TAW{date}{queue}/  —  PNR placed on personal queue',n:'7TAW14SEP60/',
+    f:[{id:'date',l:'Date (DDMTH)',p:'14SEP',u:1,r:1,h:'Example: 14SEP  or  01NOV'},
+       {id:'q',l:'Personal Queue Number',p:'60',r:1}],
+    b(v){return `7TAW${v.date}${v.q}/`}
+  },
+  'avail':{
+    t:'Flight Availability',s:'1{date}{origin}{dest}  with optional airline / class',
+    n:'130JUNBAHLHR  or  130JUNBAHLHR‡MS  or  130JUNBAHLHR-Y‡MS',
+    f:[{id:'date',l:'Date (DDMTH)',p:'30JUN',u:1,r:1,h:'Example: 30JUN  or  01NOV  or  25DEC'},
+       {id:'orig',l:'Origin — 3-letter city code',p:'CAI',u:1,r:1},
+       {id:'dest',l:'Destination — 3-letter city code',p:'LHR',u:1,r:1},
+       {id:'airline',l:'Airline Code (optional — leave blank for all)',p:'MS',u:1,h:'2-letter airline code e.g. MS EK QR BA'},
+       {id:'cls',l:'Class of Service (optional)',p:'Y',u:1,h:'Leave blank for all classes — e.g. Y W C F M B'}],
+    b(v){const al=v.airline?`‡${v.airline}`:'';const cl=v.cls?`-${v.cls}`:'';return `1${v.date}${v.orig}${v.dest}${cl}${al}`}
+  },
+  'qp':{
+    t:'Queue Placement',s:'QP/{queue}/{PIC}',n:'QP/500/11',
+    f:[{id:'q',l:'Queue Number',p:'500',r:1},{id:'pic',l:'PIC (Place In Category)',p:'11',r:1,h:'Numeric category code'}],
+    b(v){return `QP/${v.q}/${v.pic}`}
+  },
+  'qp-ref':{
+    t:'Queue Capture with Booking Reference',s:'QP/{RecordLocator}/{PIC}',n:'QP/G8VK501/11',
+    f:[{id:'rl',l:'Record Locator / Booking Reference',p:'G8VK501',u:1,r:1},
+       {id:'pic',l:'PIC',p:'11',r:1}],
+    b(v){return `QP/${v.rl}/${v.pic}`}
+  },
+  'seat':{
+    t:'Seat Selection',s:'4G{segment}/{seat}-{pax}',n:'4G1/14A-1.1',
+    f:[{id:'seg',l:'Segment Number',p:'1',r:1},
+       {id:'seat',l:'Seat Number',p:'14A',u:1,r:1,h:'e.g. 14A  22F  or  NW (non-smoking window)  NA (non-smoking aisle)'},
+       {id:'pax',l:'Pax Number (optional — blank = all pax)',p:'1.1',h:'e.g. 1.1'}],
+    b(v){const p=v.pax?`-${v.pax}`:'';return `4G${v.seg}/${v.seat}${p}`}
+  },
+  'ssr-meal':{
+    t:'Special Service Request — Meal',s:'3{mealcode}{segment}-{pax}',n:'3MOML1-1.1',
+    f:[{id:'meal',l:'Meal Type',sel:['VGML  Vegetarian (non-meat)','MOML  Muslim / Halal','KSML  Kosher','CHML  Child Meal','DBML  Diabetic','GFML  Gluten Free','LSML  Low Salt / Sodium','AVML  Asian Vegetarian','SFML  Seafood Meal','FPML  Fruit Plate','LCML  Low Calorie','SPML  Special Meal (specify)','BLML  Bland Meal','RVML  Raw Vegetarian']},
+       {id:'seg',l:'Segment(s)',p:'1',r:1,h:'e.g. 1  or  1,2  or  2,3'},
+       {id:'pax',l:'Pax Number(s)',p:'1.1',r:1,h:'e.g. 1.1  or  1.1,2.1'}],
+    b(v){return `3${v.meal.split(' ')[0]}${v.seg}-${v.pax}`}
+  },
+  'fq':{
+    t:'Fare Quote Builder',s:'FQ{origin}{dest}{date}{type}-{airline}',
+    n:'FQCAILHR25JUN-MS   or   FQCAIJFK01NOVSP-MS‡R20NOV',
+    f:[{id:'orig',l:'Origin — 3-letter city code',p:'CAI',u:1,r:1},
+       {id:'dest',l:'Destination — 3-letter city code',p:'LHR',u:1,r:1},
+       {id:'date',l:'Departure Date (DDMTH)',p:'25JUN',u:1,r:1,h:'Example: 25JUN  or  01NOV  or  15DEC'},
+       {id:'airline',l:'Airline Code (optional)',p:'MS',u:1,h:'Leave blank for all airlines'},
+       {id:'ftype',l:'Fare Type',sel:['(all published fares)','SP  Special fares only','PM  Promotional fares only']},
+       {id:'ret',l:'Return Date (optional)',p:'',u:1,h:'e.g. 10JUL — leave blank for one-way query'}],
+    b(v){const al=v.airline?`-${v.airline}`:'';const tp=v.ftype.startsWith('(')?'':v.ftype.split(' ')[0];const rt=v.ret?`‡R${v.ret}`:'';return `FQ${v.orig}${v.dest}${v.date}${tp}${rt}${al}`}
+  },
+  'long-sell':{
+    t:'Long Sell — Book a Seat',s:'0{airline}{flight}{class}{date}{orig}{dest}{status}{qty}',
+    n:'0EK162Y25JULBAHLHRNN1',
+    f:[{id:'al',l:'Airline Code',p:'EK',u:1,r:1,h:'2-letter airline code e.g. EK QR MS BA'},
+       {id:'flt',l:'Flight Number',p:'162',r:1},
+       {id:'cls',l:'Class of Service',p:'Y',u:1,r:1,h:'Single letter: Y W C F M B K H Q V etc.'},
+       {id:'date',l:'Date (DDMTH)',p:'25JUL',u:1,r:1},
+       {id:'orig',l:'Origin — 3-letter',p:'BAH',u:1,r:1},
+       {id:'dest',l:'Destination — 3-letter',p:'LHR',u:1,r:1},
+       {id:'status',l:'Booking Status',sel:['NN  Need (confirmed request)','LL  Waitlist','GK  Passive (already booked direct)','DS  Open segment']},
+       {id:'qty',l:'Number of Seats',p:'1',r:1}],
+    b(v){return `0${v.al}${v.flt}${v.cls}${v.date}${v.orig}${v.dest}${v.status.split(' ')[0]}${v.qty}`}
+  },
+  'currency-conv':{
+    t:'Currency Conversion Command',s:'DC‡{FROM}{amount}/{TO}',n:'DC‡USD500.00/KWD',
+    f:[{id:'from',l:'From Currency (3-letter)',p:'USD',u:1,r:1,h:'e.g. USD  EUR  GBP  AED  EGP  SAR  KWD  QAR'},
+       {id:'amount',l:'Amount',p:'500.00',r:1},
+       {id:'to',l:'To Currency (3-letter)',p:'KWD',u:1,r:1}],
+    b(v){const a=parseFloat(v.amount)||0;return `DC‡${v.from}${a.toFixed(2)}/${v.to}`}
+  },
+};
+
+const CF={
+  '-LAST/FIRST MR':'adult-name','-LAST/FIRST MRS':'adult-name','-LAST/FIRST MS':'adult-name',
+  '-LAST/FIRST MSTR':'child-name','-LAST/FIRST MISS':'child-name',
+  '-I/LAST/FIRST MSTR':'infant-name','-I/LAST/FIRST MISS':'infant-name',
+  '3INFT/LASTNAME/FIRST/DOB-1.1':'infant-ssr',
+  'PDTCNN-1':'pdt-cnn','PDTINF-1':'pdt-inf',
+  '3DOCS/P/SA/1066495159/SA/05JUN90/M/12AUG31/LASTNAME/FIRST-1.1':'docs',
+  '3DOCS/I/SA/1066495159/SA/05JUN90/M/12AUG31/LASTNAME/FIRST-1.1':'docs',
+  '93971244 AHMED-H':'phone','3CTCM/(CC)(NUMBER)-PAX#':'ctcm',
+  'PE‡EMAIL@DOMAIN.COM‡':'email-pe','3CTCE/NAME//DOMAIN.COM-PAX#':'ctce',
+  '7TAW14SEP/':'ttl','7TAW14SEP60/':'ttl-q',
+  '130JUNBAHPAR':'avail','130JUNBAHPAR‡GF':'avail','130JUNBAHPAR2P':'avail',
+  '130JUNBAHPAR-Y':'avail','130JUNBAHNYC1APAR':'avail',
+  'QP/500/11':'qp','QP/G8VK501/11':'qp-ref',
+  '4G1/12AB':'seat','4G1/12A-1.1':'seat','4G1/12AB14AB':'seat',
+  '3VGML1-2.1':'ssr-meal','3MOML2,3-1.1,2.1':'ssr-meal',
+  'FQBAHLON25JUN-BA':'fq','FQBAHLON25JUN':'fq','FQBAHLON25JUNSP-BA':'fq',
+  'FQNYCWAS23JUNPM-DL':'fq','FQBAHPAR25JUNSP‡R10JUL-GF':'fq','FQBAHLON25JUNSP‡OW-BA':'fq',
+  'FQNYCLON24APR-BA-AA-VS':'fq','FQPARFEZ6JUN*12JUN-AF':'fq','FQMANFRA15OCTALL-LH':'fq',
+  '0EK162Y25JULBAHLHRNN1':'long-sell','0GF162Y25JULBAHLHRLL1':'long-sell',
+  '0QR162Y25JULBAHLHRGK1':'long-sell','0EYOPENY25JULBAHLHRDS1':'long-sell',
+  'DC‡USD500.00/GBP':'currency-conv','DC‡EUR250.00/AED':'currency-conv',
+};
+
+const SECTIONS=[
+{id:'signin',title:'Sign In / Out',icon:'🔑',color:'#6366f1',cmds:[
+  ['SI*1234','Sign into all areas'],['*S*','Display all working areas'],
+  ['S/*','Redisplay sign-in message'],['SO*','Sign out from all areas'],['¤B','Change to area B'],
+]},
+{id:'names',title:'Name Entry & Passengers',icon:'👤',color:'#0ea5e9',cmds:[
+  ['— ADULT NAME','',true],
+  ['-LAST/FIRST MR','Single adult male name'],
+  ['-LAST/FIRST MRS','Single adult female name'],
+  ['-LAST/FIRST MS','Single adult female (no marital status)'],
+  ['— CHILD (CNN) NAME','',true],
+  ['-LAST/FIRST MSTR','Child male name'],
+  ['-LAST/FIRST MISS','Child female name'],
+  ['— INFANT (INF) NAME','',true],
+  ['-I/LAST/FIRST MSTR','Infant male name entry'],
+  ['-I/LAST/FIRST MISS','Infant female name entry'],
+  ['3INFT/LASTNAME/FIRST/DOB-1.1','SSR infant with DOB — linked to adult 1.1'],
+  ['— PASSENGER TYPE','',true],
+  ['PDTCNN-1','Add child passenger type to pax 1'],
+  ['PDTINF-1','Add infant passenger type to pax 1'],
+  ['— DOCS SSR','',true],
+  ['3DOCS/P/SA/1066495159/SA/05JUN90/M/12AUG31/LASTNAME/FIRST-1.1','Passport DOCS for pax 1.1'],
+  ['3DOCS/I/SA/1066495159/SA/05JUN90/M/12AUG31/LASTNAME/FIRST-1.1','National ID DOCS for pax 1.1'],
+  ['— NAME CHANGES','',true],
+  ['-1.2¤MONA','Change first name only of pax 1.2'],
+  ['-1¤WHITE/JENNY MS','Change whole name of pax 1'],
+  ['-1¤','Delete all names in name item 1'],
+  ['-1.1¤*DOB17SEP98','Add name remark (DOB)'],
+]},
+{id:'avail',title:'Flight Availability',icon:'✈️',color:'#16a34a',cmds:[
+  ['— BASIC AVAILABILITY','',true],
+  ['130JUNBAHPAR','Sabre availability: date + origin + destination'],
+  ['130JUNBAHPAR‡GF','With specific airline'],
+  ['130JUNBAHPAR2P','With specific departure time (2PM)'],
+  ['130JUNBAHNYC1APAR','Via connecting city with departure time'],
+  ['130JUNBAHPAR-Y','Specific class of service'],
+  ['1*','More availability'],['1*OA','Return to original availability'],
+  ['1*R','Redisplay last availability'],['1‡2','Plus days'],['1-2','Minus days'],
+  ['123JUL','Different date'],['1‡GF','With specific carrier'],['1R10JUL','Return on specific date'],
+  ['— DIRECT ACCESS AVAILABILITY','',true],
+  ['125SEPBAHIST¤EK','Direct access availability'],
+  ['125SEPBAHIST6P¤EK','With departure time'],
+  ['125SEPBAHDXB1AIST¤EK','Via connecting city and time'],
+  ['125SEPBAHIST-Y¤GF','Specific class'],
+  ['1¤OA','Direct access to other airline'],['1¤*','More availability'],
+  ['1¤‡1','Plus days'],['1¤-1','Minus days'],
+]},
+{id:'sell',title:'Selling & Long Sell',icon:'🪑',color:'#f59e0b',cmds:[
+  ['— SELL FROM AVAILABILITY','',true],
+  ['01Y7','Sell 1 seat from availability line 7'],
+  ['01Y7M8','Y from line 7 — M from line 8'],
+  ['01Y7*','Connecting flight — same class'],
+  ['01Y7LL','Waitlist segment'],['0A','Surface segment (ARNK)'],['01Y1OPEN','Sell open segment'],
+  ['— LONG SELL','',true],
+  ['0EK162Y25JULBAHLHRNN1','Book a confirmed seat'],
+  ['0GF162Y25JULBAHLHRLL1','Book waitlist segment'],
+  ['0QR162Y25JULBAHLHRGK1','Book passive segment'],
+  ['0EYOPENY25JULBAHLHRDS1','Book open segment with date'],
+  ['— INCREASE / DECREASE','',true],
+  [',3','Increase all air segments to 3 seats'],
+  [',3S2','Increase segment 2 to 3 seats'],
+]},
+{id:'pnr',title:'PNR Fields',icon:'📋',color:'#8b5cf6',cmds:[
+  ['— PHONE FIELD','',true],
+  ['93971244 AHMED-H','Add home phone number'],
+  ['917404127 EXT 502-B','Business phone with extension'],
+  ['3CTCM/(CC)(NUMBER)-PAX#','SR CTCM mobile for specific pax'],
+  ['-A','Agent'],['-M','Mobile'],['-H','Home / Hotel'],['-B','Business'],
+  ['92¤','Remove phone line 2'],
+  ['— TICKET TIME LIMIT','',true],
+  ['7TAW14SEP/','PNR queued to Q9 on 14 Sep'],
+  ['7TAW/','PNR queued to Q9 same day'],
+  ['7TAW14SEP60/','PNR queued to personal Q60 on 14 Sep'],
+  ['7¤TAW18SEP60/','Change ticket time limit to 18 Sep Q60'],
+  ['— FORM OF PAYMENT','',true],
+  ['5-CASH','Form of payment: Cash'],['5-CK','Cheque'],['5-CC','Credit Card'],
+  ['— RECEIVED FIELD','',true],
+  ['6ALI','Received from: Ali'],['6¤JENS HANSON','Change received-from field'],
+  ['— REMARKS','',true],
+  ['5CHECK PASSPORT','General remark'],
+  ['5*FQTV NBR LH 12345','Remark shown on ticket'],
+  ['5‡HAVE A NICE TRIP','Itinerary remark'],
+  ['5‡S2 DEP AT GATE 1','Itinerary remark for specific segment'],
+  ['5H-FARE QUOTED 500 USD','Historical remark'],
+  ['51¤‡NEW TEXT','Change itinerary remark line 1'],
+  ['51¤','Delete remark from line 1'],
+]},
+{id:'email',title:'Email & Frequent Flyer',icon:'📧',color:'#ec4899',cmds:[
+  ['— EMAIL ADDRESS','',true],
+  ['PE‡EMAIL@DOMAIN.COM‡','Add email address to PNR'],
+  ['3CTCE/NAME//DOMAIN.COM-PAX#','SR CTCE email for specific pax (double //)'],
+  ['EM','End PNR and mail to passenger'],['EMT','End + e-ticket notification'],
+  ['*PE','Display email address'],['PE1¤','Delete email line 1'],
+  ['— FREQUENT FLYER','',true],
+  ['FFBA123456-1.1','Add FF number for pax 1.1'],
+  ['FFGF123456/BA-1.1','GF FF number when flying BA'],
+  ['PT*BA','FF agreement between airlines'],['PT*','All FF partner carriers'],
+  ['*FF','Display FF numbers'],['FF1¤','Delete FF line 1'],['FF1¤EK123456','Change FF number line 1'],
+]},
+{id:'osi',title:'OSI & SSR',icon:'💬',color:'#f97316',cmds:[
+  ['— OSI','',true],
+  ['3OSI QR CHD AGE 6 YRS','OSI message to specific airline'],
+  ['3OSI QR CIP CEO OF GULF AIR-1.1','OSI for specific airline and pax'],
+  ['31¤PASSENGER SPEAKS FRENCH-3.1','Change OSI pax 3.1'],['32¤','Delete OSI line 2'],
+  ['— SSR','',true],
+  ['3VGML1-2.1','Vegetarian meal — seg 1 — pax 2.1'],
+  ['3MOML2,3-1.1,2.1','Muslim meal — segs 2&3 — pax 1.1 and 2.1'],
+  ['3BSCT-1.1','Baby cot for pax 1.1'],
+  ['3NSST1/12A-1.1','Seat 12A on seg 1 for pax 1.1'],
+  ['3TKNM/12345678904455-1.1','Advise ticket number manually'],
+  ['31¤','Cancel SSR item'],['DU*/SPM','Display all special meal codes'],
+]},
+{id:'seats',title:'Seat Selection',icon:'💺',color:'#14b8a6',cmds:[
+  ['4G1*','Display seat map for segment 1'],['MD','Move down in seat map'],
+  ['4G1/12AB','Book seats 12A and 12B on segment 1'],
+  ['4G1/12AB14AB','Book non-consecutive seats'],
+  ['4G1/12A-1.1','Book seat 12A on seg 1 for pax 1.1'],
+  ['4G1/NW','Generic: Non-smoking Window'],['4G1/NA','Generic: Non-smoking Aisle'],
+  ['*B','Display pre-booked seats'],['4GX2','Cancel seats for segment 2'],
+  ['4GX1/12A','Cancel specific seat'],['4GXALL','Cancel all seats'],
+]},
+{id:'endpnr',title:'End / Ignore / Retrieve',icon:'✅',color:'#dc2626',cmds:[
+  ['— END / IGNORE','',true],
+  ['E','End transaction'],['ER','End and retrieve PNR'],
+  ['ET','End transaction and ignore'],['EM','End and mail PNR'],
+  ['I','Ignore PNR'],['IR','Ignore and retrieve PNR'],
+  ['— RETRIEVE PNR','',true],
+  ['*-WHITE','Retrieve by passenger surname'],
+  ['*GHHKLB','Retrieve by record locator'],
+  ['*BA162/25JULBAH-ABDULLA','Retrieve by flight details'],
+  ['*2','From name list'],['*L','Display name list'],
+  ['DIT‡DPI‡R','Print itinerary and retrieve'],
+]},
+{id:'display',title:'Display PNR Elements',icon:'🔍',color:'#0891b2',cmds:[
+  ['*A','Display full PNR'],['*I','Display itinerary'],['*N','Display names'],
+  ['*T','Display ticket field'],['*B','Display pre-reserved seats'],
+  ['*H','Display history'],['*P3','Display general facts / OSI / SSR'],
+  ['*FF','Display FF numbers'],['*PE','Display email address'],
+  ['*PQ','Display price quote'],['*P5','Display remarks'],['*P7','Display ticket time limit'],
+]},
+{id:'modify',title:'Modify PNR',icon:'✏️',color:'#d97706',cmds:[
+  ['— CANCEL SEGMENT','',true],
+  ['X2','Cancel segment 2'],['X1/4','Cancel segments 1 and 4'],
+  ['X1-3','Cancel segments 1 through 3'],['XI','Cancel whole itinerary'],
+  ['X1‡02Y1','Cancel seg 1 and rebook from avail line 1'],
+  ['X1‡0027JUL','Cancel seg 1 and rebook on 27 Jul'],
+  ['XIA,‡7','Cancel whole itinerary and rebook +7 days'],
+  ['— INSERT / MOVE','',true],
+  ['/2','Insert after segment 2'],['/2/1','Move seg 1 after seg 2'],
+  ['/1A','Insert ARNK after segment 1'],['EWR','Update schedule changes'],
+  ['— CHANGE STATUS / CLASS','',true],
+  ['.1HK','Confirm segment 1'],['WC1Q','Change seg 1 to Q class'],
+  ['WC1Q/2B','Change seg 1 to Q and seg 2 to B'],['WCAY','Change all segs to Y class'],
+]},
+{id:'divide',title:'Divide & Clone PNR',icon:'✂️',color:'#7c3aed',cmds:[
+  ['D1','Divide name item 1'],['D1.1*2.1','Divide names 1.1 and 2.1'],
+  ['F','File PNR after divide'],
+  ['IC','Ignore and clone itinerary'],['ICB2','Ignore and clone for 2 pax'],
+  ['ICX1','Ignore and clone except seg 1'],
+  ['IC‡7','Ignore and clone +7 days (max 30)'],
+  ['ICAPD‡20','Ignore and clone all pax data +20 days'],
+]},
+{id:'queue',title:'Queue Management',icon:'📬',color:'#2563eb',cmds:[
+  ['QC/','Count all queues'],['QC/-','Count all named queues'],
+  ['Q/17','Access queue 17'],['Q/-NABEEL','Access named queue'],
+  ['QP/500/11','Queue-place to Q500 with PIC 11'],
+  ['QP/G8VK501/11','Capture on queue with booking reference'],
+  ['QP/-NABEEL/11','Queue-place to named queue'],
+  ['QN/200/A-NABEEL','Name queue 200 to Nabeel'],
+  ['QN/200/DELETE','Delete named queue'],['QXI','Exit queue / ignore PNR'],
+  ['5Q-PCCDATEQUEUE/PIC','Future queue placement'],
+]},
+{id:'flightinfo',title:'Flight Information',icon:'ℹ️',color:'#059669',cmds:[
+  ['VA*1','Flight details from availability line 1'],
+  ['VI*1','Flight details from itinerary segment 1'],
+  ['VI*','Flight details for whole PNR'],
+  ['V*BA162/23JUL','Verify specific flight details'],
+  ['2BA164/25JUL','FIFO — flight information'],
+]},
+{id:'encode',title:'Encode / Decode',icon:'🔤',color:'#64748b',cmds:[
+  ['— ENCODE','',true],
+  ['W/-CCLONDON','City code'],['W/-APHEATHROW','Airport name'],
+  ['W/-ALSWISS','Airline name'],['W/EQ*763','Aircraft type'],
+  ['HCCFLORIDA','American state'],['HCCC/FRANCE','Country name'],
+  ['W/-HLSHERATON','Hotel code'],['W/-CRHERTZ','Car company code'],
+  ['— DECODE','',true],
+  ['W/*LON','City code decode'],['W/*LHR','Airport code decode'],
+  ['W/*LX','Airline decode'],['W/EQ*747','Aircraft decode'],
+  ['HCCFL','American state decode'],['HCCC/FR','Country decode'],
+]},
+{id:'atlas',title:'Sabre Atlas',icon:'🗺️',color:'#0369a1',cmds:[
+  ['W/-CYBERLIN,DE','Closest airports to city'],['W/-ATSXF','Closest airports to airport'],
+  ['W/-CYNICE,FR‡CYPARIS,FR','Distance between 2 cities'],
+  ['W/-CYLONDON,GB‡ATCDG','Distance between city and airport'],
+  ['W/-ATCDG‡ATORY','Distance between 2 airports'],
+  ['N*/GLOBEA','Country and city geography information'],
+]},
+{id:'currency',title:'Currency & Calculator',icon:'💱',color:'#ea580c',cmds:[
+  ['— CURRENCY','',true],
+  ['DC*CUR','Display all currencies and exchange rates'],
+  ['DC*SAR','Decode currency code'],
+  ['DC‡USD500.00/GBP','Convert USD 500.00 to GBP'],
+  ['DC‡EUR250.00/AED','Convert EUR 250.00 to AED'],
+  ['— CALCULATOR','',true],
+  ['T*NYC','Local time in New York'],['T*CAI','Local time in Cairo'],['T*DXB','Local time in Dubai'],
+  ['T¤7‡5','Sabre calculator'],['T¤JUL/03','Calendar for July'],
+  ['T¤15APR‡7','Date plus 7 days'],['T¤ETNYC/PAR','Time difference NYC / Paris'],
+]},
+{id:'fq',title:'Fare Quote',icon:'💰',color:'#be123c',cmds:[
+  ['FQBAHLON25JUN-BA','BA fares BAH→LON 25 Jun'],
+  ['FQBAHLON25JUN','All airlines BAH→LON 25 Jun'],
+  ['FQBAHLON25JUNSP-BA','BA special fares'],
+  ['FQNYCWAS23JUNPM-DL','DL promotional fare'],
+  ['FQBAHPAR25JUNSP‡R10JUL-GF','Special fares with return date'],
+  ['FQBAHLON25JUNSP‡OW-BA','One-way special fares'],
+  ['FQ*','Redisplay last fare quote'],['FQ*YZ','Change FQ fare type'],
+  ['FQ*-GF','Change FQ carrier'],['FQ*15JUN','Change FQ date'],
+  ['FQL 1','Fares from availability line 1'],['FQS1/2','Fares from PNR segments 1 and 2'],
+  ['FQNYCLON24APR-BA-AA-VS','Multiple carriers'],
+  ['FQMANFRA15OCTALL-LH','All passenger types'],
+  ['— RULES DISPLAY','',true],
+  ['RD2','Display fare rule number 2'],['RD2*M','Display menu of rule 2'],
+  ['RD**','Redisplay last rule'],['RD*RTG','Display routing'],
+  ['— BOOKING CODES','',true],
+  ['RB1BA','Booking codes FQ line 1 — single carrier'],
+  ['RB1AA/BA/GF','Booking codes — multiple carriers'],['RB*','Redisplay last RB'],
+  ['— FLIGHT FINDER','',true],
+  ['JA5*2','Find flights for fare line 5 — 2 passengers'],
+  ['JA4*1‡R20APR','Find flights with return date'],['JA4‡O','One-way flights only'],
+]},
+{id:'pricing',title:'Pricing Commands',icon:'💲',color:'#15803d',cmds:[
+  ['WP','Will price as booked'],['PQ','Retain itinerary price response'],
+  ['WPS1/3','Price with segment select'],['WPN1.1/3.1','Price with name select'],
+  ['WPPADT/CNN','Price with passenger types ADT and CNN'],
+  ['WPP2ADT/1CNN','Price: 2 ADT / 1 CNN'],
+  ['WPTE','Exempt taxes only'],['WPTN','Exempt all taxes and fees'],
+  ['WPDF','Fare calculation description'],
+  ['WPNC','Price new class — lowest available fare'],
+  ['WPNC‡S1/4','Lowest fare for segments 1 and 4'],
+  ['WPNCB','Price AND book lowest fare'],
+  ['WPNCB‡S1/4','Price and book lowest — specific segments'],
+  ['WPNI','Price new itinerary / search lower fares'],
+  ['WPNI‡S1/4','Lowest fares for selected segments'],
+  ['WPNI*','Redisplay itinerary options'],['WPNI/D','Direct flights only'],
+  ['WC‡1','Book option 1 from WPNI'],
+  ['WPQHEE3M','Command price by fare basis HEE3M'],
+  ['WPRQ‡S1‡(pricing params)','Price and retain pricing response'],
+  ['PQD-ALL','Delete all stored fares'],['*PQ','Display stored fares'],
+  ['*PQN1.1','Stored fares for pax 1.1'],
+]},
+{id:'ticket',title:'Issue Tickets',icon:'🎟️',color:'#b45309',cmds:[
+  ['— AUTOMATIC TICKETING','',true],
+  ['W‡PQ1‡KP9‡AXX‡F12345','Basic automatic ticketing'],
+  ['W‡QKLSS‡KP9‡AXX‡BA*02P‡F12345','Basic command ticketing (phase 3.5)'],
+  ['W‡Q/CD15/DP15‡KP9‡AXX‡BA*20K‡F12345','Basic discount ticketing (phase 3.75)'],
+  ['— QUALIFIERS','',true],
+  ['‡S1/4','Add segment select'],['‡N1.1','Add name select'],
+  ['‡ED AUTH BY AZIZ','Add endorsement'],['‡TE','Add tax exempt'],
+  ['‡UN*ABC123','Add tour code'],
+  ['‡F*AX371066554437/0804','Add credit card FOP — auto approval'],
+  ['‡ETR','Issue electronic ticket'],['‡XETR','Issue paper ticket'],
+  ['— VIEW TICKETS','',true],
+  ['*T','Display ticket number from PNR'],
+  ['WETR*3','Display e-ticket image (item 3)'],
+  ['WETR*T1251234123123','Display e-ticket by ticket number'],
+  ['— FROM FP LINE','',true],
+  ['FPPQ1‡AGF‡FCASH‡KP05','Create future ticketing instruction'],
+  ['FP1¤','Delete FP line 1'],['*PF','Display FP lines'],['W‡L','Issue from FP line'],
+  ['WETP*GF','Electronic ticketing profile for GF'],
+  ['W‡NET/2000.00/V*QX3AS/C*DXB520‡AGF‡FCASH‡KPN7','Net remit basic command'],
+]},
+{id:'void',title:'Void Tickets & QREX',icon:'🗑️',color:'#dc2626',cmds:[
+  ['— VOIDING','',true],
+  ['*T','Display ticket field in PNR'],
+  ['WV2','Void ticket line 2 from *T (enter TWICE to confirm)'],
+  ['WV‡0557136789012/USD500.00/JMKQLM/03JUN/CA/1','Manual void'],
+  ['W/VP1W*','Display voiding periods'],['WV*','All void tickets same month'],
+  ['WV*DT15SEP','Void tickets specific day'],['WV*DT15SEP-30SEP','Void tickets date range'],
+  ['— QREX','',true],
+  ['WFR1257264678006‡PQ1‡AGF','Exchange through QREX'],
+  ['WFR1257264678006‡PQ1N1.1‡AGF','Exchange for specific name'],
+  ['WFR1257264678006‡AGF','Refund through QREX'],
+  ['WFR*','Redisplay last QREX screen'],
+  ['WFRT1257264528603','Tax-only refund mask'],
+]},
+{id:'audit',title:'Audit Trail & Printers',icon:'📊',color:'#475569',cmds:[
+  ['DQB*','Display last sales report'],['DQB*25APR','Report for specific date'],
+  ['DQB*RF','Refunded tickets report'],['DQB*RF/JAN','Refunded tickets specific month'],
+  ['DN*PTR','Display next ticket number'],['DNLNIATA/12345678905/250','Load ticket stock'],
+  ['PPS1','Designate printer profile 1'],['PPO','Undesignate printers'],
+  ['RL/P','Release message printer'],['RL/T','Release ticket printer'],
+  ['W*TGB32322','Designate ticket printer'],['PTR/E46688','Designate hardcopy printer'],
+]},
+{id:'hotel',title:'Hotels',icon:'🏨',color:'#7c3aed',cmds:[
+  ['— STEP 1: AVAILABILITY','',true],
+  ['HOT2/2SEP1','By itinerary segment'],
+  ['HOTGIG/21SEP-2NT2','Without itinerary — city / 2 nights / 2 pax'],
+  ['HOT*','More hotel availability'],['HOT/N-MOULIN','Filter by hotel name'],
+  ['HOT/R-150','Maximum rate 150'],['HOT/R‡75','Minimum rate 75'],
+  ['HOT/R‡75/R-150','Rate range 75–150'],['HOT/PT-FIRST','Property type: First class'],
+  ['HOT/*RA','Check assured / guaranteed rates'],
+  ['— STEP 2: DESCRIPTION','',true],
+  ['HOD*3','Description for hotel line 3'],['HOD*G','Guarantee information'],
+  ['— STEP 3: RATE DESCRIPTION','',true],
+  ['HRD*2','Rate description by line 2'],['HRD*WKD','Rate description by rate code'],
+  ['— STEP 4: SELL','',true],
+  ['0H1‡1','Basic hotel sell'],['0H1‡1/AGT12345','Sell with agency IATA number'],
+  ['0H1‡1/FT-GF767621','Sell with frequent flyer number'],
+  ['0H1‡1/GAX3784921212EXP0103-ALI','Sell with credit card guarantee'],
+  ['— MODIFY','',true],
+  ['HOM3D/14JUL-19JUL','Modify hotel dates'],
+  ['HOM3R/B2DRAC-2','Modify room type / rate code'],
+]},
+{id:'cars',title:'Cars',icon:'🚗',color:'#0284c7',cmds:[
+  ["— STEP 1: SHOPPER'S QUOTE","",true],
+  ['CF1/2','Request rates using PNR segments'],
+  ['CFORD/2JUN-5JUN/5P-9A','Request rates — city / dates / times'],
+  ['CF1/2/ECAR,CCAR,ICAR','Multiple car types'],['CF*','Redisplay last shopper quote'],
+  ['— STEP 2: CAR QUOTE','',true],
+  ['CQ1/2ZT','Car quote using PNR segments for company ZT'],
+  ['CQZESFT/18MAR-22MAR/2P-11A','Quote for Hertz (ZE)'],['CQ*','Redisplay car quote'],
+  ['— STEP 3: RULES','',true],
+  ['CF*R3','Rules from shopper quote'],['CQ*R1','Rules from car quote'],
+  ['— STEP 4: BOOK','',true],
+  ['0C1','Basic car sell from line 1'],
+  ['0C1/ID-A76423/SQ-PHN','Sell with qualifiers'],['0C1‡2','Sell multiple cars'],
+  ['CP*ZEYVR','Car policy by company and location'],
+  ['CP*ZRCORP','Corporate car policy'],
+  ['DU*/CAR/TYPE','Display car type codes'],
+]},
+];
+
+const TZ={'CAI':'Africa/Cairo','HRG':'Africa/Cairo','SSH':'Africa/Cairo','LXR':'Africa/Cairo','DXB':'Asia/Dubai','AUH':'Asia/Dubai','SHJ':'Asia/Dubai','KWI':'Asia/Kuwait','BAH':'Asia/Bahrain','DOH':'Asia/Qatar','MCT':'Asia/Muscat','RUH':'Asia/Riyadh','JED':'Asia/Riyadh','MED':'Asia/Riyadh','DMM':'Asia/Riyadh','AMM':'Asia/Amman','BEY':'Asia/Beirut','IST':'Europe/Istanbul','AYT':'Europe/Istanbul','TLV':'Asia/Jerusalem','ATH':'Europe/Athens','LHR':'Europe/London','LGW':'Europe/London','MAN':'Europe/London','CDG':'Europe/Paris','ORY':'Europe/Paris','NCE':'Europe/Paris','FRA':'Europe/Berlin','MUC':'Europe/Berlin','AMS':'Europe/Amsterdam','BRU':'Europe/Brussels','ZRH':'Europe/Zurich','GVA':'Europe/Zurich','VIE':'Europe/Vienna','FCO':'Europe/Rome','MXP':'Europe/Rome','MAD':'Europe/Madrid','BCN':'Europe/Madrid','LIS':'Europe/Lisbon','CPH':'Europe/Copenhagen','OSL':'Europe/Oslo','ARN':'Europe/Stockholm','HEL':'Europe/Helsinki','WAW':'Europe/Warsaw','PRG':'Europe/Prague','BUD':'Europe/Budapest','SVO':'Europe/Moscow','BOM':'Asia/Kolkata','DEL':'Asia/Kolkata','BLR':'Asia/Kolkata','MAA':'Asia/Kolkata','KHI':'Asia/Karachi','ISB':'Asia/Karachi','DAC':'Asia/Dhaka','CMB':'Asia/Colombo','BKK':'Asia/Bangkok','KUL':'Asia/Kuala_Lumpur','SIN':'Asia/Singapore','CGK':'Asia/Jakarta','MNL':'Asia/Manila','HKG':'Asia/Hong_Kong','PEK':'Asia/Shanghai','PVG':'Asia/Shanghai','ICN':'Asia/Seoul','NRT':'Asia/Tokyo','HND':'Asia/Tokyo','KIX':'Asia/Tokyo','TPE':'Asia/Taipei','JFK':'America/New_York','LGA':'America/New_York','MIA':'America/New_York','BOS':'America/New_York','ATL':'America/New_York','ORD':'America/Chicago','DFW':'America/Chicago','DEN':'America/Denver','PHX':'America/Phoenix','LAX':'America/Los_Angeles','SFO':'America/Los_Angeles','SEA':'America/Los_Angeles','YYZ':'America/Toronto','YVR':'America/Vancouver','MEX':'America/Mexico_City','GRU':'America/Sao_Paulo','EZE':'America/Argentina/Buenos_Aires','JNB':'Africa/Johannesburg','NBO':'Africa/Nairobi','ADD':'Africa/Addis_Ababa','LOS':'Africa/Lagos','CMN':'Africa/Casablanca','TUN':'Africa/Tunis','ALG':'Africa/Algiers','SYD':'Australia/Sydney','MEL':'Australia/Melbourne','BNE':'Australia/Brisbane','PER':'Australia/Perth','AKL':'Pacific/Auckland'};
+
+let allRows=[],curForm=null;
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+function copyText(t,el){navigator.clipboard.writeText(t).then(()=>{if(!el)return;const o=el.textContent;el.textContent='✓ Copied';el.classList.add('ok');setTimeout(()=>{el.textContent=o;el.classList.remove('ok')},1400);})}
+function copyResult(){const t=document.getElementById('mres-text').textContent;if(t&&t!=='Fill in the fields above and click Generate')navigator.clipboard.writeText(t);}
+
+function buildSections(){
+  const c=document.getElementById('content');let html='';
+  SECTIONS.forEach(s=>{
+    html+=`<div class="section" id="${s.id}">`;
+    const cnt=s.cmds.filter(r=>!r[2]).length;
+    html+=`<div class="sec-hdr"><span class="sec-dot" style="background:${s.color}"></span><span class="sec-title">${s.icon} ${s.title}</span><span class="sec-badge">${cnt} entries</span></div>`;
+    html+=`<table class="ctable"><colgroup><col class="c1"><col class="c2"><col class="c3"></colgroup><tbody>`;
+    s.cmds.forEach((r,i)=>{
+      if(r[2]){html+=`<tr class="header-row"><td colspan="3">${r[0]}</td></tr>`;return;}
+      const rid=`r-${s.id}-${i}`,hf=!!CF[r[0]];
+      html+=`<tr class="cmd-row" id="${rid}" data-cmd="${esc(r[0])}" data-desc="${esc(r[1])}">`;
+      html+=`<td><span class="cmd-box" onclick="copyText(this.textContent.trim(),this)">${esc(r[0])}</span></td>`;
+      html+=`<td><span class="desc">${esc(r[1])}</span></td>`;
+      html+=`<td><div class="btn-wrap">${hf?`<button class="fillbtn" onclick="openForm('${esc(r[0])}')">✏️ Fill</button>`:''}`;
+      html+=`<button class="cpbtn" onclick="copyText('${esc(r[0])}',document.querySelector('#${rid} .cmd-box'))">Copy</button></div></td></tr>`;
+      allRows.push({id:rid,cmd:r[0].toLowerCase(),desc:r[1].toLowerCase()});
+    });
+    html+=`</tbody></table></div>`;
+  });
+  html+=buildTools();
+  c.innerHTML=html;
+}
+
+function buildTools(){return `<div class="section" id="tools">
+<div class="sec-hdr"><span class="sec-dot" style="background:#0891b2"></span><span class="sec-title">🛠️ Interactive Tools</span></div>
+<div class="note">These tools generate the Sabre command AND attempt live results when online. Click any output to copy it.</div>
+<div class="tool-wrap">
+<div class="tool-card"><div class="tool-hdr">⏰ Local Time Lookup</div>
+<div class="tool-label">City Code (3 letters)</div>
+<div class="tool-row"><input id="t-city" class="tinput sm" placeholder="CAI" maxlength="3" oninput="this.value=this.value.toUpperCase()"><button class="tbtn" onclick="getLocalTime()">Get Local Time</button></div>
+<div class="tool-label">Sabre Command</div><div id="t-time-cmd" class="tout" onclick="copyText(this.textContent,this)" title="Click to copy"></div>
+<div class="tool-label" style="margin-top:8px">Local Time</div><div id="t-time-result" class="tout"></div></div>
+<div class="tool-card"><div class="tool-hdr">💱 Currency Converter</div>
+<div class="tool-label">From / Amount / To</div>
+<div class="tool-row"><input id="c-from" class="tinput sm" placeholder="USD" maxlength="3" oninput="this.value=this.value.toUpperCase()"><input id="c-amt" class="tinput md" placeholder="500" type="number" min="0"><input id="c-to" class="tinput sm" placeholder="KWD" maxlength="3" oninput="this.value=this.value.toUpperCase()"><button class="tbtn" onclick="convertCurrency()">Convert</button></div>
+<div class="tool-label">Sabre Command</div><div id="c-cmd" class="tout" onclick="copyText(this.textContent,this)" title="Click to copy"></div>
+<div class="tool-label" style="margin-top:8px">Live Result</div><div id="c-result" class="tout"></div></div></div>
+<div class="tool-wrap">
+<div class="tool-card"><div class="tool-hdr">📅 Date Calculator</div>
+<div class="tool-label">Date + Days to add</div>
+<div class="tool-row"><input id="d-date" class="tinput md" placeholder="15APR" maxlength="6" oninput="this.value=this.value.toUpperCase()"><input id="d-days" class="tinput sm" placeholder="7" type="number"><button class="tbtn" onclick="calcDate()">Calculate</button></div>
+<div class="tool-label">Sabre Command</div><div id="d-cmd" class="tout" onclick="copyText(this.textContent,this)" title="Click to copy"></div>
+<div class="tool-label" style="margin-top:8px">Result</div><div id="d-result" class="tout"></div></div>
+<div class="tool-card"><div class="tool-hdr">🔤 Quick Encode / Decode</div>
+<div class="tool-label">City name or 3-letter code</div>
+<div class="tool-row"><input id="e-input" class="tinput lg" placeholder="LONDON or LON" oninput="encodeHelper(this.value)"></div>
+<div class="tool-label">Sabre Command</div><div id="e-cmd" class="tout" onclick="copyText(this.textContent,this)" title="Click to copy"></div>
+<div class="tool-label" style="margin-top:8px">Description</div><div id="e-result" class="tout"></div></div></div>
+</div>`;}
+
+function openForm(cmdKey){
+  const fid=CF[cmdKey];if(!fid)return;
+  const def=FD[fid];if(!def)return;curForm=def;
+  document.getElementById('mtitle').textContent=def.t;
+  document.getElementById('msub').textContent=def.s||'';
+  document.getElementById('mnote').textContent=def.n||'';
+  const mf=document.getElementById('mfields');
+  mf.innerHTML=def.f.map(f=>{
+    const u=f.u!==false?'style="text-transform:uppercase"':'';
+    if(f.sel){
+      const opts=f.sel.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');
+      return `<div class="mf"><label>${f.l}${f.r?'<span style="color:#dc2626"> *</span>':''}</label><select id="mf-${f.id}">${opts}</select>${f.h?`<div class="hint">${f.h}</div>`:''}</div>`;
+    }
+    return `<div class="mf"><label>${f.l}${f.r?'<span style="color:#dc2626"> *</span>':''}</label><input id="mf-${f.id}" type="text" placeholder="${f.p||''}" ${f.max?`maxlength="${f.max}"`:''} ${u} autocomplete="off">${f.h?`<div class="hint">${f.h}</div>`:''}</div>`;
+  }).join('');
+  document.getElementById('mres-text').textContent='Fill in the fields above and click Generate';
+  document.getElementById('mres').style.background='#1a1a2e';
+  document.getElementById('mres').style.color='#e8e6f8';
+  document.getElementById('gbtn').textContent='⚡ Generate & Copy';
+  document.getElementById('mo').classList.add('show');
+  setTimeout(()=>{mf.querySelector('input,select')?.focus();},100);
+}
+
+function genAndCopy(){
+  if(!curForm)return;
+  const vals={};let ok=true;
+  curForm.f.forEach(f=>{
+    const el=document.getElementById('mf-'+f.id);if(!el)return;
+    let v=el.value.trim();
+    if(f.u!==false)v=v.toUpperCase();
+    if(f.r&&!v){el.style.borderColor='#dc2626';ok=false;}else el.style.borderColor='';
+    vals[f.id]=v;
+  });
+  if(!ok){
+    document.getElementById('mres-text').textContent='⚠️ Please fill in all required fields (marked *)';
+    document.getElementById('mres').style.background='#3d0a0a';
+    document.getElementById('mres').style.color='#f87171';return;
+  }
+  const result=curForm.b(vals);
+  document.getElementById('mres-text').textContent=result;
+  navigator.clipboard.writeText(result).then(()=>{
+    document.getElementById('mres').style.background='#0f3323';
+    document.getElementById('mres').style.color='#7de09e';
+    const btn=document.getElementById('gbtn');
+    btn.textContent='✅ Copied to Clipboard!';
+    setTimeout(()=>{btn.textContent='⚡ Generate & Copy';},2000);
+  }).catch(()=>{
+    document.getElementById('mres').style.background='#2a2000';
+    document.getElementById('mres').style.color='#fde047';
+    document.getElementById('gbtn').textContent='Click the code above to copy';
+    setTimeout(()=>{document.getElementById('gbtn').textContent='⚡ Generate & Copy';},3000);
+  });
+}
+
+function closeModal(){document.getElementById('mo').classList.remove('show');curForm=null;}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+function buildNav(){
+  const nav=document.getElementById('sb-nav');
+  const G=[
+    {l:'Reservations',ids:['signin','names','avail','sell','pnr','email','osi','seats','endpnr','display']},
+    {l:'Modify & Queue',ids:['modify','divide','queue','flightinfo']},
+    {l:'Reference',ids:['encode','atlas','currency','fq']},
+    {l:'Fares & Tickets',ids:['pricing','ticket','void','audit']},
+    {l:'Hotels & Cars',ids:['hotel','cars']},
+    {l:'Interactive Tools',ids:['tools']},
+  ];
+  const allS=[...SECTIONS,{id:'tools',title:'Tools',icon:'🛠️',cmds:[]}];
+  let h='';
+  G.forEach(g=>{
+    h+=`<div class="nav-grp">${g.l}</div>`;
+    g.ids.forEach(id=>{
+      const s=allS.find(x=>x.id===id);if(!s)return;
+      const cnt=s.id==='tools'?'':s.cmds.filter(r=>!r[2]).length;
+      h+=`<div class="nav-item" id="nav-${s.id}" onclick="gotoSec('${s.id}')"><span class="ic">${s.icon||'•'}</span>${s.title}${cnt?`<span class="nc">${cnt}</span>`:''}`;
+      h+=`</div>`;
+    });
+  });
+  nav.innerHTML=h;
+}
+
+function gotoSec(id){
+  document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('on'));
+  document.getElementById('nav-'+id)?.classList.add('on');
+}
+
+function filterNav(q){
+  const v=q.toLowerCase();
+  document.querySelectorAll('.nav-item').forEach(el=>{el.style.display=(!v||el.textContent.toLowerCase().includes(v))?'':'none';});
+}
+
+function doSearch(q){
+  const v=q.trim().toLowerCase();let shown=0;
+  allRows.forEach(r=>{
+    const el=document.getElementById(r.id);if(!el)return;
+    const m=!v||r.cmd.includes(v)||r.desc.includes(v);
+    el.classList.toggle('hide',!m);if(m)shown++;
+  });
+  document.getElementById('res-count').textContent=v?`${shown} of ${allRows.length}`:`${allRows.length} total entries`;
+  SECTIONS.forEach(s=>{const el=document.getElementById(s.id);if(!el)return;el.style.display=(v&&!el.querySelectorAll('.cmd-row:not(.hide)').length)?'none':'';});
+}
+
+const MONTHS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+
+function getLocalTime(){
+  const city=(document.getElementById('t-city').value||'').toUpperCase().trim();
+  const ce=document.getElementById('t-time-cmd'),re=document.getElementById('t-time-result');
+  if(!city||city.length!==3){re.textContent='Enter a 3-letter city code';re.className='tout err';return;}
+  ce.textContent=`T*${city}`;ce.className='tout';
+  const tz=TZ[city];
+  if(tz){re.textContent=`${city} → ${new Intl.DateTimeFormat('en-GB',{timeZone:tz,weekday:'short',year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date())}`;re.className='tout result';}
+  else{re.textContent=`${city} not in local database. Use T*${city} in Sabre.`;re.className='tout';}
+}
+
+let rC={};
+function convertCurrency(){
+  const from=(document.getElementById('c-from').value||'USD').toUpperCase();
+  const amt=parseFloat(document.getElementById('c-amt').value)||100;
+  const to=(document.getElementById('c-to').value||'KWD').toUpperCase();
+  const ce=document.getElementById('c-cmd'),re=document.getElementById('c-result');
+  ce.textContent=`DC‡${from}${amt.toFixed(2)}/${to}`;ce.className='tout';
+  re.textContent='Fetching rates...';re.className='tout';
+  if(rC[from]){applyR(rC[from],from,to,amt,re);return;}
+  fetch(`https://open.er-api.com/v6/latest/${from}`).then(r=>r.json()).then(d=>{
+    if(d.result==='success'){rC[from]=d.rates;applyR(d.rates,from,to,amt,re);}else throw 0;
+  }).catch(()=>{re.textContent='Live rates unavailable. Use the Sabre command shown above.';re.className='tout';});
+}
+function applyR(rates,from,to,amt,el){
+  if(rates[to]){el.textContent=`${amt} ${from} = ${(amt*rates[to]).toFixed(4)} ${to}  (Rate: 1 ${from} = ${rates[to].toFixed(6)} ${to})`;el.className='tout result';}
+  else{el.textContent=`Currency code ${to} not found.`;el.className='tout';}
+}
+
+function calcDate(){
+  const ds=document.getElementById('d-date').value.toUpperCase().trim();
+  const days=parseInt(document.getElementById('d-days').value)||7;
+  document.getElementById('d-cmd').textContent=`T¤${ds}‡${days}`;
+  document.getElementById('d-cmd').className='tout';
+  const m=ds.match(/^(\d{1,2})([A-Z]{3})$/);
+  if(m){const mi=MONTHS.indexOf(m[2]);
+    if(mi>=0){const d=new Date(new Date().getFullYear(),mi,parseInt(m[1]));d.setDate(d.getDate()+days);
+      const re=document.getElementById('d-result');
+      re.textContent=`${ds} + ${days} days = ${String(d.getDate()).padStart(2,'0')}${MONTHS[d.getMonth()]}${d.getFullYear()}`;
+      re.className='tout result';return;}}
+  document.getElementById('d-result').textContent='Enter date as DDMTH (e.g. 15APR)';
+  document.getElementById('d-result').className='tout';
+}
+
+function encodeHelper(v){
+  const val=v.trim().toUpperCase();
+  const ce=document.getElementById('e-cmd'),re=document.getElementById('e-result');
+  if(!val){ce.textContent='';re.textContent='';return;}
+  if(val.length<=2){ce.textContent=`W/*${val}`;re.textContent='Airline code decode';}
+  else if(val.length===3){ce.textContent=`W/*${val}`;re.textContent='Airport / City code decode — or HCCC/'+val+' for country decode';}
+  else{ce.textContent=`W/-CC${val}`;re.textContent='Encoding city name — use W/-AP for airport, W/-AL for airline name';}
+  ce.className='tout';re.className='tout';
+}
+
+buildSections();buildNav();
+document.getElementById('res-count').textContent=`${allRows.length} total entries`;
+
+new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('on'));
+    const ni=document.getElementById('nav-'+e.target.id);
+    if(ni){ni.classList.add('on');ni.scrollIntoView({block:'nearest'});}
+  }});
+},{root:null,rootMargin:'-20% 0px -60% 0px',threshold:0}).observe=((orig)=>function(el){orig.call(this,el);})(IntersectionObserver.prototype.observe);
+document.querySelectorAll('.section').forEach(s=>{
+  new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){
+      document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('on'));
+      const ni=document.getElementById('nav-'+e.target.id);
+      if(ni){ni.classList.add('on');ni.scrollIntoView({block:'nearest'});}
+    }});
+  },{root:null,rootMargin:'-20% 0px -60% 0px',threshold:0}).observe(s);
+});
+setInterval(()=>{const c=(document.getElementById('t-city')?.value||'').toUpperCase();if(c.length===3&&TZ[c]&&document.getElementById('t-time-result')?.className.includes('result'))getLocalTime();},5000);
+</script>
+</body>
+</html>
