@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Currency Converter — Adel's Toolkit</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💱</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0f2044;
+  --navy2:#162d5c;
+  --blue:#1a56db;
+  --blue2:#1e40af;
+  --teal:#0891b2;
+  --green:#059669;
+  --red:#dc2626;
+  --amber:#d97706;
+  --bg:#0a1428;
+  --bg2:#0f1d3a;
+  --card:#162d5c;
+  --card-hover:#1d3a73;
+  --border:rgba(255,255,255,.08);
+  --border-bright:rgba(255,255,255,.16);
+  --border-hover:rgba(59,130,246,.4);
+  --text:#f1f5f9;
+  --muted:#94a3b8;
+  --dim:#64748b;
+  --shadow:0 4px 20px rgba(0,0,0,.3);
+  --shadow-lg:0 12px 40px rgba(26,86,219,.25);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  position:relative;
+  overflow-x:hidden;
+}
+body[dir="rtl"]{font-family:'Cairo','Plus Jakarta Sans',sans-serif}
+
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(26,86,219,.18) 0%, transparent 50%),
+    radial-gradient(circle at 80% 60%, rgba(8,145,178,.15) 0%, transparent 50%),
+    radial-gradient(circle at 50% 90%, rgba(99,102,241,.12) 0%, transparent 50%);
+  pointer-events:none; z-index:0;
+}
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+  background-size:50px 50px;
+  pointer-events:none; z-index:0;
+}
+
+.page{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:32px 20px 48px}
+
+/* Header */
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-icon{width:50px;height:50px;background:linear-gradient(135deg,#10b981 0%,#06b6d4 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 8px 24px rgba(16,185,129,.4)}
+.brand-text h1{font-size:22px;font-weight:800;letter-spacing:-.02em;background:linear-gradient(135deg,#fff 0%,#cbd5e1 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.brand-text p{font-size:12px;color:var(--muted);margin-top:2px;font-weight:500}
+
+.header-right{display:flex;align-items:center;gap:10px}
+.back-link{font-size:12px;color:var(--muted);text-decoration:none;padding:8px 12px;border:1px solid var(--border);border-radius:8px;transition:all .15s;background:rgba(255,255,255,.02)}
+.back-link:hover{color:var(--text);border-color:var(--border-hover);background:rgba(255,255,255,.04)}
+.lang-toggle{display:flex;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;overflow:hidden;font-size:12px}
+.lang-toggle button{padding:7px 12px;background:transparent;border:none;cursor:pointer;font-family:inherit;font-weight:700;color:var(--muted);transition:all .15s}
+.lang-toggle button.active{background:var(--blue);color:#fff}
+.lang-toggle button:not(.active):hover{color:var(--text)}
+
+/* Live status */
+.live-status{display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:10px;margin-bottom:24px;font-size:12.5px;color:var(--muted)}
+.live-status.error{background:rgba(220,38,38,.08);border-color:rgba(220,38,38,.2);color:#fca5a5}
+.live-status.loading{background:rgba(217,119,6,.08);border-color:rgba(217,119,6,.2);color:#fcd34d}
+.live-dot{width:8px;height:8px;background:#10b981;border-radius:50%;box-shadow:0 0 8px rgba(16,185,129,.6);animation:pulse 2s infinite;flex-shrink:0}
+.live-status.error .live-dot{background:#dc2626;box-shadow:0 0 8px rgba(220,38,38,.6);animation:none}
+.live-status.loading .live-dot{background:#d97706;box-shadow:0 0 8px rgba(217,119,6,.6)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.live-status .ts{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;opacity:.7}
+body[dir="rtl"] .live-status .ts{margin-left:0;margin-right:auto}
+
+/* Main converter card */
+.converter{background:linear-gradient(135deg,rgba(22,45,92,.8) 0%,rgba(15,29,58,.8) 100%);border:1px solid var(--border);border-radius:18px;padding:28px;backdrop-filter:blur(10px);box-shadow:var(--shadow-lg);position:relative;overflow:hidden;margin-bottom:24px}
+.converter::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#10b981,#06b6d4)}
+
+.row{display:grid;grid-template-columns:1fr;gap:14px}
+.field{position:relative}
+.field-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.field-input-row{display:grid;grid-template-columns:1fr 160px;gap:10px;align-items:stretch}
+@media (max-width:520px){.field-input-row{grid-template-columns:1fr}}
+.amount-input{width:100%;height:60px;padding:0 18px;background:rgba(0,0,0,.25);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:.02em;outline:none;transition:all .15s}
+.amount-input:focus{border-color:#3b82f6;background:rgba(0,0,0,.35);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.currency-select-wrap{position:relative}
+.currency-select{width:100%;height:60px;padding:0 14px;background:rgba(0,0,0,.25);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-size:14px;font-weight:600;font-family:inherit;outline:none;cursor:pointer;transition:all .15s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D'http%3A//www.w3.org/2000/svg'%20width%3D'12'%20height%3D'8'%20viewBox%3D'0%200%2012%208'%3E%3Cpath%20d%3D'M1%201l5%205%205-5'%20stroke%3D'%2394a3b8'%20stroke-width%3D'1.8'%20fill%3D'none'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+body[dir="rtl"] .currency-select{padding-right:14px;padding-left:36px;background-position:left 14px center}
+.currency-select:focus{border-color:#3b82f6;background-color:rgba(0,0,0,.35);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.currency-select optgroup{background:#0f2044;color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.currency-select option{background:#0f2044;color:var(--text);padding:8px;font-weight:500}
+
+/* Swap button */
+.swap-row{display:flex;justify-content:center;margin:8px 0;position:relative}
+.swap-row::before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:var(--border);z-index:0}
+.swap-btn{position:relative;z-index:1;width:42px;height:42px;border-radius:50%;background:var(--bg2);border:1.5px solid var(--border);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .2s;box-shadow:var(--shadow)}
+.swap-btn:hover{transform:rotate(180deg);border-color:#3b82f6;background:rgba(59,130,246,.1);color:#3b82f6}
+
+/* Result display */
+.result-card{background:linear-gradient(135deg,rgba(16,185,129,.12) 0%,rgba(6,182,212,.08) 100%);border:1px solid rgba(16,185,129,.25);border-radius:14px;padding:24px;margin-top:18px;text-align:center;position:relative;overflow:hidden}
+.result-card::before{content:'';position:absolute;top:-50%;right:-20%;width:200px;height:200px;background:radial-gradient(circle,rgba(16,185,129,.15) 0%,transparent 70%);pointer-events:none}
+.result-label{font-size:10.5px;font-weight:700;color:#34d399;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px}
+.result-amount{font-size:34px;font-weight:800;letter-spacing:-.02em;color:var(--text);font-family:'JetBrains Mono',monospace;line-height:1.1;word-break:break-all}
+.result-amount .num{color:#fff}
+.result-amount .ccy{color:#34d399;margin-left:8px}
+body[dir="rtl"] .result-amount .ccy{margin-left:0;margin-right:8px}
+.result-amount.placeholder{color:var(--dim);font-size:24px}
+.result-rate{font-size:13px;color:var(--muted);margin-top:14px;font-family:'JetBrains Mono',monospace;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.result-rate .live-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);border-radius:100px;font-size:10px;font-weight:700;color:#34d399;text-transform:uppercase;letter-spacing:.05em}
+.result-rate .live-pill::before{content:'';width:5px;height:5px;background:#10b981;border-radius:50%;animation:pulse 2s infinite}
+
+.actions{display:flex;gap:8px;margin-top:18px;justify-content:center;flex-wrap:wrap}
+.action-btn{padding:8px 14px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.action-btn:hover{background:rgba(255,255,255,.08);color:var(--text);border-color:var(--border-hover)}
+
+/* Quick reference card */
+.quick-ref{background:linear-gradient(135deg,rgba(22,45,92,.5) 0%,rgba(15,29,58,.5) 100%);border:1px solid var(--border);border-radius:14px;padding:20px;backdrop-filter:blur(10px)}
+.quick-ref-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.quick-ref-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:6px}
+.quick-ref-base{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);background:rgba(255,255,255,.04);padding:4px 10px;border-radius:6px;border:1px solid var(--border)}
+.quick-ref-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media (max-width:520px){.quick-ref-grid{grid-template-columns:1fr}}
+.quick-ref-item{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:9px;font-size:13px;cursor:pointer;transition:all .15s}
+.quick-ref-item:hover{border-color:var(--border-hover);background:rgba(0,0,0,.3)}
+.quick-ref-item .ccy{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--muted);font-size:11.5px}
+.quick-ref-item .val{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--text)}
+
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:#0f2044;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 12px 32px rgba(0,0,0,.5);border:1px solid var(--border-bright);opacity:0;transition:all .3s;pointer-events:none;z-index:100;max-width:90vw}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+.footer{margin-top:36px;padding-top:24px;border-top:1px solid var(--border);text-align:center;font-size:11.5px;color:var(--muted)}
+.footer a{color:var(--muted);text-decoration:none;transition:color .15s}
+.footer a:hover{color:var(--text)}
+.footer .src{font-family:'JetBrains Mono',monospace;font-size:10.5px;opacity:.7;margin-top:4px}
+
+@media (max-width:520px){
+  .page{padding:20px 14px 40px}
+  .converter{padding:20px 18px}
+  .brand-text h1{font-size:18px}
+  .result-amount{font-size:26px}
+  .amount-input{font-size:20px;height:54px}
+  .currency-select{height:54px}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="header">
+    <div class="brand">
+      <div class="brand-icon">💱</div>
+      <div class="brand-text">
+        <h1 data-i18n="title">Currency Converter</h1>
+        <p data-i18n="subtitle">Live rates · updated daily</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <a href="index.html" class="back-link" data-i18n="back">← Toolkit</a>
+      <div class="lang-toggle">
+        <button class="active" data-lang="en" onclick="setLang('en')">🇬🇧 EN</button>
+        <button data-lang="ar" onclick="setLang('ar')">🇸🇦 AR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live status -->
+  <div class="live-status loading" id="status">
+    <span class="live-dot"></span>
+    <span id="status-text" data-i18n="loadingRates">Loading live rates...</span>
+    <span class="ts" id="status-ts"></span>
+  </div>
+
+  <!-- Main converter -->
+  <div class="converter">
+    <div class="row">
+      <div class="field">
+        <div class="field-label" data-i18n="fromLabel">💵 From (you have)</div>
+        <div class="field-input-row">
+          <input type="text" class="amount-input" id="amount-from" value="100" inputmode="decimal" autocomplete="off">
+          <div class="currency-select-wrap">
+            <select class="currency-select" id="ccy-from"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="swap-row">
+        <button class="swap-btn" id="swap-btn" title="Swap currencies">⇅</button>
+      </div>
+
+      <div class="field">
+        <div class="field-label" data-i18n="toLabel">🌍 To (customer pays)</div>
+        <div class="field-input-row">
+          <input type="text" class="amount-input" id="amount-to" value="" inputmode="decimal" autocomplete="off">
+          <div class="currency-select-wrap">
+            <select class="currency-select" id="ccy-to"></select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="result-card">
+      <div class="result-label">
+        <span data-i18n="resultLabel">Conversion result</span>
+      </div>
+      <div class="result-amount" id="result-amount">
+        <span class="placeholder" data-i18n="enterAmount">Enter amount to convert</span>
+      </div>
+      <div class="result-rate" id="result-rate"></div>
+      <div class="actions">
+        <button class="action-btn" id="copy-btn">📋 <span data-i18n="copyResult">Copy result</span></button>
+        <button class="action-btn" id="copy-rate-btn">💱 <span data-i18n="copyRate">Copy rate only</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick reference grid -->
+  <div class="quick-ref">
+    <div class="quick-ref-head">
+      <div class="quick-ref-title" data-i18n="quickRefTitle">⚡ Quick reference</div>
+      <div class="quick-ref-base" id="quick-ref-base">1 USD =</div>
+    </div>
+    <div class="quick-ref-grid" id="quick-ref-grid"></div>
+  </div>
+
+  <div class="footer">
+    <div data-i18n="footerText">Built by Adel · Cairo, Egypt 🇪🇬</div>
+    <div class="src">
+      <span data-i18n="sourceLabel">Rate source:</span>
+      <a href="https://www.exchangerate-api.com" target="_blank" rel="noopener">ExchangeRate-API</a>
+      ·
+      <a href="https://frankfurter.dev" target="_blank" rel="noopener">Frankfurter (ECB)</a>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// CURRENCIES
+// ─────────────────────────────────────────────────────────────
+const PINNED = ['USD','EUR','EGP','AED','SAR','LBP'];
+
+const CURRENCIES = [
+  // Major
+  ['USD','US Dollar','🇺🇸'], ['EUR','Euro','🇪🇺'], ['GBP','British Pound','🇬🇧'],
+  ['JPY','Japanese Yen','🇯🇵'], ['CHF','Swiss Franc','🇨🇭'], ['CAD','Canadian Dollar','🇨🇦'],
+  ['AUD','Australian Dollar','🇦🇺'], ['CNY','Chinese Yuan','🇨🇳'], ['HKD','Hong Kong Dollar','🇭🇰'],
+  ['SGD','Singapore Dollar','🇸🇬'], ['NZD','New Zealand Dollar','🇳🇿'], ['SEK','Swedish Krona','🇸🇪'],
+  ['NOK','Norwegian Krone','🇳🇴'], ['DKK','Danish Krone','🇩🇰'],
+  // Middle East
+  ['EGP','Egyptian Pound','🇪🇬'], ['AED','UAE Dirham','🇦🇪'], ['SAR','Saudi Riyal','🇸🇦'],
+  ['QAR','Qatari Riyal','🇶🇦'], ['KWD','Kuwaiti Dinar','🇰🇼'], ['BHD','Bahraini Dinar','🇧🇭'],
+  ['OMR','Omani Rial','🇴🇲'], ['JOD','Jordanian Dinar','🇯🇴'], ['LBP','Lebanese Pound','🇱🇧'],
+  ['ILS','Israeli Shekel','🇮🇱'], ['TRY','Turkish Lira','🇹🇷'], ['IRR','Iranian Rial','🇮🇷'],
+  ['IQD','Iraqi Dinar','🇮🇶'], ['SYP','Syrian Pound','🇸🇾'], ['YER','Yemeni Rial','🇾🇪'],
+  // Africa
+  ['MAD','Moroccan Dirham','🇲🇦'], ['TND','Tunisian Dinar','🇹🇳'], ['DZD','Algerian Dinar','🇩🇿'],
+  ['ZAR','South African Rand','🇿🇦'], ['NGN','Nigerian Naira','🇳🇬'], ['KES','Kenyan Shilling','🇰🇪'],
+  ['ETB','Ethiopian Birr','🇪🇹'], ['SDG','Sudanese Pound','🇸🇩'],
+  // Asia
+  ['INR','Indian Rupee','🇮🇳'], ['PKR','Pakistani Rupee','🇵🇰'], ['BDT','Bangladeshi Taka','🇧🇩'],
+  ['LKR','Sri Lankan Rupee','🇱🇰'], ['THB','Thai Baht','🇹🇭'], ['MYR','Malaysian Ringgit','🇲🇾'],
+  ['IDR','Indonesian Rupiah','🇮🇩'], ['PHP','Philippine Peso','🇵🇭'], ['VND','Vietnamese Dong','🇻🇳'],
+  ['KRW','South Korean Won','🇰🇷'], ['TWD','Taiwan Dollar','🇹🇼'],
+  // Americas
+  ['MXN','Mexican Peso','🇲🇽'], ['BRL','Brazilian Real','🇧🇷'], ['ARS','Argentine Peso','🇦🇷'],
+  ['CLP','Chilean Peso','🇨🇱'], ['COP','Colombian Peso','🇨🇴'], ['PEN','Peruvian Sol','🇵🇪'],
+  // Europe
+  ['PLN','Polish Zloty','🇵🇱'], ['CZK','Czech Koruna','🇨🇿'], ['HUF','Hungarian Forint','🇭🇺'],
+  ['RON','Romanian Leu','🇷🇴'], ['BGN','Bulgarian Lev','🇧🇬'], ['UAH','Ukrainian Hryvnia','🇺🇦'],
+  ['RUB','Russian Ruble','🇷🇺'], ['ISK','Icelandic Krona','🇮🇸'],
+];
+
+const CURRENCY_AR_NAMES = {
+  USD:'دولار أمريكي', EUR:'يورو', GBP:'جنيه إسترليني', JPY:'ين ياباني', CHF:'فرنك سويسري',
+  CAD:'دولار كندي', AUD:'دولار أسترالي', CNY:'يوان صيني', HKD:'دولار هونغ كونغ',
+  SGD:'دولار سنغافوري', NZD:'دولار نيوزيلندي', SEK:'كرونا سويدية', NOK:'كرونا نرويجية',
+  DKK:'كرونا دنماركية', EGP:'جنيه مصري', AED:'درهم إماراتي', SAR:'ريال سعودي',
+  QAR:'ريال قطري', KWD:'دينار كويتي', BHD:'دينار بحريني', OMR:'ريال عماني',
+  JOD:'دينار أردني', LBP:'ليرة لبنانية', ILS:'شيكل إسرائيلي', TRY:'ليرة تركية',
+  IRR:'ريال إيراني', IQD:'دينار عراقي', SYP:'ليرة سورية', YER:'ريال يمني',
+  MAD:'درهم مغربي', TND:'دينار تونسي', DZD:'دينار جزائري', ZAR:'راند جنوب أفريقي',
+  NGN:'نايرا نيجيري', KES:'شلن كيني', ETB:'بير إثيوبي', SDG:'جنيه سوداني',
+  INR:'روبية هندية', PKR:'روبية باكستانية', BDT:'تاكا بنغلاديشية', LKR:'روبية سريلانكية',
+  THB:'بات تايلاندي', MYR:'رينغيت ماليزي', IDR:'روبية إندونيسية', PHP:'بيزو فلبيني',
+  VND:'دونغ فيتنامي', KRW:'وون كوري', TWD:'دولار تايواني', MXN:'بيزو مكسيكي',
+  BRL:'ريال برازيلي', ARS:'بيزو أرجنتيني', CLP:'بيزو تشيلي', COP:'بيزو كولومبي',
+  PEN:'سول بيروفي', PLN:'زلوتي بولندي', CZK:'كرونا تشيكية', HUF:'فورنت هنغاري',
+  RON:'ليو روماني', BGN:'ليف بلغاري', UAH:'هريفنيا أوكرانية', RUB:'روبل روسي',
+  ISK:'كرونا أيسلندية',
+};
+
+// ─────────────────────────────────────────────────────────────
+// I18N
+// ─────────────────────────────────────────────────────────────
+const I18N = {
+  en: {
+    title:'Currency Converter',
+    subtitle:'Live rates · updated daily',
+    back:'← Toolkit',
+    loadingRates:'Loading live rates...',
+    ratesLive:'✓ Live rates loaded',
+    ratesError:'⚠ Could not fetch live rates — using cached values',
+    ratesCached:'Using cached rates from',
+    fromLabel:'💵 From (you have)',
+    toLabel:'🌍 To (customer pays)',
+    resultLabel:'Conversion result',
+    enterAmount:'Enter amount to convert',
+    copyResult:'Copy result',
+    copyRate:'Copy rate only',
+    quickRefTitle:'⚡ Quick reference',
+    footerText:'Built by Adel · Cairo, Egypt 🇪🇬',
+    sourceLabel:'Rate source:',
+    liveBadge:'LIVE',
+    today:'today',
+    copied:'✓ Copied to clipboard',
+    pinned:'─── My currencies ───',
+    other:'─── All other currencies ───',
+    locale:'en-GB',
+  },
+  ar: {
+    title:'محوّل العملات',
+    subtitle:'أسعار حية · تُحدَّث يومياً',
+    back:'← الأدوات',
+    loadingRates:'جاري تحميل الأسعار الحية...',
+    ratesLive:'✓ تم تحميل الأسعار الحية',
+    ratesError:'⚠ تعذّر جلب الأسعار الحية — استخدام القيم المحفوظة',
+    ratesCached:'استخدام أسعار محفوظة من',
+    fromLabel:'💵 من (لديك)',
+    toLabel:'🌍 إلى (العميل يدفع)',
+    resultLabel:'نتيجة التحويل',
+    enterAmount:'أدخل المبلغ للتحويل',
+    copyResult:'نسخ النتيجة',
+    copyRate:'نسخ السعر فقط',
+    quickRefTitle:'⚡ مرجع سريع',
+    footerText:'صنع بواسطة عادل · القاهرة، مصر 🇪🇬',
+    sourceLabel:'مصدر السعر:',
+    liveBadge:'حي',
+    today:'اليوم',
+    copied:'✓ تم النسخ',
+    pinned:'─── عملاتي ───',
+    other:'─── جميع العملات الأخرى ───',
+    locale:'ar-EG',
+  }
+};
+
+let currentLang = localStorage.getItem('adel-tools-lang') || 'en';
+function tA(key) { return (I18N[currentLang] && I18N[currentLang][key]) || key; }
+
+// ─────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────
+let rates = {}; // base USD
+let ratesDate = null;
+let ratesSource = null;
+const CACHE_KEY = 'adel-currency-cache-v1';
+const CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
+
+// ─────────────────────────────────────────────────────────────
+// FETCH RATES (with fallback)
+// ─────────────────────────────────────────────────────────────
+async function fetchLiveRates() {
+  const status = document.getElementById('status');
+  const statusText = document.getElementById('status-text');
+  status.className = 'live-status loading';
+  statusText.textContent = tA('loadingRates');
+
+  // Try to use cached rates if fresh enough
+  const cached = loadCache();
+  if (cached && (Date.now() - cached.fetchedAt) < CACHE_TTL) {
+    rates = cached.rates;
+    ratesDate = cached.date;
+    ratesSource = cached.source + ' (cached)';
+    setLiveStatus(true, true);
+    convert();
+    renderQuickRef();
+    return;
+  }
+
+  // Try ExchangeRate-API first (open access endpoint, no key needed for /latest/USD)
+  try {
+    const r = await fetch('https://open.er-api.com/v6/latest/USD', { cache: 'no-store' });
+    if (r.ok) {
+      const data = await r.json();
+      if (data && data.result === 'success' && data.rates) {
+        rates = data.rates;
+        ratesDate = data.time_last_update_utc || new Date().toUTCString();
+        ratesSource = 'ExchangeRate-API';
+        saveCache();
+        setLiveStatus(true, false);
+        convert();
+        renderQuickRef();
+        return;
+      }
+    }
+  } catch (e) { console.log('ExchangeRate-API failed:', e); }
+
+  // Fallback: Frankfurter (ECB rates, EUR base — convert to USD base)
+  try {
+    const r = await fetch('https://api.frankfurter.dev/v1/latest?base=USD', { cache: 'no-store' });
+    if (r.ok) {
+      const data = await r.json();
+      if (data && data.rates) {
+        rates = { USD: 1, ...data.rates };
+        ratesDate = data.date ? new Date(data.date).toUTCString() : new Date().toUTCString();
+        ratesSource = 'Frankfurter (ECB)';
+        saveCache();
+        setLiveStatus(true, false);
+        convert();
+        renderQuickRef();
+        return;
+      }
+    }
+  } catch (e) { console.log('Frankfurter failed:', e); }
+
+  // Both failed — use stale cache or hardcoded fallback
+  if (cached) {
+    rates = cached.rates;
+    ratesDate = cached.date;
+    ratesSource = cached.source + ' (stale cache)';
+    setLiveStatus(false, true);
+  } else {
+    // Hardcoded last-resort fallback (Apr 2026 approximate)
+    rates = FALLBACK_RATES;
+    ratesDate = 'approx. April 2026';
+    ratesSource = 'offline fallback';
+    setLiveStatus(false, true);
+  }
+  convert();
+  renderQuickRef();
+}
+
+const FALLBACK_RATES = {
+  USD:1, EUR:0.92, GBP:0.79, JPY:155, CHF:0.88, CAD:1.37, AUD:1.52, CNY:7.25, HKD:7.81,
+  SGD:1.35, NZD:1.65, SEK:10.6, NOK:10.8, DKK:6.85, EGP:50.2, AED:3.6725, SAR:3.75,
+  QAR:3.64, KWD:0.307, BHD:0.376, OMR:0.385, JOD:0.708, LBP:89500, ILS:3.7, TRY:32.5,
+  IRR:42000, IQD:1310, SYP:13000, YER:250, MAD:9.95, TND:3.12, DZD:135, ZAR:18.5,
+  NGN:1500, KES:130, ETB:115, SDG:600, INR:83.5, PKR:278, BDT:117, LKR:300, THB:36,
+  MYR:4.7, IDR:16000, PHP:57, VND:25000, KRW:1370, TWD:32, MXN:17.2, BRL:5.05,
+  ARS:870, CLP:920, COP:4100, PEN:3.75, PLN:4.0, CZK:23.2, HUF:362, RON:4.6, BGN:1.8,
+  UAH:39, RUB:92, ISK:138,
+};
+
+function setLiveStatus(success, fromCache) {
+  const status = document.getElementById('status');
+  const statusText = document.getElementById('status-text');
+  const ts = document.getElementById('status-ts');
+  if (success) {
+    status.className = 'live-status';
+    statusText.textContent = tA('ratesLive');
+  } else {
+    status.className = 'live-status error';
+    statusText.textContent = tA('ratesError');
+  }
+  // Show timestamp
+  let dateStr = '';
+  if (ratesDate) {
+    try {
+      const d = new Date(ratesDate);
+      if (!isNaN(d)) {
+        dateStr = new Intl.DateTimeFormat(tA('locale'), {
+          day:'2-digit', month:'short', year:'numeric',
+          hour:'2-digit', minute:'2-digit', timeZone:'UTC'
+        }).format(d) + ' UTC';
+      } else { dateStr = ratesDate; }
+    } catch (e) { dateStr = ratesDate; }
+  }
+  ts.textContent = dateStr ? `${ratesSource} · ${dateStr}` : ratesSource || '';
+}
+
+function saveCache() {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({
+      rates, date: ratesDate, source: ratesSource, fetchedAt: Date.now()
+    }));
+  } catch (e) {}
+}
+function loadCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+
+// ─────────────────────────────────────────────────────────────
+// POPULATE SELECTS
+// ─────────────────────────────────────────────────────────────
+function populateSelects() {
+  const fromSel = document.getElementById('ccy-from');
+  const toSel = document.getElementById('ccy-to');
+  const prevFrom = fromSel.value || 'USD';
+  const prevTo = toSel.value || 'EGP';
+
+  function buildOptions() {
+    let html = '';
+    // Pinned group
+    html += `<optgroup label="${tA('pinned')}">`;
+    PINNED.forEach(code => {
+      const c = CURRENCIES.find(x => x[0] === code);
+      if (c) html += renderOption(c);
+    });
+    html += `</optgroup>`;
+    // All others
+    html += `<optgroup label="${tA('other')}">`;
+    CURRENCIES.forEach(c => {
+      if (!PINNED.includes(c[0])) html += renderOption(c);
+    });
+    html += `</optgroup>`;
+    return html;
+  }
+
+  function renderOption(c) {
+    const [code, nameEn, flag] = c;
+    const name = currentLang === 'ar' ? (CURRENCY_AR_NAMES[code] || nameEn) : nameEn;
+    return `<option value="${code}">${flag} ${code} — ${name}</option>`;
+  }
+
+  fromSel.innerHTML = buildOptions();
+  toSel.innerHTML = buildOptions();
+  fromSel.value = prevFrom;
+  toSel.value = prevTo;
+}
+
+// ─────────────────────────────────────────────────────────────
+// CONVERSION
+// ─────────────────────────────────────────────────────────────
+function getRate(from, to) {
+  if (!rates || !rates[from] || !rates[to]) return null;
+  // rates are vs USD (base). To convert from→to: amt * (rates[to] / rates[from])
+  return rates[to] / rates[from];
+}
+
+function fmtMoney(num, currency) {
+  if (!isFinite(num)) return '—';
+  const decimals = (currency === 'JPY' || currency === 'KRW' || currency === 'VND' || currency === 'IDR' || currency === 'LBP' || currency === 'IRR') ? 0 : 2;
+  try {
+    return new Intl.NumberFormat(tA('locale'), {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    }).format(num);
+  } catch (e) {
+    return num.toFixed(decimals);
+  }
+}
+
+function fmtRate(num) {
+  // For rate display: show enough precision
+  if (!isFinite(num)) return '—';
+  if (num >= 1000) return num.toFixed(0);
+  if (num >= 100) return num.toFixed(2);
+  if (num >= 1) return num.toFixed(4);
+  return num.toFixed(6);
+}
+
+function convert() {
+  const amt = parseFloat(document.getElementById('amount-from').value.replace(/,/g, ''));
+  const from = document.getElementById('ccy-from').value;
+  const to = document.getElementById('ccy-to').value;
+  const resultAmt = document.getElementById('result-amount');
+  const resultRate = document.getElementById('result-rate');
+  const amountTo = document.getElementById('amount-to');
+
+  if (!amt || amt <= 0 || isNaN(amt)) {
+    resultAmt.innerHTML = `<span class="placeholder">${tA('enterAmount')}</span>`;
+    resultRate.innerHTML = '';
+    amountTo.value = '';
+    return;
+  }
+
+  const rate = getRate(from, to);
+  if (!rate) {
+    resultAmt.innerHTML = `<span class="placeholder">—</span>`;
+    resultRate.innerHTML = '';
+    amountTo.value = '';
+    return;
+  }
+
+  const result = amt * rate;
+  resultAmt.innerHTML = `<span class="num">${fmtMoney(result, to)}</span><span class="ccy">${to}</span>`;
+  amountTo.value = fmtMoney(result, to);
+
+  // Live rate line: 1 USD = 50.20 EGP · LIVE
+  const livePill = `<span class="live-pill">${tA('liveBadge')} · ${tA('today')}</span>`;
+  resultRate.innerHTML = `1 ${from} = <strong style="color:var(--text)">${fmtRate(rate)}</strong> ${to} ${livePill}`;
+}
+
+// reverse conversion when user types in "to" field
+function reverseConvert() {
+  const amt = parseFloat(document.getElementById('amount-to').value.replace(/,/g, ''));
+  const from = document.getElementById('ccy-from').value;
+  const to = document.getElementById('ccy-to').value;
+  if (!amt || amt <= 0 || isNaN(amt)) return;
+  const rate = getRate(to, from);
+  if (!rate) return;
+  document.getElementById('amount-from').value = fmtMoney(amt * rate, from).replace(/,/g, '');
+  convert();
+}
+
+// ─────────────────────────────────────────────────────────────
+// QUICK REFERENCE GRID
+// ─────────────────────────────────────────────────────────────
+function renderQuickRef() {
+  const from = document.getElementById('ccy-from').value;
+  const grid = document.getElementById('quick-ref-grid');
+  document.getElementById('quick-ref-base').textContent = `1 ${from} =`;
+  const others = PINNED.filter(c => c !== from);
+  let html = '';
+  others.forEach(code => {
+    const rate = getRate(from, code);
+    if (rate) {
+      const c = CURRENCIES.find(x => x[0] === code);
+      html += `<div class="quick-ref-item" onclick="setTo('${code}')">
+        <span class="ccy">${c[2]} ${code}</span>
+        <span class="val">${fmtRate(rate)}</span>
+      </div>`;
+    }
+  });
+  grid.innerHTML = html;
+}
+
+function setTo(code) {
+  document.getElementById('ccy-to').value = code;
+  convert();
+  renderQuickRef();
+}
+
+// ─────────────────────────────────────────────────────────────
+// COPY BUTTONS
+// ─────────────────────────────────────────────────────────────
+function copyResult() {
+  const amt = parseFloat(document.getElementById('amount-from').value.replace(/,/g, ''));
+  const from = document.getElementById('ccy-from').value;
+  const to = document.getElementById('ccy-to').value;
+  const rate = getRate(from, to);
+  if (!amt || !rate) return showToast(tA('enterAmount'));
+  const result = amt * rate;
+  const text = `${fmtMoney(amt, from)} ${from} = ${fmtMoney(result, to)} ${to}\n(1 ${from} = ${fmtRate(rate)} ${to} · ${tA('today')})`;
+  navigator.clipboard.writeText(text).then(() => showToast(tA('copied')));
+}
+
+function copyRate() {
+  const from = document.getElementById('ccy-from').value;
+  const to = document.getElementById('ccy-to').value;
+  const rate = getRate(from, to);
+  if (!rate) return;
+  const text = `1 ${from} = ${fmtRate(rate)} ${to}`;
+  navigator.clipboard.writeText(text).then(() => showToast(tA('copied')));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ─────────────────────────────────────────────────────────────
+// LANGUAGE
+// ─────────────────────────────────────────────────────────────
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('adel-tools-lang', lang);
+  document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.documentElement.lang = lang;
+  document.querySelectorAll('.lang-toggle button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const v = I18N[lang][el.dataset.i18n];
+    if (v !== undefined) el.textContent = v;
+  });
+  populateSelects();
+  setLiveStatus(!!Object.keys(rates).length, ratesSource && ratesSource.includes('cache'));
+  convert();
+  renderQuickRef();
+}
+
+// ─────────────────────────────────────────────────────────────
+// EVENT LISTENERS
+// ─────────────────────────────────────────────────────────────
+document.getElementById('amount-from').addEventListener('input', convert);
+document.getElementById('amount-to').addEventListener('input', reverseConvert);
+document.getElementById('ccy-from').addEventListener('change', () => { convert(); renderQuickRef(); });
+document.getElementById('ccy-to').addEventListener('change', () => { convert(); renderQuickRef(); });
+document.getElementById('swap-btn').addEventListener('click', () => {
+  const f = document.getElementById('ccy-from');
+  const t = document.getElementById('ccy-to');
+  const tmp = f.value; f.value = t.value; t.value = tmp;
+  convert();
+  renderQuickRef();
+});
+document.getElementById('copy-btn').addEventListener('click', copyResult);
+document.getElementById('copy-rate-btn').addEventListener('click', copyRate);
+
+// Block non-numeric input but allow decimals
+document.getElementById('amount-from').addEventListener('keypress', e => {
+  if (!/[0-9.,]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Tab') e.preventDefault();
+});
+document.getElementById('amount-to').addEventListener('keypress', e => {
+  if (!/[0-9.,]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Tab') e.preventDefault();
+});
+
+// ─────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────
+populateSelects();
+setLang(currentLang);
+fetchLiveRates();
+</script>
+
+</body>
+</html>

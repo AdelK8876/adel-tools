@@ -1,6 +1,6 @@
 # 🛠️ Adel's Toolkit
 
-A personal collection of 11 productivity tools for everyday work.
+A personal collection of 12 productivity tools for everyday work.
 
 **Live URL:** [https://adelk8876.github.io/adel-tools/](https://adelk8876.github.io/adel-tools/)
 
@@ -14,6 +14,7 @@ A personal collection of 11 productivity tools for everyday work.
 | ✈️ **Flight Calculator** | Distance, duration, arrival time, customer-ready emails |
 | 💬 **Canned Responses** | Ready-to-use professional reply templates |
 | 🕌 **Shift & Prayer Times** | Schedule and prayer times with alarms |
+| 💱 **Currency Converter** | Live exchange rates for 60+ currencies |
 
 ### 🖥️ Airline & GDS Tools
 | Tool | Description |
@@ -39,6 +40,7 @@ A personal collection of 11 productivity tools for everyday work.
 - **Offline-capable** — Once loaded, works without internet
 - **Privacy-first** — All data stored locally in your browser
 - **Auto-timezone** — Dashboard clock follows your current location
+- **Live data** — Currency converter pulls real-time exchange rates
 - **Mobile-friendly** — Works on phone, tablet, and desktop
 
 ---
@@ -48,5 +50,6 @@ A personal collection of 11 productivity tools for everyday work.
 This toolkit is a personal project, built and owned by Adel.
 
 **Author:** Adel  
+**Version:** 1.1  
 **Hosting:** GitHub Pages (free)  
 **License:** Personal use
