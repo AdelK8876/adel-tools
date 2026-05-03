@@ -432,6 +432,13 @@ const DEFAULT_AIRLINES = [
     first:   { pieces:2, weight:50, cabin:15, excess_kg:35, extra_piece:200, sports:200 },
   },
   {
+    iata:'ME', name:'Middle East Airlines (MEA)', system:'hybrid',
+    economy: { pieces:1, weight:23, cabin:7, excess_kg:20, extra_piece:130, sports:160 },
+    premium: { pieces:2, weight:23, cabin:7, excess_kg:20, extra_piece:130, sports:160 },
+    business:{ pieces:2, weight:32, cabin:12, excess_kg:30, extra_piece:180, sports:200 },
+    first:   { pieces:3, weight:32, cabin:12, excess_kg:30, extra_piece:200, sports:200 },
+  },
+  {
     iata:'SV', name:'Saudia', system:'piece',
     economy: { pieces:2, weight:23, cabin:7, excess_kg:30, extra_piece:150, sports:200 },
     premium: { pieces:2, weight:23, cabin:7, excess_kg:30, extra_piece:150, sports:200 },
@@ -461,25 +468,119 @@ const DEFAULT_AIRLINES = [
   },
 ];
 
-const STORAGE_KEY = 'adel-baggage-rules-v1';
+// ── SHARED STORAGE: reads master airline list from Airline Directory ──
+const AIRLINE_DIRECTORY_KEY = 'adel-airline-directory-v1';   // shared with Airline Directory
+const STORAGE_KEY = 'adel-baggage-rules-v3';                  // baggage rules only (keyed by IATA)
+const OLD_STORAGE_KEYS = ['adel-baggage-rules-v1', 'adel-baggage-rules-v2'];
 let airlines = [];
 
 function loadAirlines() {
+  // STEP 1: Read master airline list from Airline Directory's storage
+  let directoryAirlines = [];
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length) {
-        airlines = parsed;
-        return;
-      }
+    const raw = localStorage.getItem(AIRLINE_DIRECTORY_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length) directoryAirlines = parsed;
     }
   } catch (e) {}
-  airlines = JSON.parse(JSON.stringify(DEFAULT_AIRLINES));
-  saveAirlines();
+
+  // STEP 2: Read saved baggage rules (keyed by IATA, e.g. {MS: {economy:..., business:...}, ...})
+  let savedRules = {};
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) savedRules = parsed;
+    }
+  } catch (e) {}
+
+  // STEP 2b: Migrate old format (array of full airline objects) → new format (rules keyed by IATA)
+  if (Object.keys(savedRules).length === 0) {
+    for (const oldKey of OLD_STORAGE_KEYS) {
+      try {
+        const raw = localStorage.getItem(oldKey);
+        if (!raw) continue;
+        const oldList = JSON.parse(raw);
+        if (Array.isArray(oldList)) {
+          oldList.forEach(a => {
+            if (a.iata) {
+              savedRules[a.iata] = {
+                system: a.system || 'weight',
+                economy: a.economy, premium: a.premium,
+                business: a.business, first: a.first,
+              };
+            }
+          });
+          localStorage.removeItem(oldKey);
+        }
+      } catch (e) {}
+    }
+    if (Object.keys(savedRules).length) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRules));
+    }
+  }
+
+  // STEP 3: Build the airlines list — merge directory airlines with baggage rules
+  const merged = [];
+  const addedIatas = new Set();
+
+  // Priority A: airlines from Airline Directory (master list)
+  directoryAirlines.forEach(da => {
+    if (!da.iata || addedIatas.has(da.iata)) return;
+    const def = DEFAULT_AIRLINES.find(d => d.iata === da.iata);
+    const saved = savedRules[da.iata];
+    const airline = {
+      iata: da.iata,
+      name: da.name || (def ? def.name : da.iata),
+      system: (saved && saved.system) || (def && def.system) || 'weight',
+      economy: (saved && saved.economy) || (def && def.economy) || makeEmptyRules('economy'),
+      premium: (saved && saved.premium) || (def && def.premium) || makeEmptyRules('premium'),
+      business: (saved && saved.business) || (def && def.business) || makeEmptyRules('business'),
+      first: (saved && saved.first) || (def && def.first) || makeEmptyRules('first'),
+    };
+    merged.push(airline);
+    addedIatas.add(da.iata);
+  });
+
+  // Priority B: any DEFAULT airlines not in directory yet (fallback for first-time users)
+  DEFAULT_AIRLINES.forEach(def => {
+    if (addedIatas.has(def.iata)) return;
+    const saved = savedRules[def.iata];
+    merged.push({
+      iata: def.iata,
+      name: def.name,
+      system: (saved && saved.system) || def.system,
+      economy: (saved && saved.economy) || def.economy,
+      premium: (saved && saved.premium) || def.premium,
+      business: (saved && saved.business) || def.business,
+      first: (saved && saved.first) || def.first,
+    });
+    addedIatas.add(def.iata);
+  });
+
+  airlines = merged;
 }
+
+function makeEmptyRules(cabin) {
+  // Sensible default rules for newly-added airlines (user can customize via ⚙️ Edit Rules)
+  if (cabin === 'business' || cabin === 'first') {
+    return { pieces: 2, weight: 32, cabin: 12, excess_kg: 25, extra_piece: 150, sports: 175 };
+  }
+  return { pieces: 1, weight: 23, cabin: 7, excess_kg: 20, extra_piece: 100, sports: 150 };
+}
+
 function saveAirlines() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(airlines)); } catch (e) {}
+  // Save ONLY baggage rules (keyed by IATA) — airline list belongs to Airline Directory
+  const rules = {};
+  airlines.forEach(a => {
+    rules[a.iata] = {
+      system: a.system,
+      economy: a.economy, premium: a.premium,
+      business: a.business, first: a.first,
+    };
+  });
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(rules)); } catch (e) {}
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -995,6 +1096,34 @@ loadRates();
 populateAirlines();
 initialBags();
 setLang(currentLang);
+
+// Auto-refresh when window regains focus (e.g. after user adds airline in Airline Directory tab)
+window.addEventListener('focus', () => {
+  const prevIata = document.getElementById('airline').value;
+  const prevCount = airlines.length;
+  loadAirlines();
+  if (airlines.length !== prevCount) {
+    populateAirlines();
+    if (airlines.find(a => a.iata === prevIata)) {
+      document.getElementById('airline').value = prevIata;
+    }
+    renderAllowance(); renderBags(); renderResult();
+    showToast('✓ Airline list refreshed');
+  }
+});
+
+// Also listen for storage events (when another tab modifies airlines)
+window.addEventListener('storage', (e) => {
+  if (e.key === AIRLINE_DIRECTORY_KEY) {
+    const prevIata = document.getElementById('airline').value;
+    loadAirlines();
+    populateAirlines();
+    if (airlines.find(a => a.iata === prevIata)) {
+      document.getElementById('airline').value = prevIata;
+    }
+    renderAllowance(); renderBags(); renderResult();
+  }
+});
 </script>
 
 </body>

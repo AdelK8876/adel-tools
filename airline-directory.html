@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Airline Directory — Wego Tools</title>
+<title>Airline Directory — Adel's Toolkit</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -86,6 +86,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .pill-lcc{background:#fef3c7;color:#92400e}
 .pill-hub{background:#f1f5f9;color:#475569;font-family:'JetBrains Mono',monospace;text-transform:none;letter-spacing:0}
 .pill-alliance{background:#ede9fe;color:#5b21b6}
+.pill-wfra{background:#dcfce7;color:#166534;font-weight:700}
+.pill-wfra::before{content:'✓ '}
+.ac-noshow{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;margin-top:8px;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;font-size:11.5px;color:#78350f;line-height:1.4}
+.ac-noshow .icon{flex-shrink:0;margin-top:1px}
+.ac-noshow .ref{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#92400e;background:#fde68a;padding:1px 6px;border-radius:3px;white-space:nowrap}
 .ac-info{padding:10px 16px 14px 18px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:5px;border-top:1px solid var(--border);background:#fafbfc}
 .ac-info-row{display:flex;align-items:center;gap:8px}
 .ac-info-row .icon{flex-shrink:0;width:14px;text-align:center;font-size:12.5px}
@@ -181,7 +186,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 <aside id="sidebar">
   <div id="sb-head">
     <div class="logo"><span>✈</span> Airline Directory</div>
-    <div class="sub">Wego · Quick Reference</div>
+    <div class="sub">Adel's Toolkit · Quick Reference</div>
   </div>
   <nav id="sb-nav" id="nav-container"></nav>
 </aside>
@@ -322,10 +327,56 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 <div class="toast" id="toast"></div>
 
 <script>
-const STORAGE_KEY = 'wego_airline_directory_v1';
+const STORAGE_KEY = 'adel-airline-directory-v1';
+const OLD_STORAGE_KEYS = ['wego_airline_directory_v1']; // for migration
 const TODAY = new Date().toISOString().slice(0,10).replace(/-/g,'');
 
 // ── STARTER DATA ───────────────────────────────────────────
+// ── WFRA MASTER LIST (Sabre Automated Refund-eligible airlines) ──
+const WFRA_ELIGIBLE = new Set([
+  '2K','2P','3C','3K','3M','5J','5O','5T','7C','7F','7H','8M','9X','A3','AA','AC','AD','AE',
+  'AI','AM','AR','AT','AV','B2','B7','BA','BG','BI','BM','BR','BS','BT','BW','CI','CX','D4',
+  'DE','DL','DT','DV','DY','EK','EN','ET','FB','FC','FI','FJ','FM','FZ','G3','GA','GD','GK',
+  'GP','GQ','GZ','H1','H2','H9','HA','HM','IB','ID','IE','J2','JQ','JT','JU','JV','JX','KC',
+  'KG','KM','KQ','KS','LG','LH','LJ','LO','LR','LX','LY','ME','MH','MO','MS','MU','NE','NP',
+  'NZ','OD','OS','OU','OZ','PC','PG','PK','PR','PX','QR','QV','R5','RA','RJ','RO','S4','SB',
+  'SL','SN','SP','SQ','SV','SW','T0','TA','TF','TK','TP','TS','TU','TN','TW','UA','UK','UP',
+  'UX','VA','VF','VJ','VN','VS','VT','VY','WX','WY','X1','YN','YP','Z9','ZE','ZL'
+]);
+function isWFRAEligible(iata) { return WFRA_ELIGIBLE.has((iata||'').toUpperCase()); }
+
+// ── NO SHOW POLICIES (per IATA code, briefly summarized) ──
+const NO_SHOW_POLICIES = {
+  'A3': { ref:'A3-390',  text:'Cancel at least 4 hours before departure to avoid no-show.' },
+  'AF': { ref:'AF-057',  text:'No-show applies for changes requested after original flight departure.' },
+  'AI': { ref:'AI-098',  text:'Cancel/change at least 4 hours before departure to avoid no-show.' },
+  'UJ': { ref:'UJ-110',  text:'Date change less than 24 hours before departure = no-show.' },
+  'TC': { ref:'TC-197',  text:'Re-booking within 3 hours of departure or after = no-show.' },
+  'DQ': { ref:'DQ-293',  text:'No-show NOT permitted. Tickets cannot be changed; return segment denied.' },
+  'BA': { ref:'BA-125',  text:'No-show: passenger fails to report at airport before scheduled departure.' },
+  'CX': { ref:'CX-160',  text:'Ticket must be revalidated/reissued before scheduled flight or no-show applies.' },
+  'CZ': { ref:'CZ-784',  text:'No-show if not cancelled before check-in deadline, or cancelled after check-in.' },
+  'EY': { ref:'EY-607',  text:'Reissue/refund must be done at least 4 hours before scheduled departure.' },
+  'EK': { ref:'EK-176',  text:'No-show: failure to report at airport 1 hour before scheduled departure.' },
+  'MS': { ref:'MS-077',  text:'Reissue must be completed 24 hours before departure or charged as no-show.' },
+  'ET': { ref:'ET-071',  text:'Cancel at least 24 hours before scheduled departure to avoid no-show.' },
+  'KU': { ref:'KU-229',  text:'No-show: passenger fails to report at airport before scheduled departure.' },
+  'GF': { ref:'GF-072',  text:'Cancel at least 24 hours before departure to avoid no-show.' },
+  'KQ': { ref:'KQ-706',  text:'No-show: failure to change/cancel reservation before flight departure.' },
+  'ME': { ref:'ME-076',  text:'No-show: passenger fails to report at airport before scheduled departure.' },
+  'NE': { ref:'NE-477',  text:'Reissue must be completed 24 hours before departure or charged as no-show.' },
+  'WY': { ref:'WY-910',  text:'No-show: failure to show at airport 1 hour before scheduled departure.' },
+  'PK': { ref:'PK-214',  text:'No-show applies for changes requested after original flight departure.' },
+  'PR': { ref:'PR-079',  text:'No-show fee for reservations not cancelled 24 hours prior to departure.' },
+  'QR': { ref:'QR-157',  text:'Cancel/change at least 3 hours before departure to avoid no-show.' },
+  'RJ': { ref:'RJ-512',  text:'Cancel at least 4 hours before departure to avoid no-show.' },
+  'SV': { ref:'SV-065',  text:'No-show: passenger fails to report at airport before scheduled departure.' },
+  'UL': { ref:'UL-603',  text:'Cancel/change at least 5 hours before departure to avoid no-show.' },
+  'TK': { ref:'TK-235',  text:'Cancel reservation and reissue ticket before original flight or no-show applies.' },
+  'UK': { ref:'UK-228',  text:'Cancel/change at least 4 hours before departure to avoid no-show.' },
+};
+function getNoShowPolicy(iata) { return NO_SHOW_POLICIES[(iata||'').toUpperCase()] || null; }
+
 const STARTER_AIRLINES = [
   // Middle East — FSC
   {id:'eg-ms', name:'EgyptAir', nameAr:'مصر للطيران', iata:'MS', icao:'MSR', type:'FSC', hub:'Cairo (CAI)', alliance:'Star Alliance', accent:'#C8102E', phones:[], email:'', website:'https://www.egyptair.com', refundPolicy:'', changePolicy:'', baggage:'', notes:''},
@@ -368,7 +419,22 @@ let editingId = null;
 
 // ── INIT ───────────────────────────────────────────────────
 function init(){
-  const stored = localStorage.getItem(STORAGE_KEY);
+  let stored = localStorage.getItem(STORAGE_KEY);
+
+  // Migration: if no new key but old Wego key exists, copy it over
+  if(!stored){
+    for(const oldKey of OLD_STORAGE_KEYS){
+      const oldData = localStorage.getItem(oldKey);
+      if(oldData){
+        stored = oldData;
+        localStorage.setItem(STORAGE_KEY, oldData);
+        localStorage.removeItem(oldKey);
+        console.log('Migrated airline data from', oldKey, 'to', STORAGE_KEY);
+        break;
+      }
+    }
+  }
+
   if(stored){
     try{ airlines = JSON.parse(stored); }
     catch(e){ airlines = [...STARTER_AIRLINES]; }
@@ -497,6 +563,7 @@ function render(){
         <span class="pill ${a.type==='LCC'?'pill-lcc':'pill-fsc'}">${a.type}</span>
         ${a.hub ? `<span class="pill pill-hub">📍 ${escapeHtml(a.hub)}</span>` : ''}
         ${a.alliance ? `<span class="pill pill-alliance">${escapeHtml(a.alliance)}</span>` : ''}
+        ${isWFRAEligible(a.iata) ? `<span class="pill pill-wfra" title="Sabre Automated Refund (WFRA) eligible">WFRA</span>` : ''}
       </div>
       <div class="ac-info">
         <div class="ac-info-row"><span class="icon">📞</span><span class="val ${hasPhones?'':'empty'}">${hasPhones ? `${escapeHtml(primaryPhone.region)}: ${escapeHtml(primaryPhone.number)}${a.phones.length>1?` <span style="color:var(--muted);font-weight:400">+${a.phones.length-1} more</span>`:''}` : 'No phone added yet'}</span></div>
@@ -504,6 +571,10 @@ function render(){
         <div class="ac-info-row"><span class="icon">🧳</span><span class="val ${hasBaggage?'':'empty'}">${hasBaggage ? 'Baggage rules' : 'No baggage notes yet'}</span></div>
         <div class="ac-info-row"><span class="icon">🔗</span><span class="val ${hasWeb?'':'empty'}">${hasWeb ? escapeHtml(a.website.replace(/^https?:\/\//,'').replace(/\/$/,'')) : 'No website'}</span></div>
       </div>
+      ${(() => {
+        const ns = a.noShow ? { text: a.noShow, ref: a.noShowRef||'' } : getNoShowPolicy(a.iata);
+        return ns ? `<div class="ac-noshow"><span class="icon">🚫</span><span><strong>No Show:</strong> ${escapeHtml(ns.text)}${ns.ref?` <span class="ref">${escapeHtml(ns.ref)}</span>`:''}</span></div>` : '';
+      })()}
     </div>`;
   }).join('');
 }
@@ -537,7 +608,16 @@ function openDetail(id){
         ${a.icao ? `<span class="pill pill-hub">ICAO: ${escapeHtml(a.icao)}</span>` : ''}
         ${a.hub ? `<span class="pill pill-hub">📍 Hub: ${escapeHtml(a.hub)}</span>` : ''}
         ${a.alliance ? `<span class="pill pill-alliance">${escapeHtml(a.alliance)}</span>` : ''}
+        ${isWFRAEligible(a.iata) ? `<span class="pill pill-wfra" title="Sabre Automated Refund (WFRA) eligible">WFRA Eligible</span>` : ''}
       </div>
+
+      ${(() => {
+        const ns = a.noShow ? { text: a.noShow, ref: a.noShowRef||'' } : getNoShowPolicy(a.iata);
+        return ns ? `<div class="ac-noshow" style="margin:0 0 14px 0">
+          <span class="icon">🚫</span>
+          <span><strong>No Show Policy:</strong> ${escapeHtml(ns.text)}${ns.ref?` <span class="ref">${escapeHtml(ns.ref)}</span>`:''}</span>
+        </div>` : '';
+      })()}
 
       <div class="detail-section">
         <div class="detail-label">📞 Phone Numbers</div>
