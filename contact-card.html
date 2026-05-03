@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Contacts — Adel's Toolkit</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📇</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0f10;
+  --surface: #18181a;
+  --surface-2: #1f1f22;
+  --border: #2a2a2c;
+  --border-bright: #3a3a3d;
+  --text: #f5f1ea;
+  --text-muted: #8a8784;
+  --text-dim: #5a5856;
+  --accent: #d4a574;
+  --accent-dim: #8a6d4a;
+  --danger: #c97064;
+  --male: #6ba6cf;
+  --female: #d4799c;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Geist', -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+body[dir="rtl"] { font-family: 'Cairo', 'Geist', sans-serif; }
+body {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none;
+  background-image: radial-gradient(circle at 20% 10%, rgba(212,165,116,0.04), transparent 40%),
+                    radial-gradient(circle at 80% 80%, rgba(212,165,116,0.02), transparent 40%);
+  z-index: 0;
+}
+body > * { position: relative; z-index: 1; }
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+header h1 {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 36px;
+  letter-spacing: -0.02em;
+}
+.header-right { display: flex; align-items: center; gap: 10px; }
+.back-link {
+  font-size: 12px; color: var(--text-muted); text-decoration: none;
+  padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px;
+  font-family: 'Geist Mono', monospace;
+  transition: all .15s;
+}
+.back-link:hover { color: var(--text); border-color: var(--border-bright); }
+.lang-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.lang-toggle button {
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  transition: all .15s;
+}
+.lang-toggle button.active { background: var(--accent); color: #1a1a1a; }
+.lang-toggle button:not(.active):hover { color: var(--text); }
+
+.subtitle {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 28px;
+  letter-spacing: 0.02em;
+}
+.subtitle .accent { color: var(--accent); }
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.toolbar input[type="text"] {
+  flex: 1; min-width: 240px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 9px 12px 9px 32px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238a8784' stroke-width='2'><circle cx='11' cy='11' r='7'/><line x1='16.5' y1='16.5' x2='21' y2='21'/></svg>");
+  background-repeat: no-repeat;
+  background-position: 10px 50%;
+  transition: border-color .15s;
+}
+.toolbar input[type="text"]:focus { border-color: var(--accent-dim); }
+.btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 9px 16px;
+  border-radius: 6px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+  letter-spacing: 0.02em;
+}
+.btn:hover { border-color: var(--accent-dim); color: var(--accent); }
+.btn.primary {
+  background: var(--accent);
+  color: #1a1a1a;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.btn.primary:hover { filter: brightness(1.1); }
+
+/* Filter pills (gender + tags) */
+.filter-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  align-items: center;
+}
+.filter-label {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-right: 4px;
+}
+.filter-pill {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 5px 11px;
+  border-radius: 100px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all .15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.filter-pill:hover { color: var(--text); border-color: var(--border-bright); }
+.filter-pill.active {
+  background: var(--accent);
+  color: #1a1a1a;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.filter-pill.male.active { background: var(--male); border-color: var(--male); }
+.filter-pill.female.active { background: var(--female); border-color: var(--female); }
+.filter-pill .count { font-size: 10px; opacity: .7; }
+.filter-pill.active .count { opacity: 1; }
+
+.results-info {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin: 16px 0 12px;
+}
+
+/* Contact row */
+.contact-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  transition: all .15s;
+  overflow: hidden;
+}
+.contact-row:hover { border-color: var(--border-bright); }
+.contact-row.expanded { border-color: var(--accent-dim); }
+.contact-row-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  cursor: pointer;
+}
+.gender-icon {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.gender-icon.male { background: rgba(107,166,207,.12); border-color: rgba(107,166,207,.3); }
+.gender-icon.female { background: rgba(212,121,156,.12); border-color: rgba(212,121,156,.3); }
+.contact-info { flex: 1; min-width: 0; }
+.contact-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.contact-name.placeholder { color: var(--text-dim); font-style: italic; font-weight: 400; }
+.contact-meta {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.contact-meta .gender-tag {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 10px;
+}
+.contact-meta .gender-tag.male { color: var(--male); }
+.contact-meta .gender-tag.female { color: var(--female); }
+.contact-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.icon-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: 30px; height: 30px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+  font-size: 14px;
+  font-family: inherit;
+}
+.icon-btn:hover { color: var(--accent); border-color: var(--accent-dim); background: var(--surface-2); }
+.icon-btn.danger:hover { color: var(--danger); border-color: var(--danger); }
+.icon-btn.copied { color: #4ade80; border-color: #4ade80; }
+
+/* Detail (expanded) */
+.contact-detail {
+  border-top: 1px solid var(--border);
+  padding: 18px 20px;
+  background: var(--surface-2);
+}
+.detail-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.detail-row:last-child { margin-bottom: 0; }
+.detail-icon {
+  width: 28px; height: 28px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--accent);
+  background: rgba(212,165,116,.1);
+  border-radius: 6px;
+  margin-top: 2px;
+}
+.detail-content { flex: 1; min-width: 0; }
+.detail-label {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+/* Multi-value (email/phone) */
+.multi-list { display: flex; flex-direction: column; gap: 6px; }
+.multi-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 4px 4px 12px;
+}
+.multi-item .value {
+  flex: 1;
+  font-family: 'Geist Mono', monospace;
+  font-size: 13px;
+  color: var(--text);
+  word-break: break-all;
+}
+.multi-item .country-flag {
+  font-size: 14px;
+  margin-right: 4px;
+}
+.multi-item .country-code {
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+.multi-item .copy-tiny, .multi-item .open-tiny {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: 26px; height: 26px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+  font-family: inherit;
+}
+.multi-item .copy-tiny:hover, .multi-item .open-tiny:hover {
+  color: var(--accent);
+  border-color: var(--accent-dim);
+}
+.multi-item .copy-tiny.copied { color: #4ade80; border-color: #4ade80; }
+.notes-text {
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.55;
+}
+.notes-text.empty { color: var(--text-dim); font-style: italic; }
+
+.detail-foot {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+  flex-wrap: wrap;
+}
+
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+.empty-icon {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 48px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+.empty p { font-size: 13px; margin-bottom: 16px; }
+
+/* Modal */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.7);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-backdrop.show { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border-bright);
+  border-radius: 10px;
+  max-width: 560px;
+  width: 100%;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+}
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-head h2 {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 22px;
+}
+.modal-close {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: 32px; height: 32px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+}
+.modal-close:hover { color: var(--danger); border-color: var(--danger); }
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+.field-group { margin-bottom: 16px; }
+.field-group:last-child { margin-bottom: 0; }
+.field-group label {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: block;
+  margin-bottom: 6px;
+}
+.field-group input[type="text"],
+.field-group input[type="email"],
+.field-group input[type="tel"],
+.field-group textarea,
+.field-group select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color .15s;
+}
+.field-group input:focus, .field-group textarea:focus, .field-group select:focus {
+  border-color: var(--accent-dim);
+}
+.field-group textarea {
+  resize: vertical;
+  min-height: 60px;
+  line-height: 1.5;
+}
+.name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 480px) { .name-row { grid-template-columns: 1fr; } }
+
+/* Gender selector */
+.gender-select {
+  display: flex;
+  gap: 8px;
+}
+.gender-select label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Geist', sans-serif;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-transform: none;
+  letter-spacing: 0;
+  margin: 0;
+  transition: all .15s;
+}
+.gender-select input { display: none; }
+.gender-select label:hover { color: var(--text); border-color: var(--border-bright); }
+.gender-select input:checked + .gender-pill { /* unused but kept */ }
+.gender-select label.selected.male {
+  background: rgba(107,166,207,.15);
+  border-color: var(--male);
+  color: var(--male);
+  font-weight: 600;
+}
+.gender-select label.selected.female {
+  background: rgba(212,121,156,.15);
+  border-color: var(--female);
+  color: var(--female);
+  font-weight: 600;
+}
+
+/* Multi-input rows in form */
+.multi-input-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+  align-items: center;
+}
+.multi-input-row input { flex: 1; }
+.multi-input-row .country-select {
+  width: 110px;
+  flex-shrink: 0;
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px;
+}
+.multi-input-row .remove-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: 32px; height: 32px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  flex-shrink: 0;
+  font-family: inherit;
+}
+.multi-input-row .remove-btn:hover { color: var(--danger); border-color: var(--danger); }
+.add-more-btn {
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  width: 100%;
+  margin-top: 4px;
+  transition: all .15s;
+}
+.add-more-btn:hover { color: var(--accent); border-color: var(--accent-dim); }
+
+.modal-foot {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--surface);
+  color: var(--text);
+  padding: 12px 20px;
+  border: 1px solid var(--border-bright);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: 'Geist Mono', monospace;
+  opacity: 0;
+  transition: all .3s;
+  pointer-events: none;
+  z-index: 200;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+@media (max-width: 720px) {
+  body { padding: 20px 14px 60px; }
+  header h1 { font-size: 28px; }
+  .contact-row-main { flex-wrap: wrap; }
+  .contact-actions { margin-left: auto; }
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1 data-i18n="title">Contacts</h1>
+  <div class="header-right">
+    <a href="index.html" class="back-link" data-i18n="back">← Toolkit</a>
+    <div class="lang-toggle">
+      <button class="active" data-lang="en" onclick="setLang('en')">🇬🇧 EN</button>
+      <button data-lang="ar" onclick="setLang('ar')">🇸🇦 AR</button>
+    </div>
+  </div>
+</header>
+<div class="subtitle">
+  <span id="totalCount">0</span> <span data-i18n="contacts">contacts</span>
+  · <span class="accent">⌘K</span> <span data-i18n="toSearch">to search</span>
+</div>
+
+<div class="toolbar">
+  <input type="text" id="searchInput" data-i18n-placeholder="searchPh" placeholder="Search name, email, phone, notes…" autocomplete="off">
+  <button class="btn primary" onclick="openAddModal()" data-i18n="addContact">+ Add Contact</button>
+  <button class="btn" onclick="exportJSON()" data-i18n="export">↓ Export</button>
+  <button class="btn" onclick="document.getElementById('importFile').click()" data-i18n="import">↑ Import</button>
+  <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+</div>
+
+<div class="filter-group" id="genderFilter"></div>
+
+<div class="results-info" id="resultsInfo"></div>
+<div id="contactList"></div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-backdrop" id="contactModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="modalTitle" data-i18n="addContactTitle">Add Contact</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-group">
+        <label data-i18n="fullName">Full name</label>
+        <div class="name-row">
+          <input type="text" id="f-firstName" data-i18n-placeholder="firstNamePh" placeholder="First name">
+          <input type="text" id="f-lastName" data-i18n-placeholder="lastNamePh" placeholder="Last name">
+        </div>
+      </div>
+      <div class="field-group">
+        <label data-i18n="genderLabel">Gender</label>
+        <div class="gender-select" id="genderSelect">
+          <label data-gender="male" onclick="setGender('male')">👨 <span data-i18n="male">Male</span></label>
+          <label data-gender="female" onclick="setGender('female')">👩 <span data-i18n="female">Female</span></label>
+        </div>
+      </div>
+      <div class="field-group">
+        <label data-i18n="emailsLabel">📧 Emails</label>
+        <div id="emailsContainer"></div>
+        <button class="add-more-btn" onclick="addEmailField()">+ <span data-i18n="addEmail">Add another email</span></button>
+      </div>
+      <div class="field-group">
+        <label data-i18n="phonesLabel">📞 Phones</label>
+        <div id="phonesContainer"></div>
+        <button class="add-more-btn" onclick="addPhoneField()">+ <span data-i18n="addPhone">Add another phone</span></button>
+      </div>
+      <div class="field-group">
+        <label data-i18n="notesLabel">📝 Notes</label>
+        <textarea id="f-notes" data-i18n-placeholder="notesPh" placeholder="Any extra info — company, preferences, history…"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal()" data-i18n="cancel">Cancel</button>
+      <button class="btn primary" onclick="saveContact()" data-i18n="save">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// COUNTRY CODES (with flags)
+// ============================================================
+const COUNTRY_CODES = [
+  { code:'+20',  flag:'🇪🇬', name:'Egypt' },
+  { code:'+961', flag:'🇱🇧', name:'Lebanon' },
+  { code:'+971', flag:'🇦🇪', name:'UAE' },
+  { code:'+966', flag:'🇸🇦', name:'Saudi Arabia' },
+  { code:'+974', flag:'🇶🇦', name:'Qatar' },
+  { code:'+965', flag:'🇰🇼', name:'Kuwait' },
+  { code:'+973', flag:'🇧🇭', name:'Bahrain' },
+  { code:'+968', flag:'🇴🇲', name:'Oman' },
+  { code:'+962', flag:'🇯🇴', name:'Jordan' },
+  { code:'+963', flag:'🇸🇾', name:'Syria' },
+  { code:'+964', flag:'🇮🇶', name:'Iraq' },
+  { code:'+90',  flag:'🇹🇷', name:'Turkey' },
+  { code:'+1',   flag:'🇺🇸', name:'USA / Canada' },
+  { code:'+44',  flag:'🇬🇧', name:'UK' },
+  { code:'+33',  flag:'🇫🇷', name:'France' },
+  { code:'+49',  flag:'🇩🇪', name:'Germany' },
+  { code:'+39',  flag:'🇮🇹', name:'Italy' },
+  { code:'+34',  flag:'🇪🇸', name:'Spain' },
+  { code:'+31',  flag:'🇳🇱', name:'Netherlands' },
+  { code:'+91',  flag:'🇮🇳', name:'India' },
+  { code:'+92',  flag:'🇵🇰', name:'Pakistan' },
+  { code:'+86',  flag:'🇨🇳', name:'China' },
+  { code:'+81',  flag:'🇯🇵', name:'Japan' },
+  { code:'+82',  flag:'🇰🇷', name:'S. Korea' },
+  { code:'+60',  flag:'🇲🇾', name:'Malaysia' },
+  { code:'+62',  flag:'🇮🇩', name:'Indonesia' },
+  { code:'+63',  flag:'🇵🇭', name:'Philippines' },
+  { code:'+66',  flag:'🇹🇭', name:'Thailand' },
+  { code:'+65',  flag:'🇸🇬', name:'Singapore' },
+  { code:'+27',  flag:'🇿🇦', name:'S. Africa' },
+];
+function getCountryByCode(code) {
+  return COUNTRY_CODES.find(c => c.code === code) || COUNTRY_CODES[0];
+}
+
+// ============================================================
+// I18N
+// ============================================================
+const I18N = {
+  en: {
+    title: 'Contacts',
+    contacts: 'contacts',
+    back: '← Toolkit',
+    toSearch: 'to search',
+    searchPh: 'Search name, email, phone, notes…',
+    addContact: '+ Add Contact',
+    export: '↓ Export',
+    import: '↑ Import',
+    addContactTitle: 'Add Contact',
+    editContactTitle: 'Edit Contact',
+    fullName: 'Full name',
+    firstNamePh: 'First name',
+    lastNamePh: 'Last name',
+    genderLabel: 'Gender',
+    male: 'Male',
+    female: 'Female',
+    emailsLabel: '📧 Emails',
+    phonesLabel: '📞 Phones',
+    notesLabel: '📝 Notes',
+    notesPh: 'Any extra info — company, preferences, history…',
+    addEmail: 'Add another email',
+    addPhone: 'Add another phone',
+    cancel: 'Cancel',
+    save: 'Save',
+    edit: '✏️ Edit',
+    deleteContact: '🗑 Delete',
+    downloadVcard: '📥 Download vCard',
+    copyAll: '📋 Copy info',
+    confirmDelete: 'Delete this contact?',
+    saved: '✓ Saved',
+    deleted: '✓ Deleted',
+    copied: '✓ Copied',
+    vcardDone: '✓ vCard downloaded',
+    nameRequired: 'Name is required',
+    filterAll: 'All',
+    filterMale: '👨 Male',
+    filterFemale: '👩 Female',
+    showing: 'Showing',
+    of: 'of',
+    contact: 'contact',
+    emailLabel: 'Email',
+    phoneLabel: 'Phone',
+    notesShort: 'Notes',
+    noNotes: 'No notes',
+    noEmail: 'No email',
+    noPhone: 'No phone',
+    noContacts: 'No contacts yet. Click "+ Add Contact" to start.',
+    noMatches: 'No contacts match your filters.',
+    locale: 'en-GB',
+  },
+  ar: {
+    title: 'جهات الاتصال',
+    contacts: 'جهة اتصال',
+    back: '← الأدوات',
+    toSearch: 'للبحث',
+    searchPh: 'ابحث بالاسم أو البريد أو الهاتف أو الملاحظات…',
+    addContact: '+ إضافة جهة',
+    export: '↓ تصدير',
+    import: '↑ استيراد',
+    addContactTitle: 'إضافة جهة اتصال',
+    editContactTitle: 'تعديل جهة اتصال',
+    fullName: 'الاسم الكامل',
+    firstNamePh: 'الاسم',
+    lastNamePh: 'اسم العائلة',
+    genderLabel: 'النوع',
+    male: 'ذكر',
+    female: 'أنثى',
+    emailsLabel: '📧 البريد الإلكتروني',
+    phonesLabel: '📞 الهاتف',
+    notesLabel: '📝 ملاحظات',
+    notesPh: 'أي معلومات إضافية — الشركة، التفضيلات، التاريخ…',
+    addEmail: 'إضافة بريد آخر',
+    addPhone: 'إضافة هاتف آخر',
+    cancel: 'إلغاء',
+    save: 'حفظ',
+    edit: '✏️ تعديل',
+    deleteContact: '🗑 حذف',
+    downloadVcard: '📥 تنزيل vCard',
+    copyAll: '📋 نسخ المعلومات',
+    confirmDelete: 'حذف جهة الاتصال؟',
+    saved: '✓ تم الحفظ',
+    deleted: '✓ تم الحذف',
+    copied: '✓ تم النسخ',
+    vcardDone: '✓ تم تنزيل vCard',
+    nameRequired: 'الاسم مطلوب',
+    filterAll: 'الكل',
+    filterMale: '👨 ذكور',
+    filterFemale: '👩 إناث',
+    showing: 'عرض',
+    of: 'من',
+    contact: 'جهة',
+    emailLabel: 'البريد الإلكتروني',
+    phoneLabel: 'الهاتف',
+    notesShort: 'ملاحظات',
+    noNotes: 'لا توجد ملاحظات',
+    noEmail: 'لا يوجد بريد',
+    noPhone: 'لا يوجد هاتف',
+    noContacts: 'لا توجد جهات اتصال بعد. اضغط "+ إضافة جهة" للبدء.',
+    noMatches: 'لا توجد جهات تطابق المرشحات.',
+    locale: 'ar-EG',
+  }
+};
+let currentLang = localStorage.getItem('adel-tools-lang') || 'en';
+function tA(key) { return (I18N[currentLang] && I18N[currentLang][key]) || key; }
+
+// ============================================================
+// STATE
+// ============================================================
+let contacts = [];
+let activeGender = 'all';
+let expandedId = null;
+let editingId = null;
+let formGender = 'male';
+let formEmails = [''];
+let formPhones = [{ code: '+20', number: '' }];
+const STORAGE_KEY = 'adel-contacts-v1';
+
+// ============================================================
+// STORAGE
+// ============================================================
+function loadContacts() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) { contacts = parsed; return; }
+    }
+  } catch (e) {}
+  contacts = [];
+}
+function saveContacts() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(contacts)); }
+  catch (e) { showToast('Save failed — storage full?'); }
+}
+
+// ============================================================
+// MODAL — open / close
+// ============================================================
+function openAddModal() {
+  editingId = null;
+  document.getElementById('modalTitle').textContent = tA('addContactTitle');
+  document.getElementById('f-firstName').value = '';
+  document.getElementById('f-lastName').value = '';
+  document.getElementById('f-notes').value = '';
+  formGender = 'male';
+  formEmails = [''];
+  formPhones = [{ code: '+20', number: '' }];
+  renderEmailsForm();
+  renderPhonesForm();
+  setGender('male');
+  document.getElementById('contactModal').classList.add('show');
+  setTimeout(() => document.getElementById('f-firstName').focus(), 100);
+}
+function openEditModal(id) {
+  const c = contacts.find(x => x.id === id);
+  if (!c) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = tA('editContactTitle');
+  document.getElementById('f-firstName').value = c.firstName || '';
+  document.getElementById('f-lastName').value = c.lastName || '';
+  document.getElementById('f-notes').value = c.notes || '';
+  formGender = c.gender || 'male';
+  formEmails = (c.emails && c.emails.length) ? [...c.emails] : [''];
+  formPhones = (c.phones && c.phones.length) ? c.phones.map(p => ({ ...p })) : [{ code: '+20', number: '' }];
+  renderEmailsForm();
+  renderPhonesForm();
+  setGender(formGender);
+  document.getElementById('contactModal').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('contactModal').classList.remove('show');
+}
+
+function setGender(g) {
+  formGender = g;
+  document.querySelectorAll('#genderSelect label').forEach(el => {
+    el.classList.remove('selected', 'male', 'female');
+    if (el.dataset.gender === g) {
+      el.classList.add('selected', g);
+    }
+  });
+}
+
+// ============================================================
+// FORM — emails
+// ============================================================
+function renderEmailsForm() {
+  const wrap = document.getElementById('emailsContainer');
+  wrap.innerHTML = formEmails.map((email, i) => `
+    <div class="multi-input-row">
+      <input type="email" placeholder="email@example.com" value="${escapeAttr(email)}"
+             oninput="formEmails[${i}] = this.value">
+      ${formEmails.length > 1 ? `<button class="remove-btn" onclick="removeEmailField(${i})" type="button">×</button>` : ''}
+    </div>
+  `).join('');
+}
+function addEmailField() {
+  if (formEmails.length >= 3) { showToast('Max 3 emails'); return; }
+  formEmails.push('');
+  renderEmailsForm();
+}
+function removeEmailField(i) {
+  formEmails.splice(i, 1);
+  if (!formEmails.length) formEmails = [''];
+  renderEmailsForm();
+}
+
+// ============================================================
+// FORM — phones
+// ============================================================
+function renderPhonesForm() {
+  const wrap = document.getElementById('phonesContainer');
+  wrap.innerHTML = formPhones.map((p, i) => `
+    <div class="multi-input-row">
+      <select class="country-select" onchange="formPhones[${i}].code = this.value">
+        ${COUNTRY_CODES.map(c => `<option value="${c.code}" ${p.code === c.code ? 'selected' : ''}>${c.flag} ${c.code}</option>`).join('')}
+      </select>
+      <input type="tel" placeholder="100 234 5678" value="${escapeAttr(p.number)}"
+             oninput="formPhones[${i}].number = this.value">
+      ${formPhones.length > 1 ? `<button class="remove-btn" onclick="removePhoneField(${i})" type="button">×</button>` : ''}
+    </div>
+  `).join('');
+}
+function addPhoneField() {
+  if (formPhones.length >= 3) { showToast('Max 3 phones'); return; }
+  formPhones.push({ code: '+20', number: '' });
+  renderPhonesForm();
+}
+function removePhoneField(i) {
+  formPhones.splice(i, 1);
+  if (!formPhones.length) formPhones = [{ code: '+20', number: '' }];
+  renderPhonesForm();
+}
+
+// ============================================================
+// SAVE / DELETE
+// ============================================================
+function saveContact() {
+  const firstName = document.getElementById('f-firstName').value.trim();
+  const lastName = document.getElementById('f-lastName').value.trim();
+  const notes = document.getElementById('f-notes').value.trim();
+  if (!firstName && !lastName) { showToast(tA('nameRequired')); return; }
+
+  const cleanEmails = formEmails.map(e => e.trim()).filter(Boolean);
+  const cleanPhones = formPhones
+    .map(p => ({ code: p.code, number: (p.number || '').trim() }))
+    .filter(p => p.number);
+
+  if (editingId) {
+    const c = contacts.find(x => x.id === editingId);
+    if (c) {
+      c.firstName = firstName;
+      c.lastName = lastName;
+      c.gender = formGender;
+      c.emails = cleanEmails;
+      c.phones = cleanPhones;
+      c.notes = notes;
+      c.updatedAt = Date.now();
+    }
+  } else {
+    contacts.push({
+      id: 'c_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+      firstName, lastName,
+      gender: formGender,
+      emails: cleanEmails,
+      phones: cleanPhones,
+      notes,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+  }
+  saveContacts();
+  closeModal();
+  render();
+  showToast(tA('saved'));
+}
+
+function deleteContact(id) {
+  if (!confirm(tA('confirmDelete'))) return;
+  contacts = contacts.filter(c => c.id !== id);
+  if (expandedId === id) expandedId = null;
+  saveContacts();
+  render();
+  showToast(tA('deleted'));
+}
+
+// ============================================================
+// COPY / VCARD
+// ============================================================
+function copyValue(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    if (btn) {
+      btn.classList.add('copied');
+      const orig = btn.textContent;
+      btn.textContent = '✓';
+      setTimeout(() => { btn.classList.remove('copied'); btn.textContent = orig; }, 1400);
+    }
+    showToast(tA('copied'));
+  });
+}
+
+function copyAllInfo(id) {
+  const c = contacts.find(x => x.id === id);
+  if (!c) return;
+  const fullName = [c.firstName, c.lastName].filter(Boolean).join(' ');
+  let txt = fullName + '\n';
+  if (c.gender) txt += (c.gender === 'male' ? 'Male' : 'Female') + '\n';
+  if (c.emails && c.emails.length) txt += '\n' + c.emails.map(e => '📧 ' + e).join('\n');
+  if (c.phones && c.phones.length) txt += '\n' + c.phones.map(p => '📞 ' + p.code + ' ' + p.number).join('\n');
+  if (c.notes) txt += '\n\n' + c.notes;
+  navigator.clipboard.writeText(txt.trim()).then(() => showToast(tA('copied')));
+}
+
+function downloadVCard(id) {
+  const c = contacts.find(x => x.id === id);
+  if (!c) return;
+  const fullName = [c.firstName, c.lastName].filter(Boolean).join(' ');
+  let vcf = 'BEGIN:VCARD\nVERSION:3.0\n';
+  vcf += 'FN:' + fullName + '\n';
+  vcf += 'N:' + (c.lastName || '') + ';' + (c.firstName || '') + ';;;\n';
+  if (c.gender) vcf += 'GENDER:' + (c.gender === 'male' ? 'M' : 'F') + '\n';
+  (c.emails || []).forEach((e, i) => { vcf += 'EMAIL;TYPE=' + (i === 0 ? 'PREF' : 'INTERNET') + ':' + e + '\n'; });
+  (c.phones || []).forEach((p, i) => {
+    const num = (p.code + ' ' + p.number).trim();
+    vcf += 'TEL;TYPE=' + (i === 0 ? 'CELL,PREF' : 'CELL') + ':' + num + '\n';
+  });
+  if (c.notes) vcf += 'NOTE:' + c.notes.replace(/\n/g, '\\n') + '\n';
+  vcf += 'END:VCARD\n';
+  const blob = new Blob([vcf], { type: 'text/vcard' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (fullName.replace(/[^a-zA-Z0-9]/g, '_') || 'contact') + '.vcf';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(tA('vcardDone'));
+}
+
+// ============================================================
+// EXPORT / IMPORT
+// ============================================================
+function exportJSON() {
+  const data = JSON.stringify(contacts, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'contacts-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Exported ' + contacts.length + ' contacts');
+}
+
+function importJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!Array.isArray(imported)) { showToast('Invalid file'); return; }
+      const existingIds = new Set(contacts.map(c => c.id));
+      let added = 0, skipped = 0;
+      imported.forEach(c => {
+        if (existingIds.has(c.id)) { skipped++; return; }
+        if (!c.id) c.id = 'c_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+        contacts.push(c);
+        added++;
+      });
+      saveContacts();
+      render();
+      showToast('Imported ' + added + ', skipped ' + skipped);
+    } catch (err) { showToast('Failed to parse JSON'); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render() {
+  document.getElementById('totalCount').textContent = contacts.length;
+  renderGenderFilter();
+
+  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  let filtered = contacts.slice();
+  if (activeGender !== 'all') filtered = filtered.filter(c => c.gender === activeGender);
+  if (search) {
+    filtered = filtered.filter(c => {
+      const hay = [
+        c.firstName, c.lastName, c.notes,
+        ...(c.emails || []),
+        ...(c.phones || []).map(p => p.code + p.number),
+      ].filter(Boolean).join(' ').toLowerCase();
+      return hay.includes(search);
+    });
+  }
+  filtered.sort((a, b) => {
+    const an = ((a.firstName || '') + ' ' + (a.lastName || '')).trim().toLowerCase();
+    const bn = ((b.firstName || '') + ' ' + (b.lastName || '')).trim().toLowerCase();
+    return an.localeCompare(bn);
+  });
+
+  document.getElementById('resultsInfo').textContent =
+    tA('showing') + ' ' + filtered.length + ' ' + tA('of') + ' ' + contacts.length + ' ' +
+    (filtered.length === 1 ? tA('contact') : tA('contacts'));
+
+  const list = document.getElementById('contactList');
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">∅</div><p>' +
+      (contacts.length === 0 ? tA('noContacts') : tA('noMatches')) + '</p></div>';
+    return;
+  }
+  list.innerHTML = filtered.map(renderRow).join('');
+}
+
+function renderRow(c) {
+  const isExpanded = expandedId === c.id;
+  const fullName = [c.firstName, c.lastName].filter(Boolean).join(' ') || '—';
+  const gender = c.gender || 'male';
+  const genderLabel = gender === 'male' ? tA('male') : tA('female');
+  const genderEmoji = gender === 'male' ? '👨' : '👩';
+
+  return `
+    <div class="contact-row ${isExpanded ? 'expanded' : ''}" data-id="${c.id}">
+      <div class="contact-row-main" onclick="toggleExpand('${c.id}')">
+        <div class="gender-icon ${gender}">${genderEmoji}</div>
+        <div class="contact-info">
+          <div class="contact-name">${escapeHtml(fullName)}</div>
+          <div class="contact-meta">
+            <span class="gender-tag ${gender}">${escapeHtml(genderLabel)}</span>
+          </div>
+        </div>
+        <div class="contact-actions" onclick="event.stopPropagation()">
+          <button class="icon-btn" title="${escapeAttr(tA('edit'))}" onclick="openEditModal('${c.id}')">✏️</button>
+          <button class="icon-btn danger" title="${escapeAttr(tA('deleteContact'))}" onclick="deleteContact('${c.id}')">×</button>
+        </div>
+      </div>
+      ${isExpanded ? renderDetail(c) : ''}
+    </div>
+  `;
+}
+
+function renderDetail(c) {
+  let html = '<div class="contact-detail">';
+
+  // Emails
+  html += '<div class="detail-row">';
+  html += '<div class="detail-icon">📧</div>';
+  html += '<div class="detail-content">';
+  html += '<div class="detail-label">' + escapeHtml(tA('emailLabel')) + '</div>';
+  if (c.emails && c.emails.length) {
+    html += '<div class="multi-list">';
+    c.emails.forEach(e => {
+      html += '<div class="multi-item">';
+      html += '<span class="value">' + escapeHtml(e) + '</span>';
+      html += '<button class="copy-tiny" title="Copy" onclick="copyValue(\'' + escapeJs(e) + '\', this)">📋</button>';
+      html += '<a class="open-tiny" href="mailto:' + escapeAttr(e) + '" title="Open">↗</a>';
+      html += '</div>';
+    });
+    html += '</div>';
+  } else {
+    html += '<div class="notes-text empty">' + escapeHtml(tA('noEmail')) + '</div>';
+  }
+  html += '</div></div>';
+
+  // Phones
+  html += '<div class="detail-row">';
+  html += '<div class="detail-icon">📞</div>';
+  html += '<div class="detail-content">';
+  html += '<div class="detail-label">' + escapeHtml(tA('phoneLabel')) + '</div>';
+  if (c.phones && c.phones.length) {
+    html += '<div class="multi-list">';
+    c.phones.forEach(p => {
+      const country = getCountryByCode(p.code);
+      const fullPhone = (p.code + ' ' + p.number).trim();
+      html += '<div class="multi-item">';
+      html += '<span class="country-flag">' + country.flag + '</span>';
+      html += '<span class="country-code">' + escapeHtml(p.code) + '</span>';
+      html += '<span class="value">' + escapeHtml(p.number) + '</span>';
+      html += '<button class="copy-tiny" title="Copy" onclick="copyValue(\'' + escapeJs(fullPhone) + '\', this)">📋</button>';
+      html += '<a class="open-tiny" href="tel:' + escapeAttr(fullPhone.replace(/\s/g,'')) + '" title="Call">↗</a>';
+      html += '</div>';
+    });
+    html += '</div>';
+  } else {
+    html += '<div class="notes-text empty">' + escapeHtml(tA('noPhone')) + '</div>';
+  }
+  html += '</div></div>';
+
+  // Notes
+  html += '<div class="detail-row">';
+  html += '<div class="detail-icon">📝</div>';
+  html += '<div class="detail-content">';
+  html += '<div class="detail-label">' + escapeHtml(tA('notesShort')) + '</div>';
+  if (c.notes && c.notes.trim()) {
+    html += '<div class="notes-text">' + escapeHtml(c.notes) + '</div>';
+  } else {
+    html += '<div class="notes-text empty">' + escapeHtml(tA('noNotes')) + '</div>';
+  }
+  html += '</div></div>';
+
+  // Actions
+  html += '<div class="detail-foot">';
+  html += '<button class="btn" onclick="downloadVCard(\'' + c.id + '\')">' + escapeHtml(tA('downloadVcard')) + '</button>';
+  html += '<button class="btn" onclick="copyAllInfo(\'' + c.id + '\')">' + escapeHtml(tA('copyAll')) + '</button>';
+  html += '</div>';
+
+  html += '</div>';
+  return html;
+}
+
+function renderGenderFilter() {
+  const counts = {
+    all: contacts.length,
+    male: contacts.filter(c => c.gender === 'male').length,
+    female: contacts.filter(c => c.gender === 'female').length,
+  };
+  const wrap = document.getElementById('genderFilter');
+  wrap.innerHTML =
+    '<span class="filter-label">' + escapeHtml(tA('genderLabel')) + ':</span>' +
+    '<button class="filter-pill ' + (activeGender === 'all' ? 'active' : '') + '" onclick="setActiveGender(\'all\')">' +
+      escapeHtml(tA('filterAll')) + ' <span class="count">' + counts.all + '</span></button>' +
+    '<button class="filter-pill male ' + (activeGender === 'male' ? 'active' : '') + '" onclick="setActiveGender(\'male\')">' +
+      escapeHtml(tA('filterMale')) + ' <span class="count">' + counts.male + '</span></button>' +
+    '<button class="filter-pill female ' + (activeGender === 'female' ? 'active' : '') + '" onclick="setActiveGender(\'female\')">' +
+      escapeHtml(tA('filterFemale')) + ' <span class="count">' + counts.female + '</span></button>';
+}
+function setActiveGender(g) {
+  activeGender = g;
+  expandedId = null;
+  render();
+}
+
+function toggleExpand(id) {
+  expandedId = expandedId === id ? null : id;
+  render();
+}
+
+// ============================================================
+// LANGUAGE
+// ============================================================
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('adel-tools-lang', lang);
+  document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.documentElement.lang = lang;
+  document.querySelectorAll('.lang-toggle button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const v = I18N[lang][el.dataset.i18n];
+    if (v !== undefined) el.textContent = v;
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const v = I18N[lang][el.dataset.i18nPlaceholder];
+    if (v !== undefined) el.placeholder = v;
+  });
+  render();
+}
+
+// ============================================================
+// EVENTS
+// ============================================================
+document.getElementById('searchInput').addEventListener('input', render);
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    document.getElementById('searchInput').focus();
+  }
+  if (e.key === 'Escape') {
+    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
+      document.activeElement.blur();
+    } else if (document.getElementById('contactModal').classList.contains('show')) {
+      closeModal();
+    } else if (expandedId) {
+      expandedId = null; render();
+    }
+  }
+});
+
+// ============================================================
+// HELPERS
+// ============================================================
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+function escapeAttr(s) {
+  if (s == null) return '';
+  return String(s).replace(/"/g, '&quot;');
+}
+function escapeJs(s) {
+  if (s == null) return '';
+  return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+loadContacts();
+setLang(currentLang);
+</script>
+</body>
+</html>

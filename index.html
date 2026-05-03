@@ -411,7 +411,7 @@ body[dir="rtl"] .section-header .section-count { margin-left:0; margin-right:aut
     <h2 data-i18n="heroH2">Welcome back, <span class="accent">Adel</span> 👋</h2>
     <p data-i18n="heroP">Your personal toolkit for everyday work — flight calculations, GDS quick references, customer responses, and more, all organized in one place.</p>
     <div class="stats-row">
-      <div class="stat-pill"><span class="ico">🛠️</span> <strong>13</strong> <span data-i18n="statTools">tools</span></div>
+      <div class="stat-pill"><span class="ico">🛠️</span> <strong>14</strong> <span data-i18n="statTools">tools</span></div>
       <div class="stat-pill"><span class="ico">🌐</span> <span data-i18n="statBilingual">English &amp; Arabic</span></div>
       <div class="stat-pill"><span class="ico">⚡</span> <span data-i18n="statOffline">Works offline</span></div>
       <div class="stat-pill"><span class="ico">🔒</span> <span data-i18n="statPrivate">Private &amp; local</span></div>
@@ -591,7 +591,7 @@ body[dir="rtl"] .section-header .section-count { margin-left:0; margin-right:aut
         <h3 data-i18n="sec3Title">Personal &amp; Reference</h3>
         <p data-i18n="sec3Sub">Your saved links, profile, and reference material</p>
       </div>
-      <span class="section-count">4 <span data-i18n="tools">tools</span></span>
+      <span class="section-count">5 <span data-i18n="tools">tools</span></span>
     </div>
     <div class="tools-grid">
 
@@ -618,6 +618,21 @@ body[dir="rtl"] .section-header .section-count { margin-left:0; margin-right:aut
         <div class="tool-body">
           <div class="tool-title" data-i18n="hubTitle">Personal Hub</div>
           <div class="tool-desc" data-i18n="hubDesc">Your personal information card — contact details, profile, and personal info in one place.</div>
+        </div>
+        <div class="tool-footer">
+          <div class="tool-cta"><span data-i18n="ctaOpen">Open</span> →</div>
+          <div class="tool-meta">v1.0</div>
+        </div>
+      </a>
+
+      <a class="tool-card" href="contact-card.html">
+        <div class="tool-head">
+          <div class="tool-icon">📇</div>
+          <span class="tool-tag new" data-i18n="tagNew">NEW</span>
+        </div>
+        <div class="tool-body">
+          <div class="tool-title" data-i18n="contactsTitle">Contacts</div>
+          <div class="tool-desc" data-i18n="contactsDesc">Your personal contact book. Multiple emails and phones per contact, with search and notes.</div>
         </div>
         <div class="tool-footer">
           <div class="tool-cta"><span data-i18n="ctaOpen">Open</span> →</div>
@@ -688,13 +703,14 @@ const I18N = {
     cannedTitle:'Canned Responses', cannedDesc:'Ready-to-use professional reply templates for common customer scenarios. Copy & paste.',
     shiftTitle:'Shift & Prayer Times', shiftDesc:'Your shift schedule with daily prayer times, alarms, and the weekly view at a glance.',
     currencyTitle:'Currency Converter', currencyDesc:'Live exchange rates for 60+ currencies. Instant conversion with customer-ready output.',
-    baggageTitle:'Excess Baggage Calculator', baggageDesc:'Smart hybrid calculator for 8 airlines. Handles weight, piece, and oversized rules with editable airline data.',
+    baggageTitle:'Excess Baggage Calculator', baggageDesc:'Smart hybrid calculator for 9 airlines including MEA. Handles weight, piece, and oversized rules with editable airline data.',
     airlinesTitle:'Airline Directory', airlinesDesc:'Searchable directory of airlines with contact details, codes, and quick reference info.',
     tpTitle:'Travelport Galileo', tpDesc:'Quick reference for Galileo formats, commands, and common operations.',
     sabreTitle:'Sabre GDS', sabreDesc:'Quick reference for Sabre formats, commands, and PNR operations.',
     gdsTitle:'GDS Format Comparison', gdsDesc:'Side-by-side comparison of Galileo, Sabre, and Amadeus commands for the same operations.',
     linksTitle:'Link Library', linksDesc:'Personal saved social media and reference links with tags, search, and live preview.',
     hubTitle:'Personal Hub', hubDesc:'Your personal information card — contact details, profile, and personal info in one place.',
+    contactsTitle:'Contacts', contactsDesc:'Your personal contact book. Multiple emails and phones per contact, with search and notes.',
     caseTitle:'Case Tracker', caseDesc:'Personal case tracking system to organize ongoing customer issues and follow-ups.',
     cheatTitle:'Refund & Fare Cheat Sheet', cheatDesc:'Quick reference for refund policies, fare rules, and common scenarios.',
     tagUpdated:'UPDATED', tagStable:'STABLE', tagNew:'NEW',
@@ -716,13 +732,14 @@ const I18N = {
     cannedTitle:'الردود الجاهزة', cannedDesc:'قوالب ردود احترافية جاهزة للاستخدام للسيناريوهات الشائعة مع العملاء. نسخ ولصق.',
     shiftTitle:'الوردية وأوقات الصلاة', shiftDesc:'جدول ورديتك مع أوقات الصلاة اليومية والمنبهات وعرض الأسبوع في لمحة.',
     currencyTitle:'محوّل العملات', currencyDesc:'أسعار صرف حية لأكثر من 60 عملة. تحويل فوري مع نتيجة جاهزة للعميل.',
-    baggageTitle:'حاسبة الأمتعة الزائدة', baggageDesc:'حاسبة هجينة ذكية لـ 8 شركات طيران. تتعامل مع نظام الوزن والقطعة والأمتعة الكبيرة مع بيانات قابلة للتعديل.',
+    baggageTitle:'حاسبة الأمتعة الزائدة', baggageDesc:'حاسبة هجينة ذكية لـ 9 شركات طيران بما فيها MEA. تتعامل مع نظام الوزن والقطعة والأمتعة الكبيرة مع بيانات قابلة للتعديل.',
     airlinesTitle:'دليل شركات الطيران', airlinesDesc:'دليل قابل للبحث لشركات الطيران مع تفاصيل الاتصال والرموز ومعلومات سريعة.',
     tpTitle:'Travelport Galileo', tpDesc:'مرجع سريع لصيغ Galileo والأوامر والعمليات الشائعة.',
     sabreTitle:'Sabre GDS', sabreDesc:'مرجع سريع لصيغ Sabre والأوامر وعمليات PNR.',
     gdsTitle:'مقارنة صيغ GDS', gdsDesc:'مقارنة جنباً إلى جنب بين أوامر Galileo و Sabre و Amadeus لنفس العمليات.',
     linksTitle:'مكتبة الروابط', linksDesc:'الروابط الاجتماعية والمرجعية المحفوظة مع الوسوم والبحث والمعاينة المباشرة.',
     hubTitle:'البطاقة الشخصية', hubDesc:'بطاقة معلوماتك الشخصية — تفاصيل الاتصال والملف الشخصي في مكان واحد.',
+    contactsTitle:'جهات الاتصال', contactsDesc:'دفتر جهات اتصالك الشخصي. عدة إيميلات وهواتف لكل جهة، مع البحث والملاحظات.',
     caseTitle:'متتبع الحالات', caseDesc:'نظام تتبع شخصي لتنظيم قضايا العملاء الجارية والمتابعات.',
     cheatTitle:'مرجع الاسترداد والأسعار', cheatDesc:'مرجع سريع لسياسات الاسترداد وقواعد الأسعار والسيناريوهات الشائعة.',
     tagUpdated:'محدّث', tagStable:'مستقر', tagNew:'جديد',
@@ -770,8 +787,8 @@ function updateClock() {
 
 function aboutTool() {
   alert(currentLang === 'ar'
-    ? 'أدوات عادل — مجموعة أدوات إنتاجية شخصية.\n\nالإصدار: 1.2\n13 أداة\nالاستضافة: GitHub Pages\nالمؤلف: عادل'
-    : 'Adel\u2019s Toolkit — A personal productivity suite.\n\nVersion: 1.2\n13 tools included\nHosted on: GitHub Pages\nAuthor: Adel');
+    ? 'أدوات عادل — مجموعة أدوات إنتاجية شخصية.\n\nالإصدار: 1.3\n14 أداة\nالاستضافة: GitHub Pages\nالمؤلف: عادل'
+    : 'Adel\u2019s Toolkit — A personal productivity suite.\n\nVersion: 1.3\n14 tools included\nHosted on: GitHub Pages\nAuthor: Adel');
 }
 
 setLang(currentLang);
