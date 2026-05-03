@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Visa Hub — Adel's Toolkit</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0f10;
+  --surface: #18181a;
+  --surface-2: #1f1f22;
+  --border: #2a2a2c;
+  --border-bright: #3a3a3d;
+  --text: #f5f1ea;
+  --text-muted: #8a8784;
+  --text-dim: #5a5856;
+  --accent: #6ba6cf;
+  --accent-dim: #4a7a9e;
+  --accent-warm: #d4a574;
+  --danger: #c97064;
+  --warn: #d4a574;
+  --fresh: #4ade80;
+  --recent: #d4c574;
+  --aging: #d49574;
+  --stale: #c97064;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Geist', -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+body[dir="rtl"] { font-family: 'Cairo', 'Geist', sans-serif; }
+body {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none;
+  background-image: radial-gradient(circle at 20% 10%, rgba(107,166,207,0.05), transparent 40%),
+                    radial-gradient(circle at 80% 80%, rgba(212,165,116,0.03), transparent 40%);
+  z-index: 0;
+}
+body > * { position: relative; z-index: 1; }
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+header h1 {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 36px;
+  letter-spacing: -0.02em;
+}
+.header-right { display: flex; align-items: center; gap: 10px; }
+.back-link {
+  font-size: 12px; color: var(--text-muted); text-decoration: none;
+  padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px;
+  font-family: 'Geist Mono', monospace;
+  transition: all .15s;
+}
+.back-link:hover { color: var(--text); border-color: var(--border-bright); }
+.lang-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.lang-toggle button {
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  transition: all .15s;
+}
+.lang-toggle button.active { background: var(--accent); color: #0a0a0a; }
+.lang-toggle button:not(.active):hover { color: var(--text); }
+
+.subtitle {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+  letter-spacing: 0.02em;
+}
+.subtitle .accent { color: var(--accent); }
+
+/* Disclaimer banner */
+.disclaimer {
+  background: linear-gradient(135deg, rgba(212,165,116,0.08), rgba(201,112,100,0.04));
+  border: 1px solid rgba(212,165,116,0.3);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #f5d8a8;
+}
+.disclaimer .ico { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.disclaimer strong { color: #ffe6b5; font-weight: 700; }
+
+/* Lookup card */
+.lookup-card {
+  background: linear-gradient(135deg, rgba(24,24,26,0.9), rgba(31,31,34,0.7));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px;
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.lookup-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-warm));
+}
+.lookup-title {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 14px;
+}
+.lookup-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+@media (max-width: 600px) { .lookup-row { grid-template-columns: 1fr; } }
+.lookup-field label {
+  display: block;
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+.country-select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.country-select:focus { border-color: var(--accent-dim); }
+.country-select option { background: var(--surface); color: var(--text); padding: 6px; }
+.country-select optgroup { background: var(--surface); color: var(--accent); font-weight: 600; }
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.source-btn {
+  flex: 1;
+  min-width: 140px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 11px 14px;
+  border-radius: 6px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+}
+.source-btn:hover { border-color: var(--accent-dim); color: var(--accent); transform: translateY(-1px); }
+.source-btn.timatic { border-color: var(--accent-dim); color: var(--accent); }
+.source-btn.timatic:hover { background: rgba(107,166,207,0.1); }
+.source-btn .ext { opacity: 0.6; font-size: 10px; }
+.save-route-btn {
+  flex: 0 0 auto;
+  background: var(--accent);
+  color: #0a0a0a;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.save-route-btn:hover { filter: brightness(1.1); color: #0a0a0a; }
+
+/* Section header */
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 24px 0 12px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.section-head h2 {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--text);
+}
+.section-head .meta {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* Search bar for routes */
+.routes-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.routes-toolbar input {
+  flex: 1; min-width: 200px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 9px 12px 9px 32px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238a8784' stroke-width='2'><circle cx='11' cy='11' r='7'/><line x1='16.5' y1='16.5' x2='21' y2='21'/></svg>");
+  background-repeat: no-repeat;
+  background-position: 10px 50%;
+}
+.routes-toolbar input:focus { border-color: var(--accent-dim); }
+.btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 9px 16px;
+  border-radius: 6px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+  letter-spacing: 0.02em;
+}
+.btn:hover { border-color: var(--accent-dim); color: var(--accent); }
+.btn.primary {
+  background: var(--accent);
+  color: #0a0a0a;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.btn.primary:hover { filter: brightness(1.1); }
+
+/* Route card */
+.route-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  transition: all .15s;
+}
+.route-card:hover { border-color: var(--border-bright); }
+.route-card.expanded { border-color: var(--accent-dim); }
+.route-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  cursor: pointer;
+}
+.route-flags {
+  font-size: 22px;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.route-flags .arrow { font-size: 14px; color: var(--text-dim); }
+.route-info { flex: 1; min-width: 0; }
+.route-name {
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.route-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-dim);
+  flex-wrap: wrap;
+}
+.freshness-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.freshness-badge.fresh { background: rgba(74,222,128,0.12); color: var(--fresh); border: 1px solid rgba(74,222,128,0.3); }
+.freshness-badge.recent { background: rgba(212,197,116,0.12); color: var(--recent); border: 1px solid rgba(212,197,116,0.3); }
+.freshness-badge.aging { background: rgba(212,149,116,0.12); color: var(--aging); border: 1px solid rgba(212,149,116,0.3); }
+.freshness-badge.stale { background: rgba(201,112,100,0.15); color: var(--stale); border: 1px solid rgba(201,112,100,0.4); animation: pulseStale 2s infinite; }
+.freshness-badge.unverified { background: var(--surface-2); color: var(--text-muted); border: 1px dashed var(--border-bright); }
+@keyframes pulseStale {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.route-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.icon-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: 30px; height: 30px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+  font-size: 13px;
+  font-family: inherit;
+}
+.icon-btn:hover { color: var(--accent); border-color: var(--accent-dim); }
+.icon-btn.danger:hover { color: var(--danger); border-color: var(--danger); }
+
+/* Route detail (expanded) */
+.route-detail {
+  border-top: 1px solid var(--border);
+  padding: 18px 20px;
+  background: var(--surface-2);
+}
+.detail-section { margin-bottom: 16px; }
+.detail-section:last-child { margin-bottom: 0; }
+.detail-label {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+.notes-text {
+  font-size: 13.5px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 14px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+}
+.notes-text.empty { color: var(--text-dim); font-style: italic; }
+.verify-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.verify-row .date { color: var(--text); }
+.verify-row .verify-btn {
+  margin-left: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all .15s;
+}
+body[dir="rtl"] .verify-row .verify-btn { margin-left: 0; margin-right: auto; }
+.verify-row .verify-btn:hover {
+  background: rgba(74,222,128,0.1);
+  border-color: var(--fresh);
+  color: var(--fresh);
+}
+
+.detail-sources {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+}
+
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--text-muted);
+}
+.empty-icon {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 48px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+.empty p { font-size: 13px; margin-bottom: 16px; }
+
+/* Modal */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.7);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-backdrop.show { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border-bright);
+  border-radius: 10px;
+  max-width: 560px;
+  width: 100%;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+}
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-head h2 {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 22px;
+}
+.modal-close {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: 32px; height: 32px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+}
+.modal-close:hover { color: var(--danger); border-color: var(--danger); }
+.modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+.field-group { margin-bottom: 16px; }
+.field-group:last-child { margin-bottom: 0; }
+.field-group label {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: block;
+  margin-bottom: 6px;
+}
+.field-group select,
+.field-group textarea,
+.field-group input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color .15s;
+}
+.field-group select:focus, .field-group textarea:focus, .field-group input:focus {
+  border-color: var(--accent-dim);
+}
+.field-group textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.55;
+}
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 480px) { .field-row { grid-template-columns: 1fr; } }
+.modal-foot {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--surface);
+  color: var(--text);
+  padding: 12px 20px;
+  border: 1px solid var(--border-bright);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: 'Geist Mono', monospace;
+  opacity: 0;
+  transition: all .3s;
+  pointer-events: none;
+  z-index: 200;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+@media (max-width: 720px) {
+  body { padding: 20px 14px 60px; }
+  header h1 { font-size: 28px; }
+  .source-btn { min-width: 110px; font-size: 11px; padding: 9px 10px; }
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1 data-i18n="title">Visa Hub</h1>
+  <div class="header-right">
+    <a href="index.html" class="back-link" data-i18n="back">← Toolkit</a>
+    <div class="lang-toggle">
+      <button class="active" data-lang="en" onclick="setLang('en')">🇬🇧 EN</button>
+      <button data-lang="ar" onclick="setLang('ar')">🇸🇦 AR</button>
+    </div>
+  </div>
+</header>
+<div class="subtitle" data-i18n="subtitle">Quick launcher for visa rules · Timatic · Passportindex</div>
+
+<!-- Always-visible disclaimer -->
+<div class="disclaimer">
+  <span class="ico">⚠️</span>
+  <div>
+    <strong data-i18n="disclaimerTitle">Always verify before quoting:</strong>
+    <span data-i18n="disclaimerText"> Visa rules change frequently. This tool is a quick launcher, not a source of truth. ALWAYS confirm with IATA Timatic or the destination embassy before giving customers any answer.</span>
+  </div>
+</div>
+
+<!-- Lookup card -->
+<div class="lookup-card">
+  <div class="lookup-title" data-i18n="lookupTitle">🔍 Lookup a route</div>
+  <div class="lookup-row">
+    <div class="lookup-field">
+      <label data-i18n="passportLabel">🛂 Passenger passport</label>
+      <select class="country-select" id="passportSelect"></select>
+    </div>
+    <div class="lookup-field">
+      <label data-i18n="destLabel">✈️ Destination</label>
+      <select class="country-select" id="destSelect"></select>
+    </div>
+  </div>
+  <div class="action-buttons">
+    <a class="source-btn timatic" id="btnTimatic" target="_blank" rel="noopener">🚀 <span data-i18n="openTimatic">Open in Timatic</span> <span class="ext">↗</span></a>
+    <a class="source-btn" id="btnPassportindex" target="_blank" rel="noopener">🌐 <span data-i18n="openPassportindex">Passportindex</span> <span class="ext">↗</span></a>
+    <a class="source-btn" id="btnGoogle" target="_blank" rel="noopener">🔍 <span data-i18n="openGoogle">Google search</span> <span class="ext">↗</span></a>
+    <button class="source-btn save-route-btn" onclick="saveCurrentRoute()">⭐ <span data-i18n="saveRoute">Save route</span></button>
+  </div>
+</div>
+
+<!-- Saved routes -->
+<div class="section-head">
+  <h2 data-i18n="savedRoutes">Saved routes</h2>
+  <span class="meta" id="routeCount">0 routes</span>
+</div>
+
+<div class="routes-toolbar">
+  <input type="text" id="routeSearch" data-i18n-placeholder="searchPh" placeholder="Search by country, notes…" autocomplete="off">
+  <button class="btn" onclick="exportRoutes()" data-i18n="export">↓ Export</button>
+  <button class="btn" onclick="document.getElementById('importFile').click()" data-i18n="import">↑ Import</button>
+  <input type="file" id="importFile" accept=".json" style="display:none" onchange="importRoutes(event)">
+</div>
+
+<div id="routesList"></div>
+
+<!-- Edit route modal -->
+<div class="modal-backdrop" id="editModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="editTitle" data-i18n="editRouteTitle">Edit route</h2>
+      <button class="modal-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-row">
+        <div class="field-group">
+          <label data-i18n="passportLabel">🛂 Passport</label>
+          <select id="ef-passport"></select>
+        </div>
+        <div class="field-group">
+          <label data-i18n="destLabel">✈️ Destination</label>
+          <select id="ef-dest"></select>
+        </div>
+      </div>
+      <div class="field-group">
+        <label data-i18n="notesLabel">📝 Notes (visa type, fee, validity, etc.)</label>
+        <textarea id="ef-notes" data-i18n-placeholder="notesPh" placeholder="e.g. e-visa available, 30 days, ~AED 350. Apply via smartservices.icp.gov.ae"></textarea>
+      </div>
+      <div class="field-group">
+        <label data-i18n="lastVerifiedLabel">📅 Last verified date</label>
+        <input type="date" id="ef-verified">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeEditModal()" data-i18n="cancel">Cancel</button>
+      <button class="btn primary" onclick="saveEditedRoute()" data-i18n="save">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// COUNTRIES (60+)
+// ============================================================
+const COUNTRIES = [
+  // Middle East
+  { code:'LB', name:'Lebanon',        flag:'🇱🇧', region:'me' },
+  { code:'EG', name:'Egypt',          flag:'🇪🇬', region:'me' },
+  { code:'SY', name:'Syria',          flag:'🇸🇾', region:'me' },
+  { code:'JO', name:'Jordan',         flag:'🇯🇴', region:'me' },
+  { code:'PS', name:'Palestine',      flag:'🇵🇸', region:'me' },
+  { code:'IQ', name:'Iraq',           flag:'🇮🇶', region:'me' },
+  { code:'AE', name:'UAE',            flag:'🇦🇪', region:'me' },
+  { code:'SA', name:'Saudi Arabia',   flag:'🇸🇦', region:'me' },
+  { code:'QA', name:'Qatar',          flag:'🇶🇦', region:'me' },
+  { code:'KW', name:'Kuwait',         flag:'🇰🇼', region:'me' },
+  { code:'BH', name:'Bahrain',        flag:'🇧🇭', region:'me' },
+  { code:'OM', name:'Oman',           flag:'🇴🇲', region:'me' },
+  { code:'YE', name:'Yemen',          flag:'🇾🇪', region:'me' },
+  { code:'IR', name:'Iran',           flag:'🇮🇷', region:'me' },
+  { code:'IL', name:'Israel',         flag:'🇮🇱', region:'me' },
+  { code:'TR', name:'Turkey',         flag:'🇹🇷', region:'me' },
+  // Africa
+  { code:'MA', name:'Morocco',        flag:'🇲🇦', region:'af' },
+  { code:'TN', name:'Tunisia',        flag:'🇹🇳', region:'af' },
+  { code:'DZ', name:'Algeria',        flag:'🇩🇿', region:'af' },
+  { code:'LY', name:'Libya',          flag:'🇱🇾', region:'af' },
+  { code:'SD', name:'Sudan',          flag:'🇸🇩', region:'af' },
+  { code:'ET', name:'Ethiopia',       flag:'🇪🇹', region:'af' },
+  { code:'KE', name:'Kenya',          flag:'🇰🇪', region:'af' },
+  { code:'NG', name:'Nigeria',        flag:'🇳🇬', region:'af' },
+  { code:'ZA', name:'South Africa',   flag:'🇿🇦', region:'af' },
+  { code:'GH', name:'Ghana',          flag:'🇬🇭', region:'af' },
+  { code:'TZ', name:'Tanzania',       flag:'🇹🇿', region:'af' },
+  { code:'UG', name:'Uganda',         flag:'🇺🇬', region:'af' },
+  // Europe
+  { code:'GB', name:'United Kingdom', flag:'🇬🇧', region:'eu' },
+  { code:'IE', name:'Ireland',        flag:'🇮🇪', region:'eu' },
+  { code:'FR', name:'France',         flag:'🇫🇷', region:'eu' },
+  { code:'DE', name:'Germany',        flag:'🇩🇪', region:'eu' },
+  { code:'IT', name:'Italy',          flag:'🇮🇹', region:'eu' },
+  { code:'ES', name:'Spain',          flag:'🇪🇸', region:'eu' },
+  { code:'PT', name:'Portugal',       flag:'🇵🇹', region:'eu' },
+  { code:'NL', name:'Netherlands',    flag:'🇳🇱', region:'eu' },
+  { code:'BE', name:'Belgium',        flag:'🇧🇪', region:'eu' },
+  { code:'CH', name:'Switzerland',    flag:'🇨🇭', region:'eu' },
+  { code:'AT', name:'Austria',        flag:'🇦🇹', region:'eu' },
+  { code:'GR', name:'Greece',         flag:'🇬🇷', region:'eu' },
+  { code:'SE', name:'Sweden',         flag:'🇸🇪', region:'eu' },
+  { code:'NO', name:'Norway',         flag:'🇳🇴', region:'eu' },
+  { code:'DK', name:'Denmark',        flag:'🇩🇰', region:'eu' },
+  { code:'FI', name:'Finland',        flag:'🇫🇮', region:'eu' },
+  { code:'PL', name:'Poland',         flag:'🇵🇱', region:'eu' },
+  { code:'CZ', name:'Czech Republic', flag:'🇨🇿', region:'eu' },
+  { code:'RU', name:'Russia',         flag:'🇷🇺', region:'eu' },
+  { code:'UA', name:'Ukraine',        flag:'🇺🇦', region:'eu' },
+  { code:'RO', name:'Romania',        flag:'🇷🇴', region:'eu' },
+  { code:'CY', name:'Cyprus',         flag:'🇨🇾', region:'eu' },
+  // Asia
+  { code:'IN', name:'India',          flag:'🇮🇳', region:'as' },
+  { code:'PK', name:'Pakistan',       flag:'🇵🇰', region:'as' },
+  { code:'BD', name:'Bangladesh',     flag:'🇧🇩', region:'as' },
+  { code:'LK', name:'Sri Lanka',      flag:'🇱🇰', region:'as' },
+  { code:'CN', name:'China',          flag:'🇨🇳', region:'as' },
+  { code:'JP', name:'Japan',          flag:'🇯🇵', region:'as' },
+  { code:'KR', name:'South Korea',    flag:'🇰🇷', region:'as' },
+  { code:'TH', name:'Thailand',       flag:'🇹🇭', region:'as' },
+  { code:'MY', name:'Malaysia',       flag:'🇲🇾', region:'as' },
+  { code:'SG', name:'Singapore',      flag:'🇸🇬', region:'as' },
+  { code:'ID', name:'Indonesia',      flag:'🇮🇩', region:'as' },
+  { code:'PH', name:'Philippines',    flag:'🇵🇭', region:'as' },
+  { code:'VN', name:'Vietnam',        flag:'🇻🇳', region:'as' },
+  { code:'KH', name:'Cambodia',       flag:'🇰🇭', region:'as' },
+  { code:'NP', name:'Nepal',          flag:'🇳🇵', region:'as' },
+  { code:'MV', name:'Maldives',       flag:'🇲🇻', region:'as' },
+  { code:'AZ', name:'Azerbaijan',     flag:'🇦🇿', region:'as' },
+  { code:'GE', name:'Georgia',        flag:'🇬🇪', region:'as' },
+  { code:'AM', name:'Armenia',        flag:'🇦🇲', region:'as' },
+  { code:'KZ', name:'Kazakhstan',     flag:'🇰🇿', region:'as' },
+  // Americas
+  { code:'US', name:'United States',  flag:'🇺🇸', region:'am' },
+  { code:'CA', name:'Canada',         flag:'🇨🇦', region:'am' },
+  { code:'MX', name:'Mexico',         flag:'🇲🇽', region:'am' },
+  { code:'BR', name:'Brazil',         flag:'🇧🇷', region:'am' },
+  { code:'AR', name:'Argentina',      flag:'🇦🇷', region:'am' },
+  // Oceania
+  { code:'AU', name:'Australia',      flag:'🇦🇺', region:'oc' },
+  { code:'NZ', name:'New Zealand',    flag:'🇳🇿', region:'oc' },
+];
+
+const REGIONS = {
+  me: { en:'Middle East', ar:'الشرق الأوسط' },
+  af: { en:'Africa',      ar:'أفريقيا' },
+  eu: { en:'Europe',      ar:'أوروبا' },
+  as: { en:'Asia',        ar:'آسيا' },
+  am: { en:'Americas',    ar:'الأمريكتان' },
+  oc: { en:'Oceania',     ar:'أوقيانوسيا' },
+};
+
+function getCountry(code) {
+  return COUNTRIES.find(c => c.code === code) || COUNTRIES[0];
+}
+
+// ============================================================
+// I18N
+// ============================================================
+const I18N = {
+  en: {
+    title: 'Visa Hub',
+    subtitle: 'Quick launcher for visa rules · Timatic · Passportindex',
+    back: '← Toolkit',
+    disclaimerTitle: 'Always verify before quoting:',
+    disclaimerText: ' Visa rules change frequently. This tool is a quick launcher, not a source of truth. ALWAYS confirm with IATA Timatic or the destination embassy before giving customers any answer.',
+    lookupTitle: '🔍 Lookup a route',
+    passportLabel: '🛂 Passenger passport',
+    destLabel: '✈️ Destination',
+    openTimatic: 'Open in Timatic',
+    openPassportindex: 'Passportindex',
+    openGoogle: 'Google search',
+    saveRoute: 'Save route',
+    savedRoutes: 'Saved routes',
+    searchPh: 'Search by country, notes…',
+    export: '↓ Export',
+    import: '↑ Import',
+    editRouteTitle: 'Edit route',
+    notesLabel: '📝 Notes (visa type, fee, validity, etc.)',
+    notesPh: 'e.g. e-visa available, 30 days, ~AED 350. Apply via smartservices.icp.gov.ae',
+    lastVerifiedLabel: '📅 Last verified date',
+    cancel: 'Cancel',
+    save: 'Save',
+    edit: '✏️ Edit',
+    deleteRoute: 'Delete this route?',
+    routeSaved: '✓ Route saved',
+    routeDeleted: '✓ Deleted',
+    routeUpdated: '✓ Updated',
+    verifiedToday: '✓ Marked as verified today',
+    routes: 'routes',
+    route: 'route',
+    fresh: 'Fresh',
+    recent: 'Recent',
+    aging: 'Aging',
+    stale: 'Stale',
+    unverified: 'Not verified',
+    daysAgo: 'days ago',
+    today: 'today',
+    yesterday: 'yesterday',
+    lastVerified: 'Last verified:',
+    markVerifiedToday: '✓ Mark verified today',
+    noNotes: 'No notes yet — click Edit to add what you know.',
+    noRoutes: 'No saved routes yet. Use the lookup above and click "Save route" to start.',
+    noMatches: 'No routes match your search.',
+    daysWord: 'd',
+    locale: 'en-GB',
+  },
+  ar: {
+    title: 'دليل التأشيرات',
+    subtitle: 'مشغّل سريع لقواعد التأشيرات · تيماتيك · باسبورت إندكس',
+    back: '← الأدوات',
+    disclaimerTitle: 'تحقّق دائماً قبل الإجابة:',
+    disclaimerText: ' قواعد التأشيرة تتغير باستمرار. هذه الأداة مشغّل سريع، ليست مصدراً موثوقاً. تأكّد دائماً من IATA Timatic أو سفارة الوجهة قبل إعطاء العميل أي إجابة.',
+    lookupTitle: '🔍 ابحث عن مسار',
+    passportLabel: '🛂 جواز سفر المسافر',
+    destLabel: '✈️ الوجهة',
+    openTimatic: 'فتح في Timatic',
+    openPassportindex: 'Passportindex',
+    openGoogle: 'بحث Google',
+    saveRoute: 'حفظ المسار',
+    savedRoutes: 'المسارات المحفوظة',
+    searchPh: 'ابحث بالدولة أو الملاحظات…',
+    export: '↓ تصدير',
+    import: '↑ استيراد',
+    editRouteTitle: 'تعديل المسار',
+    notesLabel: '📝 ملاحظات (نوع التأشيرة، الرسوم، المدة، إلخ)',
+    notesPh: 'مثال: تأشيرة إلكترونية متاحة، 30 يوماً، ~350 درهم. التقديم عبر smartservices.icp.gov.ae',
+    lastVerifiedLabel: '📅 تاريخ آخر تحقق',
+    cancel: 'إلغاء',
+    save: 'حفظ',
+    edit: '✏️ تعديل',
+    deleteRoute: 'حذف هذا المسار؟',
+    routeSaved: '✓ تم حفظ المسار',
+    routeDeleted: '✓ تم الحذف',
+    routeUpdated: '✓ تم التحديث',
+    verifiedToday: '✓ تم وضع علامة "تم التحقق اليوم"',
+    routes: 'مسار',
+    route: 'مسار',
+    fresh: 'حديث',
+    recent: 'جديد',
+    aging: 'يتقادم',
+    stale: 'قديم',
+    unverified: 'لم يتم التحقق',
+    daysAgo: 'يوماً',
+    today: 'اليوم',
+    yesterday: 'أمس',
+    lastVerified: 'آخر تحقق:',
+    markVerifiedToday: '✓ تحقق اليوم',
+    noNotes: 'لا توجد ملاحظات بعد — اضغط "تعديل" لإضافة ما تعرفه.',
+    noRoutes: 'لا توجد مسارات محفوظة. استخدم البحث أعلاه واضغط "حفظ المسار".',
+    noMatches: 'لا توجد مسارات تطابق البحث.',
+    daysWord: 'ي',
+    locale: 'ar-EG',
+  }
+};
+let currentLang = localStorage.getItem('adel-tools-lang') || 'en';
+function tA(key) { return (I18N[currentLang] && I18N[currentLang][key]) || key; }
+
+// ============================================================
+// STATE
+// ============================================================
+let routes = [];
+let editingId = null;
+const STORAGE_KEY = 'adel-visa-routes-v1';
+
+// Pre-loaded sample routes (only on first run)
+const STARTER_ROUTES = [
+  { passport:'LB', dest:'AE', notes:'Pre-arranged visa typically required for Lebanese passport. Verify category & sponsor.', lastVerified: null },
+  { passport:'LB', dest:'SA', notes:'eVisa or sponsor-based visa. Check Nusuk for Umrah/tourism options.', lastVerified: null },
+  { passport:'LB', dest:'EG', notes:'Visa on arrival typically available for Lebanese. Check current status before travel.', lastVerified: null },
+  { passport:'EG', dest:'AE', notes:'eVisa available for Egyptian passport. Multiple categories — check sponsor & purpose.', lastVerified: null },
+  { passport:'EG', dest:'FR', notes:'Schengen visa required. Apply via VFS Global. Allow 4-6 weeks processing.', lastVerified: null },
+  { passport:'EG', dest:'GB', notes:'UK visit visa required. Apply online + biometrics at VFS. Allow 3-6 weeks.', lastVerified: null },
+  { passport:'LB', dest:'FR', notes:'Schengen visa required. Apply via French embassy or VFS. Allow 4-8 weeks.', lastVerified: null },
+  { passport:'EG', dest:'US', notes:'B1/B2 visa required. Apply via US embassy. Wait times vary significantly.', lastVerified: null },
+];
+
+// ============================================================
+// STORAGE
+// ============================================================
+function loadRoutes() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) { routes = parsed; return; }
+    }
+  } catch (e) {}
+  // First time — load starter routes
+  routes = STARTER_ROUTES.map(r => ({
+    id: 'r_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+    passport: r.passport,
+    dest: r.dest,
+    notes: r.notes,
+    lastVerified: r.lastVerified,
+    createdAt: Date.now(),
+  }));
+  saveRoutes();
+}
+function saveRoutes() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(routes)); }
+  catch (e) { showToast('Save failed'); }
+}
+
+// ============================================================
+// COUNTRY DROPDOWNS
+// ============================================================
+function buildCountrySelect(selectEl, defaultCode) {
+  const grouped = {};
+  COUNTRIES.forEach(c => {
+    if (!grouped[c.region]) grouped[c.region] = [];
+    grouped[c.region].push(c);
+  });
+  const order = ['me','af','eu','as','am','oc'];
+  let html = '';
+  order.forEach(r => {
+    if (!grouped[r]) return;
+    const label = REGIONS[r][currentLang] || REGIONS[r].en;
+    html += '<optgroup label="' + escapeAttr(label) + '">';
+    grouped[r].sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
+      html += '<option value="' + c.code + '">' + c.flag + ' ' + escapeHtml(c.name) + '</option>';
+    });
+    html += '</optgroup>';
+  });
+  selectEl.innerHTML = html;
+  if (defaultCode) selectEl.value = defaultCode;
+}
+
+// ============================================================
+// SOURCE LINKS
+// ============================================================
+function timaticUrl(passport, dest) {
+  // IATA Travel Centre — accepts country codes via URL params
+  return 'https://www.iatatravelcentre.com/world.php?CodeReturn=' + dest + '&CodeNational=' + passport;
+}
+function passportindexUrl(passport, dest) {
+  // Passport Index uses ISO country codes (lowercase) in their URL
+  const fromName = getCountry(passport).name.toLowerCase().replace(/\s+/g, '-');
+  const toName = getCountry(dest).name.toLowerCase().replace(/\s+/g, '-');
+  return 'https://www.passportindex.org/comparebyPassport.php?p1=' + passport.toLowerCase();
+}
+function googleUrl(passport, dest) {
+  const p = getCountry(passport).name;
+  const d = getCountry(dest).name;
+  const q = encodeURIComponent('visa requirements ' + p + ' passport to ' + d);
+  return 'https://www.google.com/search?q=' + q;
+}
+
+function updateSourceLinks() {
+  const passport = document.getElementById('passportSelect').value;
+  const dest = document.getElementById('destSelect').value;
+  document.getElementById('btnTimatic').href = timaticUrl(passport, dest);
+  document.getElementById('btnPassportindex').href = passportindexUrl(passport, dest);
+  document.getElementById('btnGoogle').href = googleUrl(passport, dest);
+}
+
+// ============================================================
+// SAVE ROUTE FROM LOOKUP
+// ============================================================
+function saveCurrentRoute() {
+  const passport = document.getElementById('passportSelect').value;
+  const dest = document.getElementById('destSelect').value;
+  if (passport === dest) { showToast('Pick different countries'); return; }
+  // Check if already exists
+  const existing = routes.find(r => r.passport === passport && r.dest === dest);
+  if (existing) {
+    showToast('Route already saved — opening editor');
+    openEditModal(existing.id);
+    return;
+  }
+  routes.push({
+    id: 'r_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+    passport, dest,
+    notes: '',
+    lastVerified: null,
+    createdAt: Date.now(),
+  });
+  saveRoutes();
+  render();
+  showToast(tA('routeSaved'));
+}
+
+// ============================================================
+// FRESHNESS
+// ============================================================
+function freshnessFromDate(dateStr) {
+  if (!dateStr) return { state:'unverified', days: null };
+  const verified = new Date(dateStr);
+  if (isNaN(verified)) return { state:'unverified', days: null };
+  const now = new Date();
+  const days = Math.floor((now - verified) / (1000 * 60 * 60 * 24));
+  let state;
+  if (days <= 7) state = 'fresh';
+  else if (days <= 30) state = 'recent';
+  else if (days <= 90) state = 'aging';
+  else state = 'stale';
+  return { state, days };
+}
+
+function freshnessLabel(f) {
+  if (f.state === 'unverified') return tA('unverified');
+  if (f.days === 0) return tA('today');
+  if (f.days === 1) return tA('yesterday');
+  return f.days + ' ' + tA('daysAgo');
+}
+
+function freshnessBadgeText(f) {
+  if (f.state === 'unverified') return '⊘ ' + tA('unverified');
+  if (f.state === 'fresh') return '🟢 ' + tA('fresh');
+  if (f.state === 'recent') return '🟡 ' + tA('recent');
+  if (f.state === 'aging') return '🟠 ' + tA('aging');
+  return '🔴 ' + tA('stale');
+}
+
+// ============================================================
+// EDIT MODAL
+// ============================================================
+function openEditModal(id) {
+  const r = routes.find(x => x.id === id);
+  if (!r) return;
+  editingId = id;
+  buildCountrySelect(document.getElementById('ef-passport'), r.passport);
+  buildCountrySelect(document.getElementById('ef-dest'), r.dest);
+  document.getElementById('ef-notes').value = r.notes || '';
+  document.getElementById('ef-verified').value = r.lastVerified || '';
+  document.getElementById('editModal').classList.add('show');
+}
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('show');
+  editingId = null;
+}
+function saveEditedRoute() {
+  if (!editingId) return;
+  const r = routes.find(x => x.id === editingId);
+  if (!r) return;
+  r.passport = document.getElementById('ef-passport').value;
+  r.dest = document.getElementById('ef-dest').value;
+  r.notes = document.getElementById('ef-notes').value.trim();
+  r.lastVerified = document.getElementById('ef-verified').value || null;
+  r.updatedAt = Date.now();
+  saveRoutes();
+  closeEditModal();
+  render();
+  showToast(tA('routeUpdated'));
+}
+
+function deleteRoute(id) {
+  if (!confirm(tA('deleteRoute'))) return;
+  routes = routes.filter(r => r.id !== id);
+  saveRoutes();
+  render();
+  showToast(tA('routeDeleted'));
+}
+
+function verifyToday(id) {
+  const r = routes.find(x => x.id === id);
+  if (!r) return;
+  const today = new Date().toISOString().slice(0, 10);
+  r.lastVerified = today;
+  r.updatedAt = Date.now();
+  saveRoutes();
+  render();
+  showToast(tA('verifiedToday'));
+}
+
+// ============================================================
+// EXPORT / IMPORT
+// ============================================================
+function exportRoutes() {
+  const data = JSON.stringify(routes, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'visa-routes-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Exported ' + routes.length + ' routes');
+}
+function importRoutes(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!Array.isArray(imported)) { showToast('Invalid file'); return; }
+      const existingKeys = new Set(routes.map(r => r.passport + '_' + r.dest));
+      let added = 0, skipped = 0;
+      imported.forEach(r => {
+        const key = r.passport + '_' + r.dest;
+        if (existingKeys.has(key)) { skipped++; return; }
+        if (!r.id) r.id = 'r_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+        routes.push(r);
+        added++;
+      });
+      saveRoutes();
+      render();
+      showToast('Imported ' + added + ', skipped ' + skipped);
+    } catch (err) { showToast('Failed to parse JSON'); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render() {
+  const search = document.getElementById('routeSearch').value.toLowerCase().trim();
+  let filtered = routes.slice();
+  if (search) {
+    filtered = filtered.filter(r => {
+      const p = getCountry(r.passport);
+      const d = getCountry(r.dest);
+      const hay = [p.name, d.name, p.code, d.code, r.notes || ''].join(' ').toLowerCase();
+      return hay.includes(search);
+    });
+  }
+  // Sort: stale first (so user notices), then by passport name
+  filtered.sort((a, b) => {
+    const fa = freshnessFromDate(a.lastVerified);
+    const fb = freshnessFromDate(b.lastVerified);
+    const order = { stale:0, aging:1, unverified:2, recent:3, fresh:4 };
+    if (order[fa.state] !== order[fb.state]) return order[fa.state] - order[fb.state];
+    return getCountry(a.passport).name.localeCompare(getCountry(b.passport).name);
+  });
+
+  document.getElementById('routeCount').textContent =
+    routes.length + ' ' + (routes.length === 1 ? tA('route') : tA('routes'));
+
+  const list = document.getElementById('routesList');
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">∅</div><p>' +
+      escapeHtml(routes.length === 0 ? tA('noRoutes') : tA('noMatches')) + '</p></div>';
+    return;
+  }
+  list.innerHTML = filtered.map(renderRoute).join('');
+}
+
+let expandedRouteId = null;
+function toggleRoute(id) {
+  expandedRouteId = expandedRouteId === id ? null : id;
+  render();
+}
+
+function renderRoute(r) {
+  const p = getCountry(r.passport);
+  const d = getCountry(r.dest);
+  const f = freshnessFromDate(r.lastVerified);
+  const isExpanded = expandedRouteId === r.id;
+  const routeName = p.name + ' → ' + d.name;
+
+  let html = '<div class="route-card ' + (isExpanded ? 'expanded' : '') + '">';
+  html += '<div class="route-head" onclick="toggleRoute(\'' + r.id + '\')">';
+  html += '<div class="route-flags">' + p.flag + ' <span class="arrow">→</span> ' + d.flag + '</div>';
+  html += '<div class="route-info">';
+  html += '<div class="route-name">' + escapeHtml(routeName) + '</div>';
+  html += '<div class="route-meta">';
+  html += '<span class="freshness-badge ' + f.state + '">' + freshnessBadgeText(f) + '</span>';
+  if (f.days !== null) html += '<span>· ' + escapeHtml(freshnessLabel(f)) + '</span>';
+  html += '</div>';
+  html += '</div>';
+  html += '<div class="route-actions" onclick="event.stopPropagation()">';
+  html += '<button class="icon-btn" title="' + escapeAttr(tA('edit')) + '" onclick="openEditModal(\'' + r.id + '\')">✏️</button>';
+  html += '<button class="icon-btn danger" title="Delete" onclick="deleteRoute(\'' + r.id + '\')">×</button>';
+  html += '</div>';
+  html += '</div>';
+
+  if (isExpanded) {
+    html += '<div class="route-detail">';
+    html += '<div class="detail-section">';
+    html += '<div class="detail-label">📝 Notes</div>';
+    if (r.notes && r.notes.trim()) {
+      html += '<div class="notes-text">' + escapeHtml(r.notes) + '</div>';
+    } else {
+      html += '<div class="notes-text empty">' + escapeHtml(tA('noNotes')) + '</div>';
+    }
+    html += '</div>';
+
+    html += '<div class="verify-row">';
+    html += '<span>' + escapeHtml(tA('lastVerified')) + ' <span class="date">' + escapeHtml(freshnessLabel(f)) + '</span></span>';
+    html += '<button class="verify-btn" onclick="verifyToday(\'' + r.id + '\')">' + escapeHtml(tA('markVerifiedToday')) + '</button>';
+    html += '</div>';
+
+    html += '<div class="detail-sources">';
+    html += '<a class="source-btn timatic" href="' + escapeAttr(timaticUrl(r.passport, r.dest)) + '" target="_blank" rel="noopener">🚀 Timatic <span class="ext">↗</span></a>';
+    html += '<a class="source-btn" href="' + escapeAttr(passportindexUrl(r.passport, r.dest)) + '" target="_blank" rel="noopener">🌐 Passportindex <span class="ext">↗</span></a>';
+    html += '<a class="source-btn" href="' + escapeAttr(googleUrl(r.passport, r.dest)) + '" target="_blank" rel="noopener">🔍 Google <span class="ext">↗</span></a>';
+    html += '</div>';
+
+    html += '</div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+// ============================================================
+// LANGUAGE
+// ============================================================
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('adel-tools-lang', lang);
+  document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.documentElement.lang = lang;
+  document.querySelectorAll('.lang-toggle button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const v = I18N[lang][el.dataset.i18n];
+    if (v !== undefined) el.textContent = v;
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const v = I18N[lang][el.dataset.i18nPlaceholder];
+    if (v !== undefined) el.placeholder = v;
+  });
+  // Rebuild dropdowns with translated regions
+  const pPrev = document.getElementById('passportSelect').value || 'LB';
+  const dPrev = document.getElementById('destSelect').value || 'AE';
+  buildCountrySelect(document.getElementById('passportSelect'), pPrev);
+  buildCountrySelect(document.getElementById('destSelect'), dPrev);
+  updateSourceLinks();
+  render();
+}
+
+// ============================================================
+// EVENTS
+// ============================================================
+document.getElementById('passportSelect').addEventListener('change', updateSourceLinks);
+document.getElementById('destSelect').addEventListener('change', updateSourceLinks);
+document.getElementById('routeSearch').addEventListener('input', render);
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT')) {
+      document.activeElement.blur();
+    } else if (document.getElementById('editModal').classList.contains('show')) {
+      closeEditModal();
+    } else if (expandedRouteId) {
+      expandedRouteId = null; render();
+    }
+  }
+});
+
+// ============================================================
+// HELPERS
+// ============================================================
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+function escapeAttr(s) {
+  if (s == null) return '';
+  return String(s).replace(/"/g, '&quot;');
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+loadRoutes();
+buildCountrySelect(document.getElementById('passportSelect'), 'LB');
+buildCountrySelect(document.getElementById('destSelect'), 'AE');
+updateSourceLinks();
+setLang(currentLang);
+</script>
+</body>
+</html>
