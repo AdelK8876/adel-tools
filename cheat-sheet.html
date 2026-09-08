@@ -174,7 +174,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
       <div class="tb-sub" id="tb-sub">— scenarios</div>
     </div>
     <div class="search-box">
-      <input id="search" type="text" placeholder="Search title, answer, tags (e.g. tabby, refund, LCC)…" autocomplete="off" oninput="onSearch()">
+      <input id="search" type="text" placeholder="Search title, answer, tags (e.g. refund, LCC, voucher)…" autocomplete="off" oninput="onSearch()">
     </div>
     <div class="tb-actions">
       <button class="btn btn-ghost btn-sm" onclick="exportData()">📤 Export</button>
@@ -221,7 +221,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         </div>
         <div class="form-group">
           <label>Tags <span class="helper">(comma-separated)</span></label>
-          <input id="f-tags" type="text" placeholder="e.g. Tabby, Auto Refund, LCC">
+          <input id="f-tags" type="text" placeholder="e.g. Auto Refund, LCC, Voucher">
         </div>
       </div>
 
@@ -257,7 +257,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
       <div class="form-group">
         <label>Warnings / Edge Cases <span class="helper">(things to watch out for)</span></label>
-        <textarea id="f-warnings" placeholder="e.g. If customer used Tabby, do NOT process refund directly — refer to Tabby support." rows="3"></textarea>
+        <textarea id="f-warnings" placeholder="e.g. Always confirm the payment method first — some providers require the customer to follow up directly rather than us processing the refund." rows="3"></textarea>
       </div>
     </div>
     <div class="m-foot">
@@ -294,20 +294,8 @@ const STARTER_SCENARIOS = [
     rules:'When a Wego booking fails with normal card payment, the deducted amount is refunded automatically to the original payment method. No customer action is needed. The 7–10 business day window depends on the customer\'s bank.',
     steps:'Confirm the booking is indeed failed (check status in the system).\nUse the "Booking Failed — One Way" canned response (Normal Payment variant).\nReassure the customer no action is needed on their side.\nIf customer reports no refund after 10 business days, escalate to finance team.',
     cannedResponse:'Booking Failed — One Way (Normal Payment)',
-    warnings:'Always verify the payment method first. If it was Tabby, the process is different — see "Booking Failed — Tabby" scenario.',
+    warnings:'Always verify the payment method first — some third-party payment providers require the customer to follow up with them directly instead of us processing the refund.',
     tags:['Booking Failed','Auto Refund','7-10 Days']
-  },
-  {
-    id:'sc-booking-failed-tabby',
-    category:'refund',
-    title:'Booking Failed — Tabby Payment',
-    customerSays:'I paid with Tabby and my booking failed. Where is my money?',
-    quickAnswer:'Since you paid through Tabby, please contact Tabby directly — they hold the funds and will process the refund and tell you the timeframe.',
-    rules:'Tabby holds the payment funds, so refunds for Tabby-paid bookings must be initiated through Tabby\'s customer service. Wego cannot process Tabby refunds directly because we never received the money — Tabby pays us when the booking succeeds.',
-    steps:'Confirm booking failed and payment method was Tabby.\nUse the "Booking Failed — One Way (Tabby Payment)" canned response.\nProvide Tabby\'s contact details if customer asks.\nLog the case for tracking.',
-    cannedResponse:'Booking Failed — One Way (Tabby Payment)',
-    warnings:'Do NOT promise a refund timeframe — that\'s Tabby\'s decision, not Wego\'s. Refer them to Tabby for ETA.',
-    tags:['Booking Failed','Tabby','Contact Tabby']
   },
   {
     id:'sc-soow-failed',
@@ -316,7 +304,7 @@ const STARTER_SCENARIOS = [
     customerSays:'My departure flight failed but the return is confirmed (or vice versa). What happens?',
     quickAnswer:'The failed leg\'s amount is refunded automatically. The confirmed leg remains active. Refund within 7–10 business days for normal payment.',
     rules:'Split One-Way (SOOW) bookings have departure and return as separate transactions. If one leg fails, only that amount is refunded; the other leg stays confirmed. Customer can rebook the failed leg or proceed with just the confirmed one.',
-    steps:'Identify exactly which leg failed (departure or return).\nConfirm payment method (Normal or Tabby — affects refund process).\nUse "Booking Failed — SOOW" canned response, choose appropriate sub-option.\nClarify which PNR is still active.',
+    steps:'Identify exactly which leg failed (departure or return).\nConfirm the payment method — this affects the refund process.\nUse "Booking Failed — SOOW" canned response, choose appropriate sub-option.\nClarify which PNR is still active.',
     cannedResponse:'Booking Failed — SOOW',
     warnings:'Always verify with the customer that they understand only one leg is confirmed. They may need a new ticket for the failed leg if they still want to travel.',
     tags:['SOOW','Booking Failed','Partial']
@@ -376,8 +364,8 @@ const STARTER_SCENARIOS = [
     customerSays:'I paid for extra baggage but it wasn\'t added to my ticket. Where\'s my refund?',
     quickAnswer:'The extra baggage payment is refunded automatically to your original payment method within 7–10 business days. Your flight booking remains intact.',
     rules:'When the extra baggage add-on fails to be added to a confirmed booking, the baggage charge is refunded automatically — but the flight booking itself remains active. The two are processed separately.',
-    steps:'Verify failed extra baggage on the booking (check confirmation).\nVerify payment method (Normal or Tabby).\nUse "Extra Baggage Failed" canned response (matching payment method).\nConfirm refund amount and method with customer.\nLog case for tracking.',
-    cannedResponse:'Extra Baggage Failed (Normal Payment / Tabby Payment)',
+    steps:'Verify failed extra baggage on the booking (check confirmation).\nVerify the payment method.\nUse "Extra Baggage Failed" canned response.\nConfirm refund amount and method with customer.\nLog case for tracking.',
+    cannedResponse:'Extra Baggage Failed',
     warnings:'Don\'t confuse this with booking-failure scenarios — the flight is fine, only the baggage add-on failed. If customer needs the extra baggage, they need to add it directly with the airline.',
     tags:['Extra Baggage','Failed','Auto Refund']
   },

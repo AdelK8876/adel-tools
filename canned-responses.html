@@ -132,15 +132,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         <span class="nb-badge">EN + AR</span>
       </div>
     </div>
-    <div class="nav-btn" onclick="showTemplate('ow-tabby')" id="nav-ow-tabby">
-      <div class="nb-icon" style="background:#fce7f3">💳</div>
-      <div class="nb-text">
-        <div class="nb-title">Booking Failed — One Way</div>
-        <div class="nb-sub">Tabby Payment</div>
-        <span class="nb-badge">EN + AR</span>
-      </div>
-    </div>
-
     <div class="nav-section">SOOW — Split One Way</div>
     <div class="nav-btn" onclick="showTemplate('soow-normal')" id="nav-soow-normal">
       <div class="nb-icon" style="background:#dbeafe">🔀</div>
@@ -150,15 +141,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         <span class="nb-badge">DEP + RET · EN + AR</span>
       </div>
     </div>
-    <div class="nav-btn" onclick="showTemplate('soow-tabby')" id="nav-soow-tabby">
-      <div class="nb-icon" style="background:#f3e8ff">💳</div>
-      <div class="nb-text">
-        <div class="nb-title">Booking Failed — SOOW</div>
-        <div class="nb-sub">Tabby Payment</div>
-        <span class="nb-badge">DEP + RET · EN + AR</span>
-      </div>
-    </div>
-
     <div class="nav-section">SOOW — LCC Non-Refundable</div>
     <div class="nav-btn" onclick="showTemplate('lcc-no-refund')" id="nav-lcc-no-refund">
       <div class="nb-icon" style="background:#fee2e2">🚫</div>
@@ -178,15 +160,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         <span class="nb-badge">EN + AR</span>
       </div>
     </div>
-    <div class="nav-btn" onclick="showTemplate('bag-tabby')" id="nav-bag-tabby">
-      <div class="nb-icon" style="background:#fef9c3">💳</div>
-      <div class="nb-text">
-        <div class="nb-title">Extra Baggage Failed</div>
-        <div class="nb-sub">Tabby Payment</div>
-        <span class="nb-badge">EN + AR</span>
-      </div>
-    </div>
-
     <div class="nav-section">Payment Links</div>
     <div class="nav-btn" onclick="showTemplate('paylink')" id="nav-paylink">
       <div class="nb-icon" style="background:#e0f2fe">🔗</div>
@@ -290,64 +263,26 @@ const TEMPLATES = {
     ],
     en(v){ return `Dear Valued Customer,
 
-We regret to inform you that we were unable to successfully confirm your booking.
-Please accept our sincere apologies for any inconvenience this may have caused.
-Kindly note that if any amount has been debited from your account, it will be automatically refunded.
+We're sorry to inform you that your booking could not be confirmed. Please accept our sincere apologies for any inconvenience this may have caused.
 
-The refunded amount is ${v.amount}.
+Rest assured, any amount debited from your account will be refunded automatically to your original payment method, with no action required on your part.
 
-Depending on your bank's processing time, it may take approximately 7–10 business days for the amount to reflect in your account.
-Should you require any further assistance or wish to proceed with an alternative booking, please feel free to contact us through the following channels:
-${CONTACTS}
+Refunded amount: ${v.amount}
 
-We remain at your service and look forward to assisting you.`; },
-    ar(v){ return `عزيزي العميل،
+Should you have any questions in the meantime, please don't hesitate to reach out — we're happy to help.
 
-نأسف لإبلاغك بأننا لم نتمكن من تأكيد حجزك بنجاح.
-يرجى قبول اعتذارنا الصادق عن أي إزعاج قد يسببه هذا الموقف.
-يرجى ملاحظة أنه إذا تم خصم أي مبلغ من حسابك، فسيتم رده تلقائيًا.
+Warm regards,`; },
+    ar(v){ return `عزيزي العميل الكريم،
 
-المبلغ المسترد هو ${v.amount_ar}.
+يؤسفنا إبلاغكم بتعذر تأكيد حجزكم، ونعتذر بصدق عن أي إزعاج قد يكون هذا الأمر قد سببه لكم.
 
-اعتمادًا على وقت معالجة البنك الذي تتعامل معه، قد يستغرق الأمر ما يقرب من 7-10 أيام عمل حتى ينعكس المبلغ في حسابك.
-إذا كنت بحاجة إلى أي مساعدة إضافية أو ترغب في المضي قدمًا في حجز بديل، فلا تتردد في الاتصال بنا من خلال القنوات التالية:
-${CONTACTS_AR}
+نود طمأنتكم بأن أي مبلغ تم خصمه من حسابكم سيُرد تلقائيًا إلى وسيلة الدفع الأصلية، دون الحاجة لأي إجراء من جانبكم.
 
-نحن في خدمتكم دائمًا.`; }
-  },
+المبلغ المسترد: ${v.amount_ar}
 
-  'ow-tabby': {
-    title: 'Booking Failed — One Way',
-    desc: 'Tabby Payment · Contact Tabby for Refund',
-    icon: '💳',
-    iconBg: '#fce7f3',
-    fields: [
-      {id:'amount', label:'Refund Amount', type:'currency', req:true},
-    ],
-    en(v){ return `Dear Valued Customer,
+وفي حال وجود أي استفسار، يسعدنا تواصلكم معنا في أي وقت.
 
-We regret to inform you that we were unable to successfully confirm your booking.
-Please accept our sincere apologies for any inconvenience this may have caused.
-Since the payment was made through Tabby, kindly contact Tabby directly, as they will inform you about the refund process and the expected timeframe.
-
-The refunded amount is ${v.amount}.
-
-Should you require any further assistance or wish to proceed with an alternative booking, please feel free to contact us through the following channels:
-${CONTACTS}
-
-We remain at your service and look forward to assisting you.`; },
-    ar(v){ return `عزيزي العميل،
-
-نأسف لإبلاغك بأننا لم نتمكن من تأكيد حجزك بنجاح.
-يرجى قبول اعتذارنا الصادق عن أي إزعاج قد يسببه هذا الموقف.
-بما أن الدفع تم عن طريق تابي Tabby، برجاء التواصل مع تابي Tabby مباشرةً، وذلك لإبلاغ حضرتك بإجراءات الاسترداد والمدة الزمنية المتوقعة.
-
-المبلغ المسترد هو ${v.amount_ar}.
-
-إذا كنت بحاجة إلى أي مساعدة إضافية أو ترغب في المضي قدمًا في حجز بديل، فلا تتردد في الاتصال بنا من خلال القنوات التالية:
-${CONTACTS_AR}
-
-نحن في خدمتكم دائمًا.`; }
+مع خالص التقدير،`; }
   },
 
   'soow-normal': {
@@ -396,50 +331,6 @@ ${CONTACTS_AR}
 نحن في خدمتكم دائمًا.`; }
   },
 
-  'soow-tabby': {
-    title: 'Booking Failed — SOOW',
-    desc: 'Tabby Payment · Contact Tabby for Refund',
-    icon: '💳',
-    iconBg: '#f3e8ff',
-    hasSub: true,
-    subs: ['Departure Booking Failed', 'Return Booking Failed'],
-    fields: [
-      {id:'amount', label:'Refund Amount', type:'currency', req:true},
-    ],
-    en(v, sub){ 
-      const isDep = sub === 0;
-      return `Dear Valued Customer,
-
-We regret to inform you that we were unable to successfully confirm your ${isDep ? 'Departure' : 'Return'} Booking.
-However, the ${isDep ? 'Return' : 'Departure'} Booking is already confirmed ( PNR Confirmed ).
-
-Please accept our sincere apologies for any inconvenience this may have caused.
-Since the payment was made through Tabby, kindly contact Tabby directly, as they will inform you about the refund process and the expected timeframe.
-
-The refunded amount is ${v.amount}.
-
-Should you require any further assistance or wish to proceed with an alternative booking, please feel free to contact us through the following channels:
-${CONTACTS}
-
-We remain at your service and look forward to assisting you.`; },
-    ar(v, sub){ 
-      const isDep = sub === 0;
-      return `عزيزي العميل،
-
-نأسف لإبلاغك بأننا لم نتمكن من تأكيد حجز ${isDep ? 'الذهاب' : 'العودة'} بنجاح.
-ومع ذلك، تم تأكيد حجز ${isDep ? 'العودة' : 'الذهاب'} بالفعل ( PNR Confirmed ).
-
-يرجى قبول اعتذارنا الصادق عن أي إزعاج قد يسببه هذا الموقف.
-بما أن الدفع تم عن طريق تابي Tabby، برجاء التواصل مع تابي Tabby مباشرةً، وذلك لإبلاغ حضرتك بإجراءات الاسترداد والمدة الزمنية المتوقعة.
-
-المبلغ المسترد هو ${v.amount_ar}.
-
-إذا كنت بحاجة إلى أي مساعدة إضافية أو ترغب في المضي قدمًا في حجز بديل، فلا تتردد في الاتصال بنا من خلال القنوات التالية:
-${CONTACTS_AR}
-
-نحن في خدمتكم دائمًا.`; }
-  },
-
   'bag-normal': {
     title: 'Extra Baggage Failed',
     desc: 'Normal Payment · Automatic Refund',
@@ -474,43 +365,6 @@ We remain at your service and look forward to assisting you.`; },
 
 يرجى ملاحظة أنه وفقًا لإجراءات البنك الخاص بكم، قد يستغرق ظهور المبلغ في حسابكم مدة تتراوح من 7 إلى 10 أيام عمل.
 في حال احتجتم إلى أي مساعدة إضافية أو رغبتم في المتابعة بحجز بديل، يرجى التواصل معنا من خلال القنوات التالية:
-${CONTACTS_AR}
-
-نحن في خدمتكم دائمًا.`; }
-  },
-
-  'bag-tabby': {
-    title: 'Extra Baggage Failed',
-    desc: 'Tabby Payment · Contact Tabby for Refund',
-    icon: '🧳',
-    iconBg: '#fef9c3',
-    fields: [
-      {id:'ref', label:'Booking Reference', ph:'WF5V3F4JE7J26', req:true, hint:'e.g. WF5V3F4JE7J26'},
-      {id:'amount', label:'Refund Amount', type:'currency', req:true},
-    ],
-    en(v){ return `Subject: Regarding Your Extra Baggage — ${v.ref}
-
-Dear Valued Customer,
-
-We would like to inform you that, unfortunately, we were unable to add the additional baggage you selected and paid for in your booking.
-Since the payment was made through Tabby, kindly contact Tabby directly, as they will inform you about the refund process and the expected timeframe.
-
-The refunded amount is ${v.amount}.
-
-Should you require any further assistance or wish to proceed with an alternative booking, please feel free to contact us through the following channels:
-${CONTACTS}
-
-We remain at your service and look forward to assisting you.`; },
-    ar(v){ return `الموضوع: بخصوص طلب إضافة الأمتعة — ${v.ref}
-
-عزيزي العميل،
-
-نود إفادتكم بأنه للأسف لم نتمكن من إضافة قطعة الأمتعة الإضافية التي تم اختيارها وسداد قيمتها ضمن الحجز.
-بما أن الدفع تم عن طريق تابي Tabby، برجاء التواصل مع تابي Tabby مباشرةً، وذلك لإبلاغ حضرتك بإجراءات الاسترداد والمدة الزمنية المتوقعة.
-
-المبلغ المسترد هو ${v.amount_ar}.
-
-إذا كنت بحاجة إلى أي مساعدة إضافية أو ترغب في المضي قدمًا في حجز بديل، فلا تتردد في الاتصال بنا من خلال القنوات التالية:
 ${CONTACTS_AR}
 
 نحن في خدمتكم دائمًا.`; }
