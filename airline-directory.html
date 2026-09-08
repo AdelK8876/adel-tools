@@ -421,7 +421,7 @@ let editingId = null;
 function init(){
   let stored = localStorage.getItem(STORAGE_KEY);
 
-  // Migration: if no new key but old Wego key exists, copy it over
+  // Migration: if no new key but an old key exists, copy it over
   if(!stored){
     for(const oldKey of OLD_STORAGE_KEYS){
       const oldData = localStorage.getItem(oldKey);

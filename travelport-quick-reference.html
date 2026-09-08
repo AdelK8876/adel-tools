@@ -137,8 +137,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);displ
   <div id="sb-foot">
     ✏️ Fill = generate with your data<br>
     Click any command to copy it<br><br>
-    <a href="https://travelportprod.service-now.com/mytravelport_support" target="_blank">🔗 Travelport Support</a><br>
-    <a href="https://sites.google.com/wego.com/tools/home/galileo-helper?pli=1" target="_blank">🔗 Galileo Helper</a>
+    <a href="https://travelportprod.service-now.com/mytravelport_support" target="_blank">🔗 Travelport Support</a>
   </div>
 </aside>
 
@@ -666,7 +665,7 @@ function cpResult(){
 // ── BUILD PAGE ────────────────────────────────────────────────────
 function buildSections(){
   const c=document.getElementById('content');let html='';
-  html+=`<div class="info">💡 <strong>Agent Sign:</strong> Set your agent initial in the top bar. It will be used automatically in save commands like Cancel Itinerary (XI). &nbsp;|&nbsp; <strong>Support:</strong> <a href="https://travelportprod.service-now.com/mytravelport_support" target="_blank" style="color:var(--blue)">Travelport Support Portal</a> &nbsp;|&nbsp; <a href="https://sites.google.com/wego.com/tools/home/galileo-helper?pli=1" target="_blank" style="color:var(--blue)">Galileo Helper</a></div>`;
+  html+=`<div class="info">💡 <strong>Agent Sign:</strong> Set your agent initial in the top bar. It will be used automatically in save commands like Cancel Itinerary (XI). &nbsp;|&nbsp; <strong>Support:</strong> <a href="https://travelportprod.service-now.com/mytravelport_support" target="_blank" style="color:var(--blue)">Travelport Support Portal</a></div>`;
 
   SECTIONS.forEach(s=>{
     html+=`<div class="section" id="${s.id}">`;

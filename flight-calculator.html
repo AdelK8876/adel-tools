@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flight Calculator — Wego Tools</title>
+<title>Flight Calculator</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -86,7 +86,7 @@ body[dir="rtl"] .email-preview .channel{direction:ltr;justify-content:flex-end;t
 .calc-head p{font-size:12px;color:rgba(255,255,255,.85);margin-top:3px}
 .calc-body{padding:22px}
 
-/* Trip-type tabs (Wego-style) */
+/* Trip-type tabs */
 .trip-tabs{display:flex;gap:24px;border-bottom:1px solid var(--border);margin-bottom:20px}
 .trip-tab{padding:10px 0;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;display:flex;align-items:center;gap:6px}
 .trip-tab:hover{color:var(--text)}
@@ -94,7 +94,7 @@ body[dir="rtl"] .email-preview .channel{direction:ltr;justify-content:flex-end;t
 .trip-tab .tag{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;background:#e6efff;color:var(--blue);padding:2px 6px;border-radius:4px}
 .trip-tab.active .tag{background:var(--blue);color:#fff}
 
-/* Booking reference fields (Wego internal) */
+/* Booking reference fields (internal) */
 .booking-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;padding:14px;background:#fef3f2;border:1px solid #fecaca;border-radius:10px}
 .booking-cell{display:flex;flex-direction:column;gap:5px}
 .booking-cell label{font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:4px}
@@ -189,7 +189,7 @@ body[dir="rtl"] .email-preview .channel{direction:ltr;justify-content:flex-end;t
 .calc-btn:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(26,86,219,.4)}
 .calc-btn:active{transform:translateY(0)}
 
-/* ── RESULT CARD (NEW DESIGN — EgyptAir/Wego style) ── */
+/* ── RESULT CARD ── */
 .result-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-md);display:none;animation:slideUp .3s}
 .result-card.show{display:block}
 @keyframes slideUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:none}}
@@ -391,7 +391,7 @@ body[dir="rtl"] .email-preview .channel{direction:ltr;justify-content:flex-end;t
 <aside id="sidebar">
   <div id="sb-head">
     <div class="logo"><span>🕐</span> Time Zone Tool</div>
-    <div class="sub">Wego · Flight Calculator</div>
+    <div class="sub">Flight Calculator</div>
   </div>
   <div id="sb-content">
     <div class="sb-section" data-i18n="worldClock">🌍 Live World Clock</div>
@@ -430,14 +430,14 @@ body[dir="rtl"] .email-preview .channel{direction:ltr;justify-content:flex-end;t
         <div class="section-label" data-section="booking"><span class="dot" style="background:var(--red)"></span> <span data-i18n="bookingTitle">📋 Booking References</span> <span style="color:var(--muted);font-size:10px;font-weight:500;margin-left:6px;text-transform:none;letter-spacing:0" data-i18n="optional">(optional)</span></div>
         <div class="booking-row">
           <div class="booking-cell">
-            <label data-i18n="wegoBookingRef">Wego Booking Reference</label>
-            <input id="wego-booking-ref" type="text" placeholder="e.g. WFSS2FPN9CY26" maxlength="30" oninput="this.value=this.value.toUpperCase()">
-            <div class="hint" data-i18n="wegoBookingRefHint">e.g. WFSS2FPN9CY26</div>
+            <label data-i18n="internalBookingRef">Booking Reference</label>
+            <input id="internal-booking-ref" type="text" placeholder="e.g. WFSS2FPN9CY26" maxlength="30" oninput="this.value=this.value.toUpperCase()">
+            <div class="hint" data-i18n="internalBookingRefHint">e.g. WFSS2FPN9CY26</div>
           </div>
           <div class="booking-cell">
-            <label data-i18n="wegoPnr">Wego PNR</label>
-            <input id="wego-pnr" type="text" placeholder="e.g. GHGTR5" maxlength="15" oninput="this.value=this.value.toUpperCase()">
-            <div class="hint" data-i18n="wegoPnrHint">Wego internal record locator (used in the GDS)</div>
+            <label data-i18n="internalPnr">Internal PNR</label>
+            <input id="internal-pnr" type="text" placeholder="e.g. GHGTR5" maxlength="15" oninput="this.value=this.value.toUpperCase()">
+            <div class="hint" data-i18n="internalPnrHint">Internal record locator (used in the GDS)</div>
           </div>
           <div class="booking-cell">
             <label data-i18n="airlinePnr">Airline PNR</label>
@@ -780,8 +780,8 @@ const I18N = {
     oneWay:'One-way', roundTrip:'Round-trip',
     fromOrigin:'From (Origin)', toDestination:'To (Destination)',
     bookingTitle:'📋 Booking References', optional:'(optional)',
-    wegoBookingRef:'Wego Booking Reference', wegoBookingRefHint:'e.g. WFSS2FPN9CY26',
-    wegoPnr:'Wego PNR', wegoPnrHint:'Wego internal record locator (used in the GDS)',
+    internalBookingRef:'Booking Reference', internalBookingRefHint:'e.g. WFSS2FPN9CY26',
+    internalPnr:'Internal PNR', internalPnrHint:'Internal record locator (used in the GDS)',
     airlinePnr:'Airline PNR', airlinePnrHint:'Airline record locator (the one customer uses on the airline website)',
     notProvided:'— not provided —',
     passengersTitle:'Passengers & Cabin Class',
@@ -817,13 +817,13 @@ const I18N = {
     // Email content
     emailSubject:'Flight Details',
     dearCustomer:'Dear Customer,',
-    emailIntroPart1:'Thank you for choosing Wego. We would like to inform you about your',
+    emailIntroPart1:'Thank you for choosing us. We would like to inform you about your',
     emailIntroPart2:'flight details below:',
     tripOW:'one-way', tripRT:'round-trip',
     legDeparture:'Departure', legArrival:'Arrival',
     paxBlockTitle:'Passenger Details',
     bookingBlockTitle:'Booking References',
-    emailFooterIntro:'Should you require any further assistance, please feel free to contact us through the following channels:',
+    emailFooterIntro:'Should you require any further assistance, please don\'t hesitate to reach out.',
     emailClosing:'We remain at your service and look forward to assisting you.',
     sameDayLong:'same day', dayAfter:'day after departure', daysAfter:'days after departure',
     dayBefore:'day before departure', daysBefore:'days before departure',
@@ -849,8 +849,8 @@ const I18N = {
     oneWay:'ذهاب فقط', roundTrip:'ذهاب وعودة',
     fromOrigin:'من (المغادرة)', toDestination:'إلى (الوصول)',
     bookingTitle:'📋 مراجع الحجز', optional:'(اختياري)',
-    wegoBookingRef:'رقم حجز Wego', wegoBookingRefHint:'مثال: WFSS2FPN9CY26',
-    wegoPnr:'Wego PNR', wegoPnrHint:'رمز الحجز الداخلي لـ Wego (المستخدم في GDS)',
+    internalBookingRef:'رقم الحجز', internalBookingRefHint:'مثال: WFSS2FPN9CY26',
+    internalPnr:'الرقم المرجعي الداخلي', internalPnrHint:'رمز الحجز الداخلي (المستخدم في GDS)',
     airlinePnr:'PNR شركة الطيران', airlinePnrHint:'رمز الحجز لدى شركة الطيران (الذي يستخدمه العميل على موقع الشركة)',
     notProvided:'— غير متوفر —',
     passengersTitle:'الركاب ودرجة المقصورة',
@@ -885,13 +885,13 @@ const I18N = {
     tipText:'<strong>تلميح:</strong> يتم حساب مدة الرحلة تلقائياً من المسافة بين المطارين بسرعة طيران الرحلات التجارية الاعتيادية. يمكنك التعديل اليدوي للمدة من جدول شركة الطيران. التوقيت الصيفي والمناطق الزمنية يتم معالجتها تلقائياً.',
     emailSubject:'تفاصيل الرحلة',
     dearCustomer:'عميلنا العزيز،',
-    emailIntroPart1:'شكراً لاختياركم Wego. نود إبلاغكم بتفاصيل رحلتكم',
+    emailIntroPart1:'شكراً لاختياركم إيانا. نود إبلاغكم بتفاصيل رحلتكم',
     emailIntroPart2:'أدناه:',
     tripOW:'الذهاب فقط', tripRT:'الذهاب والعودة',
     legDeparture:'المغادرة', legArrival:'الوصول',
     paxBlockTitle:'تفاصيل الركاب',
     bookingBlockTitle:'مراجع الحجز',
-    emailFooterIntro:'إذا احتجتم إلى أي مساعدة إضافية، يرجى التواصل معنا عبر القنوات التالية:',
+    emailFooterIntro:'إذا احتجتم إلى أي مساعدة إضافية، فلا تترددوا في التواصل معنا.',
     emailClosing:'نبقى في خدمتكم ونتطلع إلى مساعدتكم.',
     sameDayLong:'نفس اليوم', dayAfter:'يوم بعد المغادرة', daysAfter:'أيام بعد المغادرة',
     dayBefore:'يوم قبل المغادرة', daysBefore:'أيام قبل المغادرة',
@@ -1264,8 +1264,8 @@ function calculate() {
     distanceMi: Math.round(distanceKm * 0.6214),
     pax: paxData(),
     booking: {
-      wegoRef: document.getElementById('wego-booking-ref').value.trim(),
-      wegoPnr: document.getElementById('wego-pnr').value.trim(),
+      internalRef: document.getElementById('internal-booking-ref').value.trim(),
+      internalPnr: document.getElementById('internal-pnr').value.trim(),
       airlinePnr: document.getElementById('airline-pnr').value.trim(),
     },
     ref: 'WG-' + Date.now().toString().slice(-6),
@@ -1387,10 +1387,10 @@ function renderResult() {
   const p = r.pax;
   const total = paxTotal(p);
   const b = r.booking || {};
-  const hasAnyBooking = b.wegoRef || b.wegoPnr || b.airlinePnr;
+  const hasAnyBooking = b.internalRef || b.internalPnr || b.airlinePnr;
   const bookingBar = hasAnyBooking ? `<div class="booking-summary">
-    <div class="b-item"><span class="b-label">${tA('wegoBookingRef','Wego Booking Reference')}</span><span class="b-value ${b.wegoRef?'':'empty'}">${b.wegoRef || tA('notProvided','— not provided —')}</span></div>
-    <div class="b-item"><span class="b-label">${tA('wegoPnr','Wego PNR')}</span><span class="b-value ${b.wegoPnr?'':'empty'}">${b.wegoPnr || tA('notProvided','— not provided —')}</span></div>
+    <div class="b-item"><span class="b-label">${tA('internalBookingRef','Booking Reference')}</span><span class="b-value ${b.internalRef?'':'empty'}">${b.internalRef || tA('notProvided','— not provided —')}</span></div>
+    <div class="b-item"><span class="b-label">${tA('internalPnr','Internal PNR')}</span><span class="b-value ${b.internalPnr?'':'empty'}">${b.internalPnr || tA('notProvided','— not provided —')}</span></div>
     <div class="b-item"><span class="b-label">${tA('airlinePnr','Airline PNR')}</span><span class="b-value ${b.airlinePnr?'':'empty'}">${b.airlinePnr || tA('notProvided','— not provided —')}</span></div>
   </div>` : '';
 
@@ -1474,12 +1474,12 @@ function buildEmailHTML() {
 
   // Booking block (only if any field is filled)
   const b = r.booking || {};
-  const hasAnyBooking = b.wegoRef || b.wegoPnr || b.airlinePnr;
+  const hasAnyBooking = b.internalRef || b.internalPnr || b.airlinePnr;
   const bookingBlock = hasAnyBooking ? `<div class="email-booking-block">
     <div class="bb-title">📋 ${tA('bookingBlockTitle')}</div>
     <div class="bb-grid">
-      <div class="bb-item"><span class="bb-l">${tA('wegoBookingRef')}</span><span class="bb-v ${b.wegoRef?'':'empty'}">${b.wegoRef || tA('notProvided')}</span></div>
-      <div class="bb-item"><span class="bb-l">${tA('wegoPnr')}</span><span class="bb-v ${b.wegoPnr?'':'empty'}">${b.wegoPnr || tA('notProvided')}</span></div>
+      <div class="bb-item"><span class="bb-l">${tA('internalBookingRef')}</span><span class="bb-v ${b.internalRef?'':'empty'}">${b.internalRef || tA('notProvided')}</span></div>
+      <div class="bb-item"><span class="bb-l">${tA('internalPnr')}</span><span class="bb-v ${b.internalPnr?'':'empty'}">${b.internalPnr || tA('notProvided')}</span></div>
       <div class="bb-item"><span class="bb-l">${tA('airlinePnr')}</span><span class="bb-v ${b.airlinePnr?'':'empty'}">${b.airlinePnr || tA('notProvided')}</span></div>
     </div>
   </div>` : '';
@@ -1506,10 +1506,6 @@ ${flightBoxes}
 ${paxBlock}
 <div class="email-footer">
   <div class="footer-intro">${tA('emailFooterIntro')}</div>
-  <div class="channel"><span class="channel-icon">📞</span> <strong>Egypt&nbsp;&nbsp;&nbsp;&nbsp;:</strong> <a href="tel:0020221279930">0020 2 21279930</a></div>
-  <div class="channel"><span class="channel-icon">📞</span> <strong>UAE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</strong> <a href="tel:0097145810300">0097 1 45810300</a></div>
-  <div class="channel"><span class="channel-icon">💬</span> <strong>WhatsApp :</strong> <a href="https://wa.me/971588250786">00971 588 250 786</a></div>
-  <div class="channel"><span class="channel-icon">📧</span> <strong>Email&nbsp;&nbsp;&nbsp;&nbsp;:</strong> <a href="mailto:CustomerSupport@wego.com">CustomerSupport@wego.com</a></div>
 </div>
 <div class="email-closing">${tA('emailClosing')}</div>
 `;
@@ -1570,10 +1566,10 @@ function buildEmailPlainText() {
   let txt = `${tA('dearCustomer')}\n\n${tA('emailIntroPart1')} ${tripLabel} ${tA('emailIntroPart2')}\n\n`;
   // Booking refs (if any)
   const b = r.booking || {};
-  if (b.wegoRef || b.wegoPnr || b.airlinePnr) {
+  if (b.internalRef || b.internalPnr || b.airlinePnr) {
     txt += `📋 ${tA('bookingBlockTitle').toUpperCase()}\n─────────────────────────────────────\n`;
-    txt += `   ${tA('wegoBookingRef')}: ${b.wegoRef || tA('notProvided')}\n`;
-    txt += `   ${tA('wegoPnr')}: ${b.wegoPnr || tA('notProvided')}\n`;
+    txt += `   ${tA('internalBookingRef')}: ${b.internalRef || tA('notProvided')}\n`;
+    txt += `   ${tA('internalPnr')}: ${b.internalPnr || tA('notProvided')}\n`;
     txt += `   ${tA('airlinePnr')}: ${b.airlinePnr || tA('notProvided')}\n\n`;
   }
   txt += plainTextLeg(r.outbound, r.tripType === 'RT' ? tA('legHeaderOutbound') : tA('legHeaderFlight'));
@@ -1587,10 +1583,6 @@ function buildEmailPlainText() {
   if (p.infantsSeat > 0) txt += `   • ${p.infantsSeat} × ${tA('infantsSeat')}\n`;
   txt += `   💺 ${tA('cabinClass')}: ${cabinLabel(p.cabin)}\n\n`;
   txt += `${tA('emailFooterIntro')}\n\n`;
-  txt += `📞 Egypt    : 0020 2 21279930\n`;
-  txt += `📞 UAE      : 0097 1 45810300\n`;
-  txt += `💬 WhatsApp : 00971 588 250 786\n`;
-  txt += `📧 Email    : CustomerSupport@wego.com\n\n`;
   txt += `${tA('emailClosing')}\n`;
   return txt;
 }
