@@ -41,9 +41,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 #topbar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 #topbar .page-title{font-size:15px;font-weight:700;color:var(--navy)}
 #topbar .page-sub{font-size:12px;color:var(--muted);margin-top:1px}
-.top-contacts{display:flex;gap:16px;align-items:center}
-.top-contact{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
-.top-contact strong{color:var(--text);font-weight:600}
 
 #content{padding:24px 28px;flex:1}
 
@@ -229,11 +226,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
       <div class="page-title" id="page-title">Select a Template</div>
       <div class="page-sub" id="page-sub">Choose from the sidebar to get started</div>
     </div>
-    <div class="top-contacts">
-      <div class="top-contact">📞 <strong>EG:</strong> 0020221279930</div>
-      <div class="top-contact">📞 <strong>UAE:</strong> 0097145810300</div>
-      <div class="top-contact">💬 <strong>WA:</strong> 00971588250786</div>
-    </div>
   </div>
   <div id="content">
     <div class="welcome" id="welcome">
@@ -247,9 +239,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 </div>
 
 <script>
-const CONTACTS = `📞 Egypt    : 0020221279930\n📞 UAE      : 0097145810300\n💬 WhatsApp : 00971588250786\n📧 Email    : CustomerSupport@wego.com`;
-const CONTACTS_AR = `📞 مصر         : 0020221279930\n📞 الإمارات      : 0097145810300\n💬 واتساب       : 00971588250786\n📧 البريد الإلكتروني : CustomerSupport@wego.com`;
-
 // ── TEMPLATES ────────────────────────────────────────────────────────────────
 const TEMPLATES = {
 
@@ -308,11 +297,10 @@ Kindly note that if any amount has been debited from your account, it will be au
 The refunded amount is ${v.amount}.
 
 Depending on your bank's processing time, it may take approximately 7–10 business days for the amount to reflect in your account.
-Should you require any further assistance or wish to proceed with an alternative booking, please feel free to contact us through the following channels:
-${CONTACTS}
+Should you require any further assistance or wish to proceed with an alternative booking, please don't hesitate to reach out.
 
 We remain at your service and look forward to assisting you.`; },
-    ar(v, sub){ 
+    ar(v, sub){
       const isDep = sub === 0;
       return `عزيزي العميل،
 
@@ -325,8 +313,7 @@ We remain at your service and look forward to assisting you.`; },
 المبلغ المسترد هو ${v.amount_ar}.
 
 اعتمادًا على وقت معالجة البنك الذي تتعامل معه، قد يستغرق الأمر ما يقرب من 7-10 أيام عمل حتى ينعكس المبلغ في حسابك.
-إذا كنت بحاجة إلى أي مساعدة إضافية أو ترغب في المضي قدمًا في حجز بديل، فلا تتردد في الاتصال بنا من خلال القنوات التالية:
-${CONTACTS_AR}
+إذا كنت بحاجة إلى أي مساعدة إضافية أو ترغب في المضي قدمًا في حجز بديل، فلا تتردد في التواصل معنا.
 
 نحن في خدمتكم دائمًا.`; }
   },
@@ -350,8 +337,7 @@ Please be advised that a refund has been successfully processed for the unused b
 The refunded amount is ${v.amount}.
 
 Kindly note that, depending on your bank's processing time, it may take approximately 7–10 business days for the amount to reflect in your account.
-Should you require any further assistance or wish to proceed with an alternative booking, please feel free to contact us through the following channels:
-${CONTACTS}
+Should you require any further assistance or wish to proceed with an alternative booking, please don't hesitate to reach out.
 
 We remain at your service and look forward to assisting you.`; },
     ar(v){ return `الموضوع: بخصوص طلب إضافة الأمتعة — ${v.ref}
@@ -364,8 +350,7 @@ We remain at your service and look forward to assisting you.`; },
 قيمة المبلغ المسترد هي ${v.amount_ar}.
 
 يرجى ملاحظة أنه وفقًا لإجراءات البنك الخاص بكم، قد يستغرق ظهور المبلغ في حسابكم مدة تتراوح من 7 إلى 10 أيام عمل.
-في حال احتجتم إلى أي مساعدة إضافية أو رغبتم في المتابعة بحجز بديل، يرجى التواصل معنا من خلال القنوات التالية:
-${CONTACTS_AR}
+في حال احتجتم إلى أي مساعدة إضافية أو رغبتم في المتابعة بحجز بديل، يرجى التواصل معنا.
 
 نحن في خدمتكم دائمًا.`; }
   },
@@ -392,8 +377,7 @@ Payment Link: ${v.link}
 Kindly note that the payment link is valid for 10 minutes only.
 We recommend completing the payment within this timeframe so we can finalize and confirm your reservation at the quoted fare.
 Once the payment has been successfully processed, the booking confirmation details will be sent to you promptly.
-Should you require any further assistance, please feel free to contact us through the following channels:
-${CONTACTS}
+Should you require any further assistance, please don't hesitate to reach out.
 
 We remain at your service and look forward to assisting you.`; },
     ar(v){ return `الموضوع: رابط الدفع الآمن ( المرجع: ${v.ref} ) — لإتمام الحجز
@@ -408,8 +392,7 @@ We remain at your service and look forward to assisting you.`; },
 يرجى العلم أن صلاحية رابط الدفع هي 10 دقائق فقط.
 لذا نوصي بإتمام عملية الدفع خلال هذه المدة حتى نتمكن من تثبيت السعر المعروض وتأكيد الحجز.
 بمجرد إتمام عملية الدفع بنجاح، سيتم إرسال تفاصيل تأكيد الحجز إليكم في أقرب وقت ممكن.
-إذا كنت بحاجة إلى أي مساعدة إضافية، فلا تتردد في الاتصال بنا من خلال القنوات التالية:
-${CONTACTS_AR}
+إذا كنت بحاجة إلى أي مساعدة إضافية، فلا تتردد في التواصل معنا.
 
 نقدّر ثقتكم.
 نحن في خدمتكم دائمًا.`; }
@@ -435,10 +418,9 @@ As a gesture of goodwill and to ensure your experience with us remains a positiv
 💰 Voucher Value   : ${v.vamount}
 📅 Valid Until      : ${v.expiry}
 
-You can apply this voucher directly at checkout on your next booking through Wego.
+You can apply this voucher directly at checkout on your next booking with us.
 
-Should you require any further assistance or wish to proceed with an alternative booking, please feel free to contact us through the following channels:
-${CONTACTS}
+Should you require any further assistance or wish to proceed with an alternative booking, please don't hesitate to reach out.
 
 We remain at your service and look forward to assisting you.`; },
     ar(v){ return `عزيزي العميل،
@@ -452,22 +434,21 @@ We remain at your service and look forward to assisting you.`; },
 💰 قيمة القسيمة  : ${v.vamount_ar}
 📅 صالحة حتى    : ${v.expiry}
 
-يمكنك تطبيق هذه القسيمة مباشرةً عند إتمام حجزك القادم عبر Wego.
+يمكنك تطبيق هذه القسيمة مباشرةً عند إتمام حجزك القادم معنا.
 
-إذا كنت بحاجة إلى أي مساعدة إضافية أو ترغب في المضي قدمًا في حجز بديل، فلا تتردد في الاتصال بنا من خلال القنوات التالية:
-${CONTACTS_AR}
+إذا كنت بحاجة إلى أي مساعدة إضافية أو ترغب في المضي قدمًا في حجز بديل، فلا تتردد في التواصل معنا.
 
 نحن في خدمتكم دائمًا.`; }
   },
 
   'booking-confirmed': {
     title: 'Booking Confirmed',
-    desc: 'Confirmation email with Wego PNR, Airline PNR, ticket number(s) & up to 3 passengers',
+    desc: 'Confirmation email with Booking Reference, Airline PNR, ticket number(s) & up to 3 passengers',
     icon: '✅',
     iconBg: '#dcfce7',
     fields: [
-      {id:'ref',     label:'Wego Booking Reference', ph:'WFSS2FPN9CY26', req:true, hint:'e.g. WFSS2FPN9CY26'},
-      {id:'wpnr',    label:'Wego PNR', ph:'GHGTR5', req:true, hint:'Wego internal record locator (the one used in the GDS)'},
+      {id:'ref',     label:'Booking Reference', ph:'WFSS2FPN9CY26', req:true, hint:'e.g. WFSS2FPN9CY26'},
+      {id:'wpnr',    label:'Internal PNR', ph:'GHGTR5', req:true, hint:'Internal record locator (the one used in the GDS)'},
       {id:'pnr',     label:'Airline PNR', ph:'DH3XJR', req:true, hint:'Airline record locator (the one customer uses on the airline website)'},
       {id:'ticket',  label:'Ticket Number 1', ph:'XXX-XXXXXXXXXX', req:true, hint:'e.g. 065-5805289241'},
       {id:'name',    label:'Passenger Name 1', ph:'MR. JOHN DOE', req:true, hint:'Full name as on ticket'},
@@ -482,29 +463,27 @@ ${CONTACTS_AR}
       let ticketLines = `• Ticket Number : ${v.ticket} - ${v.name}`;
       if (hasP2) ticketLines += `\n• Ticket Number : ${v.ticket2} - ${v.name2}`;
       if (hasP3) ticketLines += `\n• Ticket Number : ${v.ticket3} - ${v.name3}`;
-      return `Subject: Booking Confirmation – Wego Ref: ${v.ref}
+      return `Subject: Booking Confirmation – Ref: ${v.ref}
 
 Dear Valued Customer,
 
-Thank you for contacting Wego.
+Thank you for contacting us.
 
 We are pleased to inform you that your booking has been successfully confirmed. Please find your reservation details below:
 
-• Wego Booking Reference : ${v.ref}
-• Wego PNR : ${v.wpnr}
+• Booking Reference : ${v.ref}
+• Internal PNR : ${v.wpnr}
 • Airline PNR : ${v.pnr}
 ${ticketLines}
 
 For your convenience, your e-ticket has been attached to this email and has also been sent directly to your registered email address.
 
-Should you require any further assistance or have any inquiries regarding your booking, please do not hesitate to reach out to us through any of our support channels:
-
-${CONTACTS}
+Should you require any further assistance or have any inquiries regarding your booking, please do not hesitate to reach out to us.
 
 We remain at your service and look forward to assisting you.
 
 Best regards,
-Wego Customer Support Team`;
+Customer Support Team`;
     },
     ar(v){
       const hasP2 = !v.ticket2.startsWith('[') && !v.name2.startsWith('[');
@@ -512,29 +491,27 @@ Wego Customer Support Team`;
       let ticketLines = `• رقم التذكرة : ${v.ticket} - ${v.name}`;
       if (hasP2) ticketLines += `\n• رقم التذكرة : ${v.ticket2} - ${v.name2}`;
       if (hasP3) ticketLines += `\n• رقم التذكرة : ${v.ticket3} - ${v.name3}`;
-      return `الموضوع: تأكيد الحجز – رقم الحجز لدى Wego: ${v.ref}
+      return `الموضوع: تأكيد الحجز – رقم الحجز: ${v.ref}
 
 عزيزي العميل،
 
-شكرًا لتواصلك مع Wego.
+شكرًا لتواصلك معنا.
 
 يسرّنا إبلاغك بأنه قد تم تأكيد حجزك بنجاح. تجد تفاصيل حجزك فيما يلي:
 
-• رقم الحجز لدى Wego : ${v.ref}
-• رقم حجز التذكرة لدى Wego : ${v.wpnr}
+• رقم الحجز : ${v.ref}
+• الرقم المرجعي الداخلي : ${v.wpnr}
 • رقم حجز التذكرة لدى شركة الطيران : ${v.pnr}
 ${ticketLines}
 
 لمزيد من اليُسر، تم إرفاق تذكرتك الإلكترونية بهذه الرسالة، كما تم إرسالها مباشرةً إلى بريدك الإلكتروني المسجّل.
 
-إذا كنت بحاجة إلى أي مساعدة إضافية أو لديك أي استفسارات بخصوص حجزك، فلا تتردد في التواصل معنا عبر أي من قنوات الدعم التالية:
-
-${CONTACTS_AR}
+إذا كنت بحاجة إلى أي مساعدة إضافية أو لديك أي استفسارات بخصوص حجزك، فلا تتردد في التواصل معنا.
 
 نحن في خدمتكم دائمًا.
 
 مع أطيب التحيات،
-فريق دعم العملاء لدى Wego`;
+فريق دعم العملاء`;
     }
   },
 
@@ -551,13 +528,9 @@ ${CONTACTS_AR}
     en(v, sub){
       return `Dear Customer,
 
-Thank you for contacting Wego.
+Thank you for contacting us.
 
-Please contact our customer care in order to assist you regarding your request, for security purposes amendment and cancellation requests can only be processed by contacting our contact center.
-
-${CONTACTS}
-
-International charges may apply.
+Please contact our customer care team in order to assist you regarding your request. For security purposes, amendment and cancellation requests can only be processed by contacting our contact center directly.
 
 Our support team is available 24/7. Please note that call and chat wait times may be longer than usual due to high demand.
 
@@ -568,13 +541,9 @@ We remain at your service and look forward to assisting you.`;
     ar(v, sub){
       return `عزيزي العميل،
 
-شكرًا لتواصلك مع Wego.
+شكرًا لتواصلك معنا.
 
-يرجى التواصل مع خدمة العملاء لمساعدتك بشأن طلبك، حيث إنه لأسباب أمنية لا يمكن معالجة طلبات التعديل والإلغاء إلا من خلال التواصل مع مركز الاتصال الخاص بنا.
-
-${CONTACTS_AR}
-
-قد يتم تطبيق رسوم الاتصال الدولية.
+يرجى التواصل مع خدمة العملاء لمساعدتك بشأن طلبك، حيث إنه لأسباب أمنية لا يمكن معالجة طلبات التعديل والإلغاء إلا من خلال التواصل مع مركز الاتصال الخاص بنا مباشرةً.
 
 فريق الدعم لدينا متاح على مدار الساعة طوال أيام الأسبوع. يرجى العلم بأن أوقات انتظار المكالمات والدردشة قد تكون أطول من المعتاد نظرًا لارتفاع الطلب.
 
@@ -642,7 +611,6 @@ Best regards`; }
       {id:'new_dt',   label:"New Date & Time (or 'Cancelled')", ph:'10 Jan 2025 · 14:30', req:true},
     ],
     en(v, sub){
-      const c = CONTACTS;
       if (sub === 0) return `Dear Valued Customer,
 
 We hope this message finds you well.
@@ -655,11 +623,10 @@ We're reaching out to let you know that your airline has made an involuntary cha
 
 We completely understand this may affect your travel plans, and we're here to help you through the next steps.
 
-Please don't hesitate to reach out to our support team — we're available to assist you right away:
-${c}
+Please don't hesitate to reach out to our support team — we're available to assist you right away.
 
 Our team will do their best to find the most suitable solution for you as quickly as possible.
-Thank you for your patience and for choosing Wego.
+Thank you for your patience.
 
 We remain at your service and look forward to assisting you.`;
 
@@ -674,8 +641,7 @@ Your airline has issued an involuntary schedule change on your booking. Please r
 🔄 New Departure      : ${v.new_dt}
 ─────────────────────────────────
 
-To confirm your acceptance, request a rebooking, or discuss your options — please contact us directly:
-${c}
+To confirm your acceptance, request a rebooking, or discuss your options — please contact us directly.
 
 Please contact us at your earliest convenience so we can secure the best available option for you.
 
@@ -683,7 +649,7 @@ We remain at your service and look forward to assisting you.`;
 
       return `Dear Valued Customer,
 
-We are writing to formally notify you that the airline operating your flight has applied an involuntary schedule change to your reservation. This amendment was made at the airline's discretion and was not initiated by Wego.
+We are writing to formally notify you that the airline operating your flight has applied an involuntary schedule change to your reservation. This amendment was made at the airline's discretion and was not initiated by us.
 
 Booking Details:
 ──────────────────────────────────
@@ -692,17 +658,15 @@ Original Schedule : ${v.orig_dt}
 Revised Schedule  : ${v.new_dt}
 ──────────────────────────────────
 
-Wego remains committed to supporting you throughout this process. Our customer support team is readily available to discuss your available options, including rebooking or any applicable entitlements.
+We remain committed to supporting you throughout this process. Our customer support team is readily available to discuss your available options, including rebooking or any applicable entitlements.
 
-Please contact us at your earliest convenience through the following channels:
-${c}
+Please contact us at your earliest convenience.
 
 We apologize for any inconvenience this may cause and appreciate your understanding.
 
 We remain at your service and look forward to assisting you.`;
     },
     ar(v, sub){
-      const c = CONTACTS_AR;
       if (sub === 0) return `عزيزي العميل،
 
 نأمل أن تكون بخير.
@@ -715,11 +679,10 @@ We remain at your service and look forward to assisting you.`;
 
 ندرك تمامًا أن هذا قد يؤثر على خططك، ونحن هنا لمساعدتك في اتخاذ الخطوات التالية.
 
-لا تتردد في التواصل مع فريق الدعم لدينا:
-${c}
+لا تتردد في التواصل مع فريق الدعم لدينا.
 
 سيبذل فريقنا قصارى جهده لإيجاد الحل الأنسب لك في أقرب وقت.
-شكرًا لصبرك ولاختيارك Wego.
+شكرًا لصبرك.
 
 نحن في خدمتكم دائمًا.`;
 
@@ -734,8 +697,7 @@ ${c}
 🔄 الموعد الجديد  : ${v.new_dt}
 ──────────────────────────────
 
-لتأكيد موافقتك أو طلب إعادة الحجز أو مناقشة خياراتك، يرجى التواصل معنا مباشرةً:
-${c}
+لتأكيد موافقتك أو طلب إعادة الحجز أو مناقشة خياراتك، يرجى التواصل معنا مباشرةً.
 
 يرجى التواصل معنا في أقرب وقت ممكن لنتمكن من تأمين أفضل خيار متاح لك.
 
@@ -743,7 +705,7 @@ ${c}
 
       return `عزيزي العميل،
 
-نكتب إليك لإعلامك رسميًا بأن شركة الطيران المشغّلة لرحلتك قد أجرت تغييرًا غير طوعي على حجزك. وقد جاء هذا التعديل وفقًا لتقدير شركة الطيران ولم يصدر عن Wego.
+نكتب إليك لإعلامك رسميًا بأن شركة الطيران المشغّلة لرحلتك قد أجرت تغييرًا غير طوعي على حجزك. وقد جاء هذا التعديل وفقًا لتقدير شركة الطيران ولم يصدر عنا.
 
 تفاصيل الحجز:
 ──────────────────────────────
@@ -752,10 +714,9 @@ ${c}
 الجدول المعدّل : ${v.new_dt}
 ──────────────────────────────
 
-تظل Wego ملتزمة بدعمك طوال هذه العملية. فريق خدمة العملاء لدينا متاح للتباحث معك بشأن الخيارات المتاحة، بما في ذلك إعادة الحجز أو أي استحقاقات معمول بها.
+نظل ملتزمين بدعمك طوال هذه العملية. فريق خدمة العملاء لدينا متاح للتباحث معك بشأن الخيارات المتاحة، بما في ذلك إعادة الحجز أو أي استحقاقات معمول بها.
 
-يرجى التواصل معنا في أقرب وقت ممكن عبر أي من القنوات التالية:
-${c}
+يرجى التواصل معنا في أقرب وقت ممكن.
 
 نعتذر عن أي إزعاج قد يسببه هذا الأمر ونقدّر تفهمكم.
 
@@ -797,8 +758,7 @@ ${retText}
 Kindly note that since the refund on the ${refundedLeg} segment has already been processed and returned to your account, we no longer hold those funds on our side and are therefore unable to issue a new booking on your behalf. Should you wish to make a new reservation, you are most welcome to do so directly through our website.
 
 We sincerely apologize for the inconvenience and appreciate your kind understanding.
-Should you require any further assistance, please feel free to contact us through the following channels:
-${CONTACTS}
+Should you require any further assistance, please don't hesitate to reach out.
 
 We remain at your service and look forward to assisting you.`;
     },
@@ -824,8 +784,7 @@ ${retTextAr}
 نحيطكم علماً أنه نظراً لاسترداد مبلغ رحلة ${refundedLegAr} بالفعل وإعادته إلى حسابكم، فإننا لم نعد نحتفظ بذلك المبلغ من جانبنا، وبالتالي لا يمكننا إصدار حجز جديد نيابةً عنكم. وفي حال رغبتكم بإجراء حجز جديد، يسعدنا دعوتكم للقيام بذلك مباشرةً عبر موقعنا الإلكتروني.
 
 نعتذر بصدق عن أي إزعاج، ونشكر لكم حسن تفهمكم.
-إذا كنت بحاجة إلى أي مساعدة إضافية، فلا تتردد في الاتصال بنا من خلال القنوات التالية:
-${CONTACTS_AR}
+إذا كنت بحاجة إلى أي مساعدة إضافية، فلا تتردد في التواصل معنا.
 
 نحن في خدمتكم دائمًا.`;
     }

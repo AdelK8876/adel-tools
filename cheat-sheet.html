@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Refund & Fare Rules Cheat Sheet — Wego Tools</title>
+<title>Refund & Fare Rules Cheat Sheet</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -160,7 +160,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 <aside id="sidebar">
   <div id="sb-head">
     <div class="logo"><span>📋</span> Cheat Sheet</div>
-    <div class="sub">Wego · Refund & Fare Rules</div>
+    <div class="sub">Refund & Fare Rules</div>
   </div>
   <nav id="sb-nav"></nav>
 </aside>
@@ -242,7 +242,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
       <div class="form-group">
         <label>Detailed Rules <span class="helper">(full policy explanation)</span></label>
-        <textarea id="f-rules" placeholder="When booking fails on Wego with normal card payment, the amount is automatically refunded…" rows="4"></textarea>
+        <textarea id="f-rules" placeholder="When a booking fails with normal card payment, the amount is automatically refunded…" rows="4"></textarea>
       </div>
 
       <div class="form-group">
@@ -283,7 +283,7 @@ const CATEGORIES = {
   other:            { label:'Other',           icon:'📋', color:'#475569', bg:'#f1f5f9' },
 };
 
-// ── STARTER SCENARIOS (derived from canned responses — confirmed Wego policy) ──
+// ── STARTER SCENARIOS (derived from canned responses — confirmed policy) ──
 const STARTER_SCENARIOS = [
   {
     id:'sc-booking-failed-normal',
@@ -291,7 +291,7 @@ const STARTER_SCENARIOS = [
     title:'Booking Failed — Normal Payment',
     customerSays:'My booking failed and the money was deducted from my card. When will I get my refund?',
     quickAnswer:'The refund is processed automatically — you should see it back on your card within 7–10 business days.',
-    rules:'When a Wego booking fails with normal card payment, the deducted amount is refunded automatically to the original payment method. No customer action is needed. The 7–10 business day window depends on the customer\'s bank.',
+    rules:'When a booking fails with normal card payment, the deducted amount is refunded automatically to the original payment method. No customer action is needed. The 7–10 business day window depends on the customer\'s bank.',
     steps:'Confirm the booking is indeed failed (check status in the system).\nUse the "Booking Failed — One Way" canned response (Normal Payment variant).\nReassure the customer no action is needed on their side.\nIf customer reports no refund after 10 business days, escalate to finance team.',
     cannedResponse:'Booking Failed — One Way (Normal Payment)',
     warnings:'Always verify the payment method first — some third-party payment providers require the customer to follow up with them directly instead of us processing the refund.',
@@ -314,9 +314,9 @@ const STARTER_SCENARIOS = [
     category:'cancellation',
     title:'LCC Ticket — Cancellation Not Allowed',
     customerSays:'I want to cancel my flight on flydubai (or AirArabia/Flynas/FlyEgypt etc.) and get a refund.',
-    quickAnswer:'Low-cost carriers don\'t allow cancellation or refund on confirmed tickets — this is the airline\'s fare rule, not Wego\'s policy.',
-    rules:'LCCs (flydubai, Air Arabia, Flynas, FlyEgypt, Air Cairo, Jazeera, SalamAir, IndiGo, etc.) have strict no-refund/no-change policies on issued tickets, regardless of whether the ticket is used or unused. This restriction is set directly by the airline; Wego as the booking agent cannot override it.',
-    steps:'Verify the ticket is confirmed and on a low-cost carrier.\nUse the "LCC Cancellation Refusal" canned response.\nClearly explain it\'s the airline\'s policy, not Wego\'s.\nIf customer is on a SOOW with one leg confirmed and one failed, the failed leg amount may already be refunded — clarify both legs.\nOffer to help with a new booking through our website.',
+    quickAnswer:'Low-cost carriers don\'t allow cancellation or refund on confirmed tickets — this is the airline\'s fare rule, not ours.',
+    rules:'LCCs (flydubai, Air Arabia, Flynas, FlyEgypt, Air Cairo, Jazeera, SalamAir, IndiGo, etc.) have strict no-refund/no-change policies on issued tickets, regardless of whether the ticket is used or unused. This restriction is set directly by the airline; we, as the booking agent, cannot override it.',
+    steps:'Verify the ticket is confirmed and on a low-cost carrier.\nUse the "LCC Cancellation Refusal" canned response.\nClearly explain it\'s the airline\'s policy, not ours.\nIf customer is on a SOOW with one leg confirmed and one failed, the failed leg amount may already be refunded — clarify both legs.\nOffer to help with a new booking through our website.',
     cannedResponse:'LCC Cancellation Refusal — SOOW',
     warnings:'Be empathetic but firm — customers often push back. The rule is non-negotiable as it\'s an airline contract. Avoid promising any voucher unless authorised by team lead.',
     tags:['LCC','Cancellation','Non-refundable','Airline Policy']
@@ -327,7 +327,7 @@ const STARTER_SCENARIOS = [
     title:'Change or Cancel Request — Standard Process',
     customerSays:'I want to change/cancel my booking. Can you help?',
     quickAnswer:'For security reasons, all change and cancellation requests must go through our contact center. Please call us — agents on the line can verify and process it.',
-    rules:'Wego policy requires phone-based verification for any modifications to a booking. This protects customer accounts and ensures proper authentication. Email/chat-based changes are not permitted for amendment or cancellation.',
+    rules:'Our policy requires phone-based verification for any modifications to a booking. This protects customer accounts and ensures proper authentication. Email/chat-based changes are not permitted for amendment or cancellation.',
     steps:'Listen to the customer\'s request to understand the urgency.\nUse the "Change or Cancel Request" canned response.\nProvide all contact channels (phone is preferred).\nIf departure is within 24 hours, suggest contacting the airline directly for fastest resolution — they may have more authority for last-minute changes.',
     cannedResponse:'Change or Cancel Request',
     warnings:'Never process a change/cancel via chat or email — it\'s a security policy. Always direct to contact center even if the customer is frustrated.',
@@ -338,8 +338,8 @@ const STARTER_SCENARIOS = [
     category:'refund',
     title:'Voucher Compensation Case',
     customerSays:'(Agent decision after escalation: issue voucher as goodwill compensation)',
-    quickAnswer:'As a gesture of goodwill, we are issuing you a voucher of [amount], valid until [expiry], usable on your next booking with Wego.',
-    rules:'When a refund isn\'t possible (e.g., LCC ticket already issued) but goodwill compensation is appropriate based on customer experience or service issue, a voucher can be issued. Voucher is applied at checkout for the customer\'s next booking through Wego.',
+    quickAnswer:'As a gesture of goodwill, we are issuing you a voucher of [amount], valid until [expiry], usable on your next booking with us.',
+    rules:'When a refund isn\'t possible (e.g., LCC ticket already issued) but goodwill compensation is appropriate based on customer experience or service issue, a voucher can be issued. Voucher is applied at checkout for the customer\'s next booking through us.',
     steps:'Get voucher details (number, value, expiry) from team lead/manager — don\'t issue without authorisation.\nUse "Booking Failed — Voucher Compensation" canned response.\nSend voucher details to customer in writing (email).\nLog voucher number for tracking.',
     cannedResponse:'Booking Failed — Voucher Compensation',
     warnings:'Voucher amount and expiry must be approved. Never promise a voucher to a customer before getting approval. Voucher is for next booking — not refundable to original payment method.',
@@ -354,7 +354,7 @@ const STARTER_SCENARIOS = [
     rules:'When the airline involuntarily changes the flight time/route/cancels, the passenger has rights as set by airline policy and applicable regulations. Options vary by airline and severity (minor vs major change), but typically include rebooking, accepting the new flight, or refund eligibility.',
     steps:'Confirm the change details (original time, new time, route).\nCheck airline policy for major vs minor change classification (consult Airline Directory).\nUse "Involuntary Schedule Change" canned response — pick the appropriate tone (warm/direct/formal).\nDiscuss options with customer and document their choice.\nIf customer accepts, log acceptance. If they want rebooking, escalate to airline desk.',
     cannedResponse:'Involuntary Schedule Change (Warm / Direct / Formal)',
-    warnings:'This is the airline\'s responsibility, not Wego\'s. Don\'t take blame. Major changes (>2h delay or route change) usually qualify for full refund. Minor changes may not.',
+    warnings:'This is the airline\'s responsibility, not ours. Don\'t take blame. Major changes (>2h delay or route change) usually qualify for full refund. Minor changes may not.',
     tags:['Schedule Change','Airline','Involuntary','Rebooking']
   },
   {
@@ -375,7 +375,7 @@ const STARTER_SCENARIOS = [
     title:'Payment Link — Pending Confirmation',
     customerSays:'How do I pay for my booking? / I haven\'t paid yet, what\'s next?',
     quickAnswer:'I\'ll send you a secure payment link valid for 10 minutes. Once you complete payment, your booking is confirmed at the quoted fare.',
-    rules:'Wego uses 10-minute secure payment links to confirm bookings that haven\'t been paid yet. The customer must complete payment within the timeframe to lock in the fare; otherwise the link expires and the fare may change.',
+    rules:'We use 10-minute secure payment links to confirm bookings that haven\'t been paid yet. The customer must complete payment within the timeframe to lock in the fare; otherwise the link expires and the fare may change.',
     steps:'Generate the payment link from the system.\nUse the "Payment Link" canned response.\nSend link to customer via their preferred channel (email or WhatsApp).\nMonitor — if expired, regenerate (fare may change).\nOnce paid, send confirmation email using "Booking Confirmed" template.',
     cannedResponse:'Payment Link',
     warnings:'10 minutes is short — make sure customer is ready to pay before sending. Fare is not guaranteed if the link expires; a new search may show a different price.',
@@ -387,10 +387,10 @@ const STARTER_SCENARIOS = [
     title:'Booking Confirmed — Send Confirmation',
     customerSays:'Did my booking go through? Can you send me the confirmation and ticket?',
     quickAnswer:'Your booking is confirmed. I\'m sending you the full reservation details now, with the e-ticket attached.',
-    rules:'After successful booking, send confirmation email containing: Wego Booking Reference, Wego Ticket PNR, Airline Ticket PNR, ticket number(s) and passenger name(s). Attach the e-ticket PDF.',
+    rules:'After successful booking, send confirmation email containing: Booking Reference, Internal Ticket PNR, Airline Ticket PNR, ticket number(s) and passenger name(s). Attach the e-ticket PDF.',
     steps:'Confirm the booking is fully issued (PNR + ticket numbers issued).\nGather all reservation details.\nAttach the e-ticket PDF to the email.\nUse the "Booking Confirmed" canned response.\nFor multi-passenger bookings (groups/families), include each passenger\'s ticket number.',
     cannedResponse:'Booking Confirmed',
-    warnings:'Wego Ticket PNR and Airline Ticket PNR are the same value — don\'t confuse customers. Wego Ticket PNR is what we use in GDS; Airline Ticket PNR is what the customer uses on the airline\'s website. Verify the e-ticket attachment matches the booking.',
+    warnings:'Internal Ticket PNR and Airline Ticket PNR are the same value — don\'t confuse customers. Internal Ticket PNR is what we use in GDS; Airline Ticket PNR is what the customer uses on the airline\'s website. Verify the e-ticket attachment matches the booking.',
     tags:['Confirmation','Ticket Issued','Send Email']
   },
 ];
